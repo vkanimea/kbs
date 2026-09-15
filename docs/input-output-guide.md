@@ -343,5 +343,6 @@ LINK TYPES         Causes · Leads To · Depends On · CONSTRAINS · Related
                    (weekly · every session · daily)
 
 SUPPORT SCRIPTS    status.sh · auto-close.sh · due-actions.sh · topic-index.sh
+                   rag-index.sh · rag-query.sh
                    health-check.sh · chat-adapter.sh · chat-api-adapter.py
 ```

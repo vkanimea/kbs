@@ -133,6 +133,8 @@ Daily/weekly/monthly rituals: [docs/user-guide.md](docs/user-guide.md)
 
 **Local search index:** For 100+ topic KBs, `scripts/topic-index.sh` accelerates topic selection before LLM synthesis.
 
+**Semantic index (RAG):** Optional fuzzy retrieval over `wiki/topics/` — `scripts/rag-index.sh` / `rag-query.sh`, local Ollama embeddings, no pip deps. Index regenerable, built after each `hourly-ingest.sh` run; source of truth stays markdown + git.
+
 ---
 
 ## Relationship to Note Apps (Obsidian, Notion, Logseq)

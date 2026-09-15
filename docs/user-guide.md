@@ -87,6 +87,7 @@ Follow agents.md. Show me all pending approvals. Do not change anything.
 Status anytime: `~/kbs/scripts/status.sh`
 Due actions: `~/kbs/scripts/due-actions.sh`
 Topic search: `~/kbs/scripts/topic-index.sh "search term"`
+Semantic search (RAG): `~/kbs/scripts/rag-query.sh "phrase it any way"`
 
 ---
 

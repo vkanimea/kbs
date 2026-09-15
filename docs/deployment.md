@@ -117,6 +117,18 @@ For KBs with 100+ topics, use the lightweight index for rapid topic selection be
 
 This is not a replacement for LLM synthesis — it accelerates topic finding so the LLM focuses on reasoning, not scanning.
 
+## Semantic Retrieval (RAG)
+
+Optional, local-only semantic index over `wiki/topics/` — no pip dependencies, embeddings via Ollama (default `nomic-embed-text`). The index at `kb/<name>/rag-index/` is git-ignored and regenerable; markdown stays the source of truth.
+
+```bash
+~/kbs/scripts/rag-index.sh                    # rebuild semantic index (auto-runs after hourly-ingest)
+~/kbs/scripts/rag-query.sh "paraphrase here"  # fuzzy semantic lookup [top-k]
+KBS_RAG_MODEL=other ~/kbs/scripts/rag-index.sh  # override embedding model via env
+```
+
+Docker: compose wires host Ollama via `host.docker.internal` (default); a fully self-contained `ollama/ollama` sidecar is included as a commented block in `docker/docker-compose.yml` — set `OLLAMA_HOST=http://ollama:11434`.
+
 ## Upgrading
 
 ```bash

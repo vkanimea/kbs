@@ -46,7 +46,7 @@ Compared against: Obsidian/Logseq, Notion AI, the Reddit "Second Brain" pattern,
 | O2 | Browser extension: one-click chat/article capture | ~2 days | High — biggest daily-friction win |
 | O3 | VS Code extension: capture + close from the command palette | ~3 days | Medium |
 | O4 | Voice pipeline: Whisper → INBOX entry | ~1 day | Medium |
-| O5 | ~~RAG retrieval layer~~ — partially addressed by `topic-index.sh` | Low | High for 100+ topic KBs |
+| O5 | ~~RAG retrieval layer~~ — shipped: `scripts/rag.py` (Ollama embeddings, stdlib) + `rag-index/query.sh`, rebuilt after hourly-ingest | Done | High for 100+ topic KBs |
 | O6 | Community template library (starter KBs per domain) | Low | Medium — starter KB shipped |
 | O7 | Enterprise: SharePoint/Copilot sync | High | Niche |
 | O8 | Mobile app or PWA for capture | High | High — biggest remaining gap |
