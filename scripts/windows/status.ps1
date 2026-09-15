@@ -1,13 +1,14 @@
-# KBS Status Check — Windows PowerShell (V0.113)
+﻿# KBS Status Check - Windows PowerShell (V0.113)
 # Usage: powershell -File $env:USERPROFILE\kbs\scripts\windows\status.ps1
+# NOTE: ASCII-only output for PowerShell 5.1 console compatibility.
 
 $KbsPath = if ($env:KBS_PATH) { $env:KBS_PATH } else { "$env:USERPROFILE\kbs" }
 $KbName  = if ($env:KB_NAME)  { $env:KB_NAME  } else { "main" }
 
 Write-Host ""
-Write-Host "╔══════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║         Knowledge Base System — Status              ║" -ForegroundColor Cyan
-Write-Host "╚══════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host "==============================================" -ForegroundColor Cyan
+Write-Host "    Knowledge Base System - Status (V0.113)   " -ForegroundColor Cyan
+Write-Host "==============================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "KBS Path : $KbsPath" -ForegroundColor Yellow
 Write-Host "KB Name  : $KbName"  -ForegroundColor Yellow
@@ -15,22 +16,22 @@ Write-Host ""
 
 # Topics
 $Topics = (Get-ChildItem "$KbsPath\kb\$KbName\wiki\topics\*.md" -ErrorAction SilentlyContinue).Count
-Write-Host "📚 Topics           : $Topics"
+Write-Host "[TOPICS]       : $Topics"
 
 # Raw files
 $Raw = (Get-ChildItem "$KbsPath\kb\$KbName\raw" -Include "*.md","*.txt" -Recurse -ErrorAction SilentlyContinue).Count
-Write-Host "📄 Raw files        : $Raw"
+Write-Host "[RAW]          : $Raw"
 
 # Outputs
 $Outputs = (Get-ChildItem "$KbsPath\kb\$KbName\outputs\*.md" -ErrorAction SilentlyContinue).Count
-Write-Host "📤 Outputs          : $Outputs"
+Write-Host "[OUTPUTS]      : $Outputs"
 
 # Pending
 $Pending = (Get-ChildItem "$KbsPath\kb\$KbName\outputs\pending-*.md" -ErrorAction SilentlyContinue).Count
 if ($Pending -gt 0) {
-    Write-Host "⏳ Pending approvals: $Pending — review needed" -ForegroundColor Red
+    Write-Host "[PENDING]      : $Pending - review needed" -ForegroundColor Red
 } else {
-    Write-Host "⏳ Pending approvals: $Pending" -ForegroundColor Green
+    Write-Host "[PENDING]      : $Pending" -ForegroundColor Green
 }
 
 # Failures
@@ -38,11 +39,11 @@ $FailuresPath = "$KbsPath\FAILURES.md"
 if (Test-Path $FailuresPath) {
     $Failures   = (Select-String -Path $FailuresPath -Pattern "^## 20" -ErrorAction SilentlyContinue).Count
     $Unresolved = (Select-String -Path $FailuresPath -Pattern "Resolved: No" -ErrorAction SilentlyContinue).Count
-    Write-Host "⚠️  Total failures  : $Failures"
+    Write-Host "[FAILURES]     : $Failures"
     if ($Unresolved -gt 0) {
-        Write-Host "   Unresolved     : $Unresolved — action needed" -ForegroundColor Red
+        Write-Host "  Unresolved  : $Unresolved - action needed" -ForegroundColor Red
     } else {
-        Write-Host "   Unresolved     : 0" -ForegroundColor Green
+        Write-Host "  Unresolved  : 0" -ForegroundColor Green
     }
 }
 
@@ -50,7 +51,7 @@ if (Test-Path $FailuresPath) {
 $CareerPath = "$KbsPath\CAREER.md"
 if (Test-Path $CareerPath) {
     $Achievements = (Select-String -Path $CareerPath -Pattern "^## 20" -ErrorAction SilentlyContinue).Count
-    Write-Host "🏆 Achievements    : $Achievements"
+    Write-Host "[ACHIEVEMENTS] : $Achievements"
 }
 
 # Last session close
@@ -60,10 +61,10 @@ if (Test-Path $LogPath) {
                     Where-Object { $_.Line -notmatch '\[ts\]' }
     $LastMatch = $CloseMatches | Select-Object -Last 1
     if ($LastMatch) {
-        $LastClose = ($LastMatch.Line -split "\|")[0].Trim()
-        Write-Host "🕐 Last close      : $LastClose"
+        $LastClose = $LastMatch.Line.Substring(0, $LastMatch.Line.IndexOf("|")).Trim()
+        Write-Host "[LAST CLOSE]   : $LastClose"
     } else {
-        Write-Host "🕐 Last close      : Never — run session close today" -ForegroundColor Red
+        Write-Host "[LAST CLOSE]   : Never - run session close today" -ForegroundColor Red
     }
 }
 
@@ -72,9 +73,9 @@ $hcFile = Get-ChildItem "$KbsPath\kb\$KbName\outputs\health-check-*.md" -ErrorAc
           Sort-Object Name | Select-Object -Last 1
 if ($hcFile) {
     $LatestHC = $hcFile.Name -replace "health-check-","" -replace "\.md$",""
-    Write-Host "🔍 Last health check: $LatestHC"
+    Write-Host "[HEALTH CHECK] : $LatestHC"
 } else {
-    Write-Host "🔍 Last health check: None — run monthly health check" -ForegroundColor Yellow
+    Write-Host "[HEALTH CHECK] : None - run monthly health check" -ForegroundColor Yellow
 }
 
 # Close streak
@@ -85,11 +86,11 @@ if (Test-Path $StreakFile) {
     if ($content -match '^\d+$') { $Streak = [int]$content }
 }
 if ($Streak -gt 2) {
-    Write-Host "🔥 Close streak    : $Streak days" -ForegroundColor Green
+    Write-Host "[STREAK]       : $Streak days" -ForegroundColor Green
 } elseif ($Streak -gt 0) {
-    Write-Host "✅ Close streak    : $Streak days" -ForegroundColor Green
+    Write-Host "[STREAK]       : $Streak days" -ForegroundColor Green
 } else {
-    Write-Host "⚠️  Close streak    : Broken or not started" -ForegroundColor Red
+    Write-Host "[STREAK]       : Broken or not started" -ForegroundColor Red
 }
 
 Write-Host ""
