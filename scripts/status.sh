@@ -1,5 +1,5 @@
 #!/bin/bash
-# KBS Status Check — Linux/macOS (V0.113)
+# KBS Status Check — Linux/macOS (V0.114)
 # Usage: ~/kbs/scripts/status.sh
 
 KBS_PATH="${KBS_PATH:-$HOME/kbs}"

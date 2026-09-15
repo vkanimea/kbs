@@ -1,4 +1,4 @@
-# CAREER.md — Work Log & Portfolio (V0.113)
+# CAREER.md — Work Log & Portfolio (V0.114)
 
 Auto-populated by every session close — at least one entry per close. Technical, process, and learning wins all count. Never delete old achievements.
 

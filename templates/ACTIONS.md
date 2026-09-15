@@ -1,4 +1,4 @@
-# ACTIONS.md — Commitments & Next Steps (V0.113)
+# ACTIONS.md — Commitments & Next Steps (V0.114)
 
 Captures decisions to act — tasks and commitments that come out of sessions. Different from DECISIONS.md (which captures why you chose something) and INBOX.md (which captures questions and observations). An action is a commitment with a due date. When completed, its outcome feeds SUCCESSES.md or FAILURES.md — closing the learning loop.
 

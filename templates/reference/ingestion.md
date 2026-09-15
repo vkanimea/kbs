@@ -1,4 +1,4 @@
-# Reference: Ingestion (V0.113)
+# Reference: Ingestion (V0.114)
 
 Loaded when the owner runs: `Follow agents.md. Ingest [KB]`
 
@@ -128,6 +128,7 @@ Create typed wiki links based on what was extracted. Always create the strongest
 Rules:
 - All links are bidirectional in the wiki
 - Prefer Causes / Leads To / Depends On over Related
+- Optional semantic assist: run `scripts/rag-query.sh "<entry summary>"` to surface candidate existing topics when the link target is unclear; verify each candidate before linking (retrieval proposes, the gate decides)
 - Never invent a Causes link when only Related is justified
 - Document entries: create links between chunks AND between chunks and existing wiki topics
 - Voice entries: same as Narrative after cleaning

@@ -1,4 +1,4 @@
-# Reference: Health Check (V0.113)
+# Reference: Health Check (V0.114)
 
 Loaded when the owner runs: `Follow agents.md and SYSTEM.md. Run health check on [KB]`
 

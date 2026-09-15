@@ -1,4 +1,4 @@
-﻿# KBS Status Check - Windows PowerShell (V0.113)
+﻿# KBS Status Check - Windows PowerShell (V0.114)
 # Usage: powershell -File $env:USERPROFILE\kbs\scripts\windows\status.ps1
 # NOTE: ASCII-only output for PowerShell 5.1 console compatibility.
 
@@ -7,7 +7,7 @@ $KbName  = if ($env:KB_NAME)  { $env:KB_NAME  } else { "main" }
 
 Write-Host ""
 Write-Host "==============================================" -ForegroundColor Cyan
-Write-Host "    Knowledge Base System - Status (V0.113)   " -ForegroundColor Cyan
+Write-Host "    Knowledge Base System - Status (V0.114)   " -ForegroundColor Cyan
 Write-Host "==============================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "KBS Path : $KbsPath" -ForegroundColor Yellow

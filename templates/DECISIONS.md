@@ -1,4 +1,4 @@
-# DECISIONS.md — Judgement Log (V0.113)
+# DECISIONS.md — Judgement Log (V0.114)
 
 **The LLM never writes here. Human only.** Session close proposes decision text in the close report — you read it, edit if needed, and paste what you agree with. This is the most human file in the system.
 

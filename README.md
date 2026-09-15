@@ -1,6 +1,6 @@
-# Knowledge Base System (KBS) V0.113
+# Knowledge Base System (KBS) V0.114
 
-[![Version](https://img.shields.io/badge/version-0.113-blue.svg)](https://github.com/vkanimea/kbs)
+[![Version](https://img.shields.io/badge/version-0.114-blue.svg)](https://github.com/vkanimea/kbs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg)]()
 
@@ -15,22 +15,22 @@ Inspired by Andrej Karpathy's "second brain" pattern — minus the dependencies.
 
 ---
 
-## What's New in V0.113
+## What's New in V0.114
 
-V0.113 restructures the system around **lazy-loaded instructions** — the same principle the system applies to knowledge, now applied to itself:
+V0.114 adds **semantic retrieval (RAG alongside)** — optional fuzzy search over `wiki/topics/`, while markdown + git stays the system of record:
 
-- `agents.md` cut from ~3,000 to ~800 words — the LLM holds only the core rules in context
-- Operation detail moved to `reference/` modules, loaded **only when that operation runs**
-- Single source of truth: activity levels live in SYSTEM.md, prompts in PROMPTS.md — everywhere else links
-- All template examples clearly marked `<!-- EXAMPLE — delete -->` with placeholder dates
-- Installers fail loudly on incomplete installs (no silent stubs)
-- CI checks actually fail the build, including an agents.md bloat guard (<1200 words enforced)
+- `scripts/rag.py` — stdlib-only index/query, Ollama embeddings (default `nomic-embed-text`), no pip deps
+- `scripts/rag-index.sh` / `rag-query.sh` — thin wrappers; index at `kb/<name>/rag-index/` (git-ignored, regenerable)
+- `hourly-ingest.sh` post-step rebuilds the RAG index automatically (logged as `RAG_INDEX`)
+- Query procedure now 7 steps — step 0 optional semantic lookup; link rules in `reference/ingestion.md` gained a semantic assist
+- Docker compose wires host Ollama (option A) or a self-contained sidecar (option B, commented)
+- git credential helper serves `GITHUB_TOKEN` from the git-ignored `.env`
 
 ---
 
 ## Why This Is Different
 
-| Feature | Traditional Notes | KBS V0.113 |
+| Feature | Traditional Notes | KBS V0.114 |
 |---------|-------------------|-----------|
 | Linking | Manual | Typed relationships (Causes, Leads To, Depends On) |
 | Learning | Success only | Success + failure, with confidence downgrades |

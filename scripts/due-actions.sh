@@ -1,5 +1,5 @@
 #!/bin/bash
-# KBS Due Actions Reminder — V0.113
+# KBS Due Actions Reminder — V0.114
 # Checks ACTIONS.md for overdue items and emits desktop notifications.
 # Schedule: 0 9 * * 1-5 ~/kbs/scripts/due-actions.sh
 #

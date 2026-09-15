@@ -1,5 +1,5 @@
 #!/bin/bash
-# KBS Hourly Ingest — V0.113
+# KBS Hourly Ingest — V0.114
 # Checks raw/ for unprocessed files, ingests them, moves to raw/processed/.
 # Post-step: rebuilds the RAG semantic index (scripts/rag-index.sh) if available.
 # Schedule: 0 * * * * ~/kbs/scripts/hourly-ingest.sh

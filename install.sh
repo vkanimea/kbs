@@ -1,5 +1,5 @@
 #!/bin/bash
-# Knowledge Base System (KBS) V0.113 — Linux/macOS Installer
+# Knowledge Base System (KBS) V0.114 — Linux/macOS Installer
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/vkanimea/kbs/main/install.sh | bash
 #   KBS_PATH=/custom/path KB_NAME=myproject ./install.sh
@@ -19,7 +19,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-/dev/null}")" 2>/dev/null && pwd 
 
 echo -e "${CYAN}"
 echo "╔══════════════════════════════════════════════════════════════╗"
-echo "║       Knowledge Base System (KBS) V0.113 Installer            ║"
+echo "║       Knowledge Base System (KBS) V0.114 Installer            ║"
 echo "╚══════════════════════════════════════════════════════════════╝"
 echo -e "${NC}"
 echo -e "${YELLOW}📍 Path : $KBS_PATH${NC}"
@@ -79,7 +79,7 @@ fi
 
 # ─── Generated files ───────────────────────────────────────────────────────────
 cat > "$KBS_PATH/.env.template" <<EOF
-# KBS V0.113 — copy to .env and edit
+# KBS V0.114 — copy to .env and edit
 KBS_PATH=$KBS_PATH
 KB_NAME=$KB_NAME
 AUTO_INGEST=false
@@ -89,7 +89,7 @@ EOF
 
 cat >> "$KBS_PATH/log.md" <<EOF
 
-## $TIMESTAMP | SYSTEM_CREATED | V0.113 | Path: $KBS_PATH | KB: $KB_NAME
+## $TIMESTAMP | SYSTEM_CREATED | V0.114 | Path: $KBS_PATH | KB: $KB_NAME
 EOF
 
 cat > "$KBS_PATH/.gitignore" <<'EOF'

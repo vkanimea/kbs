@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-KBS Universal Chat API Adapter — V0.113
+KBS Universal Chat API Adapter — V0.114
 
 Captures chat output from any LLM API via webhook or stdin.
 
@@ -180,7 +180,7 @@ def run_server(port: int = 8080):
 
 # ─── Entry Point ───────────────────────────────────────────────────────────────
 def main():
-    parser = argparse.ArgumentParser(description="KBS Chat API Adapter V0.113")
+    parser = argparse.ArgumentParser(description="KBS Chat API Adapter V0.114")
     parser.add_argument("--server", action="store_true", help="Run as HTTP webhook server")
     parser.add_argument("--port",   type=int, default=8080, help="Webhook server port")
     parser.add_argument("--file",   type=str, help="Path to transcript file")

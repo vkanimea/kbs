@@ -1,4 +1,4 @@
-# Reference: Chat Input Processing (V0.113)
+# Reference: Chat Input Processing (V0.114)
 
 Loaded when the owner runs: `Follow agents.md. Process CHAT_INBOX.md`
 

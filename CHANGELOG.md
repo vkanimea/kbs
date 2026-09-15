@@ -1,6 +1,6 @@
 # KBS Changelog
 
-## Unreleased — Semantic Retrieval (RAG alongside, Option 1)
+## V0.114 — Semantic Retrieval (RAG alongside)
 - **scripts/rag.py** — stdlib-only semantic index/query over `wiki/topics/`, using Ollama embeddings (default `nomic-embed-text`); no pip dependencies
 - **scripts/rag-index.sh / rag-query.sh** — thin wrappers; index stored at `kb/<name>/rag-index/index.json` (git-ignored, regenerable)
 - **install.sh** — installs the RAG scripts; generated `.gitignore` now excludes `kb/*/rag-index/`
@@ -8,7 +8,7 @@
 - **hourly-ingest.sh** — post-ingest step now rebuilds the RAG index automatically (logged as `RAG_INDEX` in log.md); cron entry documented at top of the script
 - **docker/docker-compose.yml** — Option A wires host Ollama via `host.docker.internal`; Option B (self-contained ollama sidecar) documented as commented block; RAG defaults overridable via `KBS_RAG_MODEL` env
 
-## V0.113 — Journal Operations & Hourly Automation (former V11.4)
+## V0.114 — Journal Operations & Hourly Automation (former V11.4)
 - **Journal** — reflective capture grounded in wiki context, pattern detection across entries
 - **Journal operations** in agents.md — save, read context, respond grounded, detect patterns
 - **Hourly ingestion script** — `scripts/hourly-ingest.sh` checks raw/ and auto-processes
