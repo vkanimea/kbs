@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  kbs:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: kbs
+    volumes:
+      - kbs-wiki:/root/kbs/kb/main/wiki
+      - kbs-raw:/root/kbs/kb/main/raw
+      - kbs-outputs:/root/kbs/kb/main/outputs
+    ports:
+      - "8080:8080"    # chat API adapter webhook
+    stdin_open: true
+    tty: true
+
+volumes:
+  kbs-wiki:
+  kbs-raw:
+  kbs-outputs:

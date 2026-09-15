@@ -1,0 +1,68 @@
+# KBS Changelog
+
+## V11.4 — Journal Operations & Hourly Automation
+- **Journal** — reflective capture grounded in wiki context, pattern detection across entries
+- **Journal operations** in agents.md — save, read context, respond grounded, detect patterns
+- **Hourly ingestion script** — `scripts/hourly-ingest.sh` checks raw/ and auto-processes
+- **raw/processed/** routing — processed files moved out of raw/ to prevent re-ingestion
+- **YouTube ingestion** — `scripts/youtube-ingest.sh` downloads + transcribes + creates INBOX entry
+- **YouTube Transcript** custom style in Style Registry
+
+## V11.3 — Style Registry & Input Architecture
+- **Input Style Registry** — 5 built-in + extensible custom styles
+- **6-step ingestion pipeline** with explicit style detection order
+- **Held entry state** — Rapid entries never rejected, expanded at session close
+- **Link-richness curve** — typed links depend on pattern completeness
+- **Activity Level × Style processing matrix**
+
+## V11.1 — Solution Patterns & Success Learning
+- **Solution pattern** with Conditions, Limitations, Evidence
+- **SUCCESSES.md** + confidence upgrades
+- **ACTIONS.md** commitment tracking
+- **8 patterns** formalized
+- **Format map** and **root ideas** documented
+
+## V11.0 — Lazy-Loaded Instructions
+- `agents.md` cut from ~3,000 to ~800 words
+- Operation detail moved to `reference/` modules
+- Single-source restructure: SYSTEM.md, PROMPTS.md as canonical
+- CI enforces agents.md < 1,200 words
+
+## V10.3 — INBOX Quality Framework
+- INBOX entry quality rating: Excellent / Good / Poor / Held
+- Quality rejections with rewrite suggestions
+
+## V10.2 — Session Close & Career Portfolio
+- Session close command formalized
+- **CAREER.md** auto-maintained portfolio
+
+## V10.1 — Failure Learning
+- **FAILURES.md** structured failure capture
+- Confidence downgrades on disproven claims
+
+## V10 — Universal Chat Adapter
+- CHAT_INBOX.md for AI conversation capture
+- Chat adapter scripts (bash + Python webhook)
+
+## V9 — Failure Containment & Scope
+- HIGH-confidence definition tightened
+- Scope boundary rules
+- Failure containment with automatic level downgrade
+
+## V8 — Activity Levels
+- Levels 0→3 with explicit upgrade criteria
+- Graduated autonomy path
+
+## V7 — Interaction Model & Prompts
+- Component thresholds
+- Human-quality limitations documented
+
+## V6 — Confidence Scoring & Validation
+- Confidence levels: LOW / MEDIUM / HIGH
+- Evidence-based confidence movement
+
+## V1–V5 — Core Pipeline
+- Ingestion pipeline
+- Typed relationships (Causes, Leads To, Depends On, CONSTRAINS, Related)
+- Wiki topic format
+- raw/ → wiki/ → outputs/ flow

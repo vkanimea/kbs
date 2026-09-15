@@ -1,0 +1,20 @@
+# KBS — Repository ignore rules
+
+# Environment
+.env
+.env.local
+
+# Logs & temp
+*.log
+*.tmp
+__pycache__/
+*.pyc
+
+# Installed KB data (from local install.sh runs)
+kbs-test/
+kb/
+examples-tmp/
+
+# OS cruft
+.DS_Store
+Thumbs.db

@@ -1,0 +1,178 @@
+name: Validate KBS Installation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+
+  validate-linux:
+    name: Linux Install & Verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run installer (local copy mode)
+        run: |
+          chmod +x install.sh
+          KBS_PATH=${{ runner.temp }}/kbs-test ./install.sh
+
+      - name: Verify directory structure (fails on missing)
+        run: |
+          set -e
+          for d in kb/main/wiki/topics kb/main/raw kb/main/outputs scripts reference; do
+            test -d "${{ runner.temp }}/kbs-test/$d" || { echo "❌ missing dir: $d"; exit 1; }
+            echo "✅ $d"
+          done
+
+      - name: Verify core files (fails on missing)
+        run: |
+          set -e
+          for f in agents.md SYSTEM.md DECISIONS.md INBOX.md CHAT_INBOX.md FAILURES.md SUCCESSES.md CAREER.md ACTIONS.md JOURNAL.md log.md PROMPTS.md CHANGELOG.md; do
+            test -f "${{ runner.temp }}/kbs-test/$f" || { echo "❌ missing: $f"; exit 1; }
+            echo "✅ $f"
+          done
+
+      - name: Verify reference modules (fails on missing)
+        run: |
+          set -e
+          for f in session-close.md ingestion.md chat-input.md failures.md successes.md actions.md journal.md health-check.md; do
+            test -f "${{ runner.temp }}/kbs-test/reference/$f" || { echo "❌ missing: reference/$f"; exit 1; }
+            echo "✅ reference/$f"
+          done
+
+      - name: Verify scripts executable
+        run: |
+          set -e
+          test -x "${{ runner.temp }}/kbs-test/scripts/chat-adapter.sh" || exit 1
+          test -x "${{ runner.temp }}/kbs-test/scripts/status.sh" || exit 1
+          test -x "${{ runner.temp }}/kbs-test/scripts/auto-close.sh" || exit 1
+          test -x "${{ runner.temp }}/kbs-test/scripts/due-actions.sh" || exit 1
+          test -x "${{ runner.temp }}/kbs-test/scripts/topic-index.sh" || exit 1
+          test -x "${{ runner.temp }}/kbs-test/scripts/youtube-ingest.sh" || exit 1
+          test -x "${{ runner.temp }}/kbs-test/scripts/hourly-ingest.sh" || exit 1
+          test -f "${{ runner.temp }}/kbs-test/scripts/chat-api-adapter.py" || exit 1
+          echo "✅ scripts verified"
+
+      - name: Run status check
+        run: KBS_PATH=${{ runner.temp }}/kbs-test bash ${{ runner.temp }}/kbs-test/scripts/status.sh
+
+      - name: Verify audit log
+        run: grep -q "SYSTEM_CREATED" "${{ runner.temp }}/kbs-test/log.md"
+
+      - name: Test chat adapter end-to-end
+        run: |
+          set -e
+          echo "Test insight from Claude about knowledge systems" | \
+            KBS_PATH=${{ runner.temp }}/kbs-test bash ${{ runner.temp }}/kbs-test/scripts/chat-adapter.sh
+          grep -q "Conversation with Claude" "${{ runner.temp }}/kbs-test/CHAT_INBOX.md" || exit 1
+          ls "${{ runner.temp }}/kbs-test/kb/main/raw/chat-transcripts/" | grep -q "chat-" || exit 1
+          echo "✅ chat adapter end-to-end OK"
+
+  validate-windows:
+    name: Windows Install & Verify
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run installer (local copy mode)
+        shell: pwsh
+        run: .\install.ps1 -KbsPath "$env:RUNNER_TEMP\kbs-test"
+
+      - name: Verify structure and files (fails on missing)
+        shell: pwsh
+        run: |
+          $base = "$env:RUNNER_TEMP\kbs-test"
+          $dirs = @("kb\main\wiki\topics","kb\main\raw","kb\main\outputs","scripts","reference")
+          foreach ($d in $dirs) {
+            if (-not (Test-Path "$base\$d")) { Write-Host "❌ missing dir: $d"; exit 1 }
+            Write-Host "✅ $d"
+          }
+          $files = @("agents.md","SYSTEM.md","DECISIONS.md","INBOX.md","CHAT_INBOX.md","FAILURES.md","SUCCESSES.md","CAREER.md","ACTIONS.md","JOURNAL.md","log.md","PROMPTS.md","CHANGELOG.md")
+          foreach ($f in $files) {
+            if (-not (Test-Path "$base\$f")) { Write-Host "❌ missing: $f"; exit 1 }
+            Write-Host "✅ $f"
+          }
+          $refs = @("session-close.md","ingestion.md","chat-input.md","failures.md","successes.md","actions.md","journal.md","health-check.md")
+          foreach ($f in $refs) {
+            if (-not (Test-Path "$base\reference\$f")) { Write-Host "❌ missing: reference/$f"; exit 1 }
+            Write-Host "✅ reference/$f"
+          }
+
+      - name: Run Windows status check
+        shell: pwsh
+        run: |
+          $env:KBS_PATH = "$env:RUNNER_TEMP\kbs-test"
+          powershell -File "$env:RUNNER_TEMP\kbs-test\scripts\windows\status.ps1"
+
+  validate-content:
+    name: Validate Content & Syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: agents.md required sections (fails on missing)
+        run: |
+          set -e
+          for s in "The 10 Rules" "Query Process" "Wiki Page Format" "Confidence Movement" "Boundaries"; do
+            grep -q "$s" templates/agents.md || { echo "❌ agents.md missing: $s"; exit 1; }
+            echo "✅ $s"
+          done
+
+      - name: agents.md conditions rule for HIGH claims (fails on missing)
+        run: |
+          grep -q "Conditions column mandatory for HIGH claims" templates/agents.md || { echo "❌ condition rule missing"; exit 1; }
+          echo "✅ HIGH claims condition rule"
+
+      - name: agents.md stays lean (under 1200 words)
+        run: |
+          WORDS=$(wc -w < templates/agents.md)
+          echo "agents.md: $WORDS words"
+          test "$WORDS" -lt 1200 || { echo "❌ agents.md has bloated past 1200 words — move detail to reference/"; exit 1; }
+
+      - name: SYSTEM.md owns activity levels (fails on missing)
+        run: |
+          set -e
+          for s in "Activity Levels" "Scope Boundary" "Failure Containment" "Learning Triggers" "Metrics Targets"; do
+            grep -q "$s" templates/SYSTEM.md || { echo "❌ SYSTEM.md missing: $s"; exit 1; }
+            echo "✅ $s"
+          done
+
+      - name: Reference modules complete (fails on missing)
+        run: |
+          set -e
+          grep -q "10-Step Close" templates/reference/session-close.md || exit 1
+          grep -q "6-Step Pipeline" templates/reference/ingestion.md || exit 1
+          grep -q "confidence = LOW\|Default confidence = LOW\|LOW" templates/reference/chat-input.md || exit 1
+          grep -q "HIGH | MEDIUM" templates/reference/failures.md || exit 1
+          grep -q "Orphan topics" templates/reference/health-check.md || exit 1
+          grep -q "confidence upgrade" templates/reference/successes.md || exit 1
+          grep -q "Route the outcome" templates/reference/actions.md || exit 1
+          grep -q "Journal Operations" templates/reference/journal.md || exit 1
+          echo "✅ reference modules verified"
+
+      - name: Examples are clearly marked
+        run: |
+          set -e
+          for f in templates/INBOX.md templates/FAILURES.md templates/CAREER.md templates/DECISIONS.md templates/JOURNAL.md; do
+            grep -q "EXAMPLE — delete" "$f" || { echo "❌ $f example not marked"; exit 1; }
+            echo "✅ $f examples marked"
+          done
+
+      - name: Script syntax (fails on error)
+        run: |
+          set -e
+          bash -n install.sh
+          bash -n scripts/chat-adapter.sh
+          bash -n scripts/status.sh
+          bash -n scripts/health-check.sh
+          bash -n scripts/auto-close.sh
+          bash -n scripts/due-actions.sh
+          bash -n scripts/topic-index.sh
+          bash -n scripts/youtube-ingest.sh
+          bash -n scripts/hourly-ingest.sh
+          python3 -m py_compile scripts/chat-api-adapter.py
+          echo "✅ all scripts pass syntax check"
