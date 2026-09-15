@@ -56,19 +56,22 @@ if (Test-Path $CareerPath) {
 # Last session close
 $LogPath = "$KbsPath\log.md"
 if (Test-Path $LogPath) {
-    $LastClose = (Select-String -Path $LogPath -Pattern "SESSION_CLOSE" -ErrorAction SilentlyContinue |
-                  Select-Object -Last 1)?.Line -split "\|" | Select-Object -First 1
-    if ($LastClose) {
-        Write-Host "🕐 Last close      : $($LastClose.Trim())"
+    $CloseMatches = Select-String -Path $LogPath -Pattern "SESSION_CLOSE" -ErrorAction SilentlyContinue |
+                    Where-Object { $_.Line -notmatch '\[ts\]' }
+    $LastMatch = $CloseMatches | Select-Object -Last 1
+    if ($LastMatch) {
+        $LastClose = ($LastMatch.Line -split "\|")[0].Trim()
+        Write-Host "🕐 Last close      : $LastClose"
     } else {
         Write-Host "🕐 Last close      : Never — run session close today" -ForegroundColor Red
     }
 }
 
 # Last health check
-$LatestHC = (Get-ChildItem "$KbsPath\kb\$KbName\outputs\health-check-*.md" -ErrorAction SilentlyContinue |
-             Sort-Object Name | Select-Object -Last 1)?.Name -replace "health-check-","" -replace ".md",""
-if ($LatestHC) {
+$hcFile = Get-ChildItem "$KbsPath\kb\$KbName\outputs\health-check-*.md" -ErrorAction SilentlyContinue |
+          Sort-Object Name | Select-Object -Last 1
+if ($hcFile) {
+    $LatestHC = $hcFile.Name -replace "health-check-","" -replace "\.md$",""
     Write-Host "🔍 Last health check: $LatestHC"
 } else {
     Write-Host "🔍 Last health check: None — run monthly health check" -ForegroundColor Yellow
@@ -76,7 +79,11 @@ if ($LatestHC) {
 
 # Close streak
 $StreakFile = "$KbsPath\.close-streak"
-$Streak = if (Test-Path $StreakFile) { [int](Get-Content $StreakFile -Raw).Trim() } else { 0 }
+$Streak = 0
+if (Test-Path $StreakFile) {
+    $content = (Get-Content $StreakFile -Raw).Trim()
+    if ($content -match '^\d+$') { $Streak = [int]$content }
+}
 if ($Streak -gt 2) {
     Write-Host "🔥 Close streak    : $Streak days" -ForegroundColor Green
 } elseif ($Streak -gt 0) {
