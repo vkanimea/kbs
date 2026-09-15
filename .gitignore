@@ -15,6 +15,9 @@ kbs-test/
 kb/
 examples-tmp/
 
+# Obsidian vault config (if any KB folder is opened as an Obsidian vault)
+.obsidian/
+
 # OS cruft
 .DS_Store
 Thumbs.db

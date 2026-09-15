@@ -4,9 +4,14 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg)]()
 
-A **governed, evolving knowledge graph with controllable autonomy** — plain-markdown knowledge that learns from successes *and* failures, compounds every session, and auto-maintains your career portfolio. Works with any LLM.
+An **agnostic, self-improving second brain** — a governed, evolving knowledge graph that learns from successes *and* failures, compounds every session, and improves not just what it knows, but how it runs.
 
-Inspired by Andrej Karpathy's "second brain" pattern.
+**Agnostic by design:**
+- **No LLM lock-in** — plain-text instructions that any LLM follows: Claude, GPT, Gemini, Ollama, or whatever comes next. Switching providers means zero migration.
+- **No app lock-in** — knowledge lives in plain markdown + git, fully yours. Obsidian, Notion, and Logseq are optional read-only viewers, never the system of record.
+- **Self-improving** — failure learning, confidence scoring, and session-close compounding; even its own instructions are lazy-loaded and refined, the same way its knowledge is.
+
+Inspired by Andrej Karpathy's "second brain" pattern — minus the dependencies.
 
 ---
 
@@ -31,7 +36,9 @@ V0.113 restructures the system around **lazy-loaded instructions** — the same 
 | Learning | Success only | Success + failure, with confidence downgrades |
 | Automation | None or all | Activity Levels 0→3, trust-gated |
 | Career tracking | Manual | Auto-maintained via session close |
-| LLM | Locked-in | Any: Claude, GPT, Gemini, Ollama |
+| LLM provider | Locked-in | Any: Claude, GPT, Gemini, Ollama |
+| Note app | Locked-in | Any — Obsidian/Notion as optional viewers, never the store |
+| Self-improvement | None | Core feature — refines its knowledge *and* its own instructions |
 | Format | Often proprietary | Plain markdown, git-friendly |
 
 ---
@@ -122,7 +129,15 @@ Daily/weekly/monthly rituals: [docs/user-guide.md](docs/user-guide.md)
 
 **Starter KB:** 20 pre-built cross-linked topics demonstrate wiki structure, confidence levels, and typed relationships. Copy and explore before writing your own.
 
+**Self-improving system:** The same principles it applies to knowledge — lazy loading, failure learning, compounding — are applied to its own instructions: `agents.md` stays at ~800 words with a CI-enforced bloat guard (<1,200 words); operation detail lives in `reference/` and loads only when an operation runs.
+
 **Local search index:** For 100+ topic KBs, `scripts/topic-index.sh` accelerates topic selection before LLM synthesis.
+
+---
+
+## Relationship to Note Apps (Obsidian, Notion, Logseq)
+
+KBS is not a note-taking app — and it doesn't need one. The knowledge base is plain markdown at `kb/main/wiki/topics/`. Want a visual graph? Open that folder as a **read-only Obsidian vault** — but never edit there. All writes flow through KBS's governed INBOX pipeline so quality gating, typed links, and the audit trail stay intact. Any viewer that reads markdown works; none of them becomes the system of record.
 
 ---
 
