@@ -1,5 +1,11 @@
 # KBS Changelog
 
+## Unreleased — Semantic Retrieval (RAG alongside, Option 1)
+- **scripts/rag.py** — stdlib-only semantic index/query over `wiki/topics/`, using Ollama embeddings (default `nomic-embed-text`); no pip dependencies
+- **scripts/rag-index.sh / rag-query.sh** — thin wrappers; index stored at `kb/<name>/rag-index/index.json` (git-ignored, regenerable)
+- **install.sh** — installs the RAG scripts; generated `.gitignore` now excludes `kb/*/rag-index/`
+- Retrieval layer remains disposable; markdown + git is the system of record
+
 ## V0.113 — Journal Operations & Hourly Automation (former V11.4)
 - **Journal** — reflective capture grounded in wiki context, pattern detection across entries
 - **Journal operations** in agents.md — save, read context, respond grounded, detect patterns

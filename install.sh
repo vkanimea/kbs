@@ -34,7 +34,7 @@ echo -e "${GREEN}✅ Directories created${NC}"
 # ─── File installer: local copy if available, else download; abort on failure ──
 TEMPLATES=(agents.md SYSTEM.md DECISIONS.md INBOX.md CHAT_INBOX.md FAILURES.md SUCCESSES.md CAREER.md ACTIONS.md JOURNAL.md PROMPTS.md log.md)
 REFERENCES=(session-close.md ingestion.md chat-input.md failures.md successes.md actions.md journal.md health-check.md)
-SCRIPTS=(chat-adapter.sh chat-api-adapter.py health-check.sh status.sh auto-close.sh due-actions.sh topic-index.sh youtube-ingest.sh hourly-ingest.sh)
+SCRIPTS=(chat-adapter.sh chat-api-adapter.py health-check.sh status.sh auto-close.sh due-actions.sh topic-index.sh youtube-ingest.sh hourly-ingest.sh rag.py rag-index.sh rag-query.sh)
 
 FAILED=0
 install_file() {
@@ -97,6 +97,7 @@ cat > "$KBS_PATH/.gitignore" <<'EOF'
 *.log
 *.tmp
 kb/*/wiki/snapshots/
+kb/*/rag-index/
 EOF
 
 # ─── Done ──────────────────────────────────────────────────────────────────────
