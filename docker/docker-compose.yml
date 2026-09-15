@@ -6,6 +6,11 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     container_name: kbs
+    # RAG embeddings: reach host Ollama (option A) — set KBS_RAG_MODEL if not nomic-embed-text
+    environment:
+      - OLLAMA_HOST=http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - kbs-wiki:/root/kbs/kb/main/wiki
       - kbs-raw:/root/kbs/kb/main/raw
@@ -15,7 +20,17 @@ services:
     stdin_open: true
     tty: true
 
+  # ─── Option B: fully self-contained embeddings sidecar (uncomment) ─────────
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: kbs-ollama
+  #   volumes:
+  #     - ollama-models:/root/.ollama
+  #   # then point kbs at it instead:
+  #   #   OLLAMA_HOST=http://ollama:11434
+
 volumes:
   kbs-wiki:
   kbs-raw:
   kbs-outputs:
+  # ollama-models:

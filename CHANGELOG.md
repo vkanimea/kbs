@@ -6,6 +6,7 @@
 - **install.sh** — installs the RAG scripts; generated `.gitignore` now excludes `kb/*/rag-index/`
 - Retrieval layer remains disposable; markdown + git is the system of record
 - **hourly-ingest.sh** — post-ingest step now rebuilds the RAG index automatically (logged as `RAG_INDEX` in log.md); cron entry documented at top of the script
+- **docker/docker-compose.yml** — Option A wires host Ollama via `host.docker.internal`; Option B (self-contained ollama sidecar) documented as commented block; RAG defaults overridable via `KBS_RAG_MODEL` env
 
 ## V0.113 — Journal Operations & Hourly Automation (former V11.4)
 - **Journal** — reflective capture grounded in wiki context, pattern detection across entries
