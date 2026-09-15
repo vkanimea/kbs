@@ -5,6 +5,7 @@
 - **scripts/rag-index.sh / rag-query.sh** — thin wrappers; index stored at `kb/<name>/rag-index/index.json` (git-ignored, regenerable)
 - **install.sh** — installs the RAG scripts; generated `.gitignore` now excludes `kb/*/rag-index/`
 - Retrieval layer remains disposable; markdown + git is the system of record
+- **hourly-ingest.sh** — post-ingest step now rebuilds the RAG index automatically (logged as `RAG_INDEX` in log.md); cron entry documented at top of the script
 
 ## V0.113 — Journal Operations & Hourly Automation (former V11.4)
 - **Journal** — reflective capture grounded in wiki context, pattern detection across entries

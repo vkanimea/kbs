@@ -1,6 +1,7 @@
 #!/bin/bash
 # KBS Hourly Ingest — V0.113
 # Checks raw/ for unprocessed files, ingests them, moves to raw/processed/.
+# Post-step: rebuilds the RAG semantic index (scripts/rag-index.sh) if available.
 # Schedule: 0 * * * * ~/kbs/scripts/hourly-ingest.sh
 #
 # Usage: ~/kbs/scripts/hourly-ingest.sh
@@ -42,6 +43,16 @@ echo "$UNPROCESSED" | while read -r f; do
 done
 
 echo "[$TIMESTAMP] HOURLY_INGEST | $KB_NAME | Complete — $COUNT files moved to processed/" >> "$LOG"
+
+# ─── Post-ingest: rebuild RAG semantic index (best effort) ────────────────────
+RAG_INDEX="$KBS_PATH/scripts/rag-index.sh"
+if [ -x "$RAG_INDEX" ]; then
+  if timeout 600 "$RAG_INDEX" 2>&1; then
+    echo "[$TIMESTAMP] RAG_INDEX | $KB_NAME | re-indexed topics" >> "$LOG"
+  else
+    echo "[$TIMESTAMP] RAG_INDEX | $KB_NAME | FAILED (Ollama unreachable?)" >> "$LOG"
+  fi
+fi
 
 # ─── Optional: Automated LLM call (requires LLM CLI) ──────────────────────────
 # Uncomment and configure for your LLM CLI tool (e.g., Anthropic CLI, llm by Simon Willison):
