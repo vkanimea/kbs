@@ -1,4 +1,4 @@
-# INBOX.md — Capture Stream (V11.3)
+# INBOX.md — Capture Stream (V0.113)
 
 The default entry point for everything. Just write — the system detects your input style automatically and processes it correctly. No prefix required.
 

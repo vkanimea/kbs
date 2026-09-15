@@ -1,5 +1,5 @@
 #!/bin/bash
-# KBS Health Check Runner — V11.3
+# KBS Health Check Runner — V0.113
 # Schedule monthly: 0 10 1 * * ~/kbs/scripts/health-check.sh
 #
 # This script sends a desktop notification reminding you to run the health check.

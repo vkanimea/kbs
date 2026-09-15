@@ -1,5 +1,5 @@
 #!/bin/bash
-# KBS Hourly Ingest — V11.4
+# KBS Hourly Ingest — V0.113
 # Checks raw/ for unprocessed files, ingests them, moves to raw/processed/.
 # Schedule: 0 * * * * ~/kbs/scripts/hourly-ingest.sh
 #

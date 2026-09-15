@@ -1,8 +1,8 @@
 FROM alpine:latest
 
 LABEL maintainer="KBS Contributors"
-LABEL version="11.3"
-LABEL description="Knowledge Base System V11.3 — The governed, evolving knowledge graph"
+LABEL version="0.113"
+LABEL description="Knowledge Base System V0.113 — The governed, evolving knowledge graph"
 
 # Install dependencies
 RUN apk add --no-cache \
@@ -43,4 +43,4 @@ EXPOSE 8080
 VOLUME ["/root/kbs/kb/main/wiki", "/root/kbs/kb/main/raw", "/root/kbs/kb/main/outputs"]
 
 # Default command: show status
-CMD ["/bin/bash", "-c", "/root/kbs/scripts/status.sh && echo '' && echo 'KBS V11.3 Ready.' && echo 'Run: Follow llm.md. Close session for main' && /bin/bash"]
+CMD ["/bin/bash", "-c", "/root/kbs/scripts/status.sh && echo '' && echo 'KBS V0.113 Ready.' && echo 'Run: Follow llm.md. Close session for main' && /bin/bash"]

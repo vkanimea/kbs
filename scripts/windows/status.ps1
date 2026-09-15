@@ -1,4 +1,4 @@
-# KBS Status Check — Windows PowerShell (V11.3)
+# KBS Status Check — Windows PowerShell (V0.113)
 # Usage: powershell -File $env:USERPROFILE\kbs\scripts\windows\status.ps1
 
 $KbsPath = if ($env:KBS_PATH) { $env:KBS_PATH } else { "$env:USERPROFILE\kbs" }

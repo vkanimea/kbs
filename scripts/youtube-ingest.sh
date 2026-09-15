@@ -1,5 +1,5 @@
 #!/bin/bash
-# KBS YouTube Ingest — V11.3
+# KBS YouTube Ingest — V0.113
 # Downloads audio from a YouTube URL, transcribes with Whisper (if available),
 # and creates an INBOX entry pointing to the transcript.
 #

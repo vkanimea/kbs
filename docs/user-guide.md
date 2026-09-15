@@ -1,4 +1,4 @@
-# KBS User Guide — V11.3
+# KBS User Guide — V0.113
 
 > **A session without a close is a session without learning.**
 

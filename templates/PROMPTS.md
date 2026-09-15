@@ -1,4 +1,4 @@
-# PROMPTS.md — Canonical Prompt Reference (V11.4)
+# PROMPTS.md — Canonical Prompt Reference (V0.113)
 
 Single source of truth for all prompts. Replace `[KB]` with your knowledge base name (default `main`).
 

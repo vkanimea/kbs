@@ -1,5 +1,5 @@
 #!/bin/bash
-# KBS Auto-Close Helper — V11.3
+# KBS Auto-Close Helper — V0.113
 # Generates a minimal close report and tracks streaks.
 # Run manually when you missed a close, or schedule via cron for a nudge.
 #

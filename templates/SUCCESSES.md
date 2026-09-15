@@ -1,4 +1,4 @@
-# SUCCESSES.md — Learning From What Worked (V11.3)
+# SUCCESSES.md — Learning From What Worked (V0.113)
 
 The mirror of FAILURES.md. Captures validated wins, confirmed predictions, and solutions that worked — with the conditions under which they work and the conditions under which they do not. Without this file, the system can only downgrade confidence when things fail. It can never upgrade confidence when things are validated.
 

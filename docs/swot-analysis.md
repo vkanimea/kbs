@@ -1,4 +1,4 @@
-# KBS SWOT Analysis — V11.3
+# KBS SWOT Analysis — V0.113
 
 Compared against: Obsidian/Logseq, Notion AI, the Reddit "Second Brain" pattern, and vector-RAG systems.
 
@@ -18,7 +18,7 @@ Compared against: Obsidian/Logseq, Notion AI, the Reddit "Second Brain" pattern,
 
 **S6 — INBOX quality gate.** Entries rated at ingestion; poor entries rejected with a rewrite suggestion. Prevents garbage from entering the graph. Unique among compared systems.
 
-**S7 — Lazy-loaded instructions (V11).** An ~800-word core file plus on-demand reference modules keeps the LLM's per-session instruction load small, which measurably improves rule adherence in long instruction sets. The CI enforces the core file stays under 1,200 words.
+**S7 — Lazy-loaded instructions (introduced V11, current V0.113).** An ~800-word core file plus on-demand reference modules keeps the LLM's per-session instruction load small, which measurably improves rule adherence in long instruction sets. The CI enforces the core file stays under 1,200 words.
 
 **S8 — Plain text, audited, recoverable.** Markdown + git + append-only log + snapshots. Survives any technology change; every action traceable.
 
@@ -69,7 +69,7 @@ Compared against: Obsidian/Logseq, Notion AI, the Reddit "Second Brain" pattern,
 
 ## Capability Matrix
 
-| Capability | Obsidian | Notion AI | Reddit Pattern | RAG | KBS V11.3 |
+| Capability | Obsidian | Notion AI | Reddit Pattern | RAG | KBS V0.113 |
 |------------|---------|-----------|----------------|-----|---------|
 | Activity levels | — | — | — | — | ✅ |
 | Failure learning | — | — | — | — | ✅ (+ implicit detection) |
@@ -92,7 +92,7 @@ Compared against: Obsidian/Logseq, Notion AI, the Reddit "Second Brain" pattern,
 
 ## Assessment
 
-KBS V11.4 is **production-ready architecture with reflective practice and automation**. The design problems identified in V10.3 — instruction bloat, duplication drift, fictional example data, dishonest installer fallbacks, decorative CI — are resolved. The starter KB, auto-close streaks, due-action reminders, topic index, frontmatter override, journal operations, and hourly ingestion address the most critical onboarding, adherence, and engagement gaps.
+KBS V0.113 is **production-ready architecture with reflective practice and automation**. The design problems identified in V10.3 — instruction bloat, duplication drift, fictional example data, dishonest installer fallbacks, decorative CI — are resolved. The starter KB, auto-close streaks, due-action reminders, topic index, frontmatter override, journal operations, and hourly ingestion address the most critical onboarding, adherence, and engagement gaps.
 
 The remaining weaknesses are primarily ecosystem: mobile capture (W4) and browser extension (O2) are the highest-leverage next investments. The architecture itself — activity levels, failure learning, typed reasoning, lazy-loaded instructions, journal grounded in wiki — is stable and validated.
 

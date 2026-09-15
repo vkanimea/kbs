@@ -1,4 +1,4 @@
-# Knowledge Base System (KBS) V11.3 — Windows PowerShell Installer
+# Knowledge Base System (KBS) V0.113 — Windows PowerShell Installer
 # Usage:
 #   powershell -ExecutionPolicy Bypass -File install.ps1
 #   powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/vkanimea/kbs/main/install.ps1 | iex"
@@ -20,7 +20,7 @@ $Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 $ScriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { "" }
 
 Write-Host "╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║       Knowledge Base System (KBS) V11.3 Installer            ║" -ForegroundColor Cyan
+Write-Host "║       Knowledge Base System (KBS) V0.113 Installer            ║" -ForegroundColor Cyan
 Write-Host "╚══════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
 Write-Host "📍 Path : $KbsPath" -ForegroundColor Yellow
 Write-Host "📚 KB   : $KbName"  -ForegroundColor Yellow
@@ -90,7 +90,7 @@ if ($script:Failed) {
 
 # ─── Generated files ───────────────────────────────────────────────────────────
 @"
-# KBS V11.3 — copy to .env and edit
+# KBS V0.113 — copy to .env and edit
 KBS_PATH=$KbsPath
 KB_NAME=$KbName
 AUTO_INGEST=false
@@ -98,7 +98,7 @@ LLM_CLIENT=claude
 ACTIVITY_LEVEL=0
 "@ | Out-File "$KbsPath\.env.template" -Encoding utf8
 
-Add-Content "$KbsPath\log.md" "`n## $Timestamp | SYSTEM_CREATED | V11.3 | Path: $KbsPath | KB: $KbName"
+Add-Content "$KbsPath\log.md" "`n## $Timestamp | SYSTEM_CREATED | V0.113 | Path: $KbsPath | KB: $KbName"
 
 ".env`n*.log`n*.tmp`nkb/*/wiki/snapshots/" | Out-File "$KbsPath\.gitignore" -Encoding utf8
 

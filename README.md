@@ -1,6 +1,6 @@
-# Knowledge Base System (KBS) V11.3
+# Knowledge Base System (KBS) V0.113
 
-[![Version](https://img.shields.io/badge/version-11.0-blue.svg)](https://github.com/vkanimea/kbs)
+[![Version](https://img.shields.io/badge/version-0.113-blue.svg)](https://github.com/vkanimea/kbs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg)]()
 
@@ -10,9 +10,9 @@ Inspired by Andrej Karpathy's "second brain" pattern.
 
 ---
 
-## What's New in V11.3
+## What's New in V0.113
 
-V11 restructures the system around **lazy-loaded instructions** — the same principle the system applies to knowledge, now applied to itself:
+V0.113 restructures the system around **lazy-loaded instructions** — the same principle the system applies to knowledge, now applied to itself:
 
 - `agents.md` cut from ~3,000 to ~800 words — the LLM holds only the core rules in context
 - Operation detail moved to `reference/` modules, loaded **only when that operation runs**
@@ -25,7 +25,7 @@ V11 restructures the system around **lazy-loaded instructions** — the same pri
 
 ## Why This Is Different
 
-| Feature | Traditional Notes | KBS V11.3 |
+| Feature | Traditional Notes | KBS V0.113 |
 |---------|-------------------|-----------|
 | Linking | Manual | Typed relationships (Causes, Leads To, Depends On) |
 | Learning | Success only | Success + failure, with confidence downgrades |

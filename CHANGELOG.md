@@ -1,6 +1,6 @@
 # KBS Changelog
 
-## V11.4 — Journal Operations & Hourly Automation
+## V0.113 — Journal Operations & Hourly Automation (former V11.4)
 - **Journal** — reflective capture grounded in wiki context, pattern detection across entries
 - **Journal operations** in agents.md — save, read context, respond grounded, detect patterns
 - **Hourly ingestion script** — `scripts/hourly-ingest.sh` checks raw/ and auto-processes
