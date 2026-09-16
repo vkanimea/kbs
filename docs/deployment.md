@@ -22,7 +22,23 @@ git clone https://github.com/vkanimea/kbs.git && cd kbs/docker
 docker compose up -d
 docker compose exec kbs bash
 ```
-The compose file ([docker/docker-compose.yml](../docker/docker-compose.yml)) persists wiki, raw, and outputs as named volumes and exposes port 8080 for the chat webhook.
+The compose file ([docker/docker-compose.yml](../docker/docker-compose.yml)) uses the **system/data separation**: the image carries the *system*, and your *data* lives in a host directory bind-mounted at `/root/kbs` (default `<repo>/docker/kbs`; set `KBS_HOME` to move it). Port 8080 is exposed for the chat webhook.
+
+**Make the data directory your private repo** — it is a complete KBS instance, so the V0.115 backup pattern applies unchanged:
+```bash
+cd kbs/docker/kbs          # the bind-mounted instance
+cp .env.template .env      # add GITHUB_TOKEN
+# create a PRIVATE remote, then:
+git init && git add -A && git commit -m "KBS data initial"
+git remote add origin https://github.com/<you>/<kbs-data>.git
+git config credential.helper '!bash scripts/git-credential-env.sh'
+git push -u origin master
+```
+Schedule the host-side backup (runs against the bind mount, no in-container cron needed):
+```cron
+45 23 * * * cd /path/to/kbs/docker/kbs && ./scripts/nightly-backup.sh >/dev/null 2>&1
+```
+On every container start the entrypoint **refreshes system files** (`scripts/`, `reference/`, `agents.md`, `PROMPTS.md`, `CHANGELOG.md`, `VERSION`) from the image and **preserves your files** (`INBOX.md`, `FAILURES.md`, `SUCCESSES.md`, `ACTIONS.md`, `DECISIONS.md`, `SYSTEM.md`, `kb/`, `.env`, …) — data is never overwritten.
 
 **The installer aborts loudly on any failed file** — you will never get a silently incomplete install.
 
@@ -131,11 +147,17 @@ Docker: compose wires host Ollama via `host.docker.internal` (default); a fully 
 
 ## Upgrading
 
+**Native install**
 ```bash
-tar -czf kbs-pre-upgrade.tar.gz ~/kbs        # backup first
 cd /path/to/cloned/kbs && git pull && ./install.sh
 ```
-Your wiki, raw files, and capture-file contents are preserved; template files are refreshed. Diff your INBOX/FAILURES/CAREER files after upgrade if you've customised their headers.
+Wiki and raw files are preserved. **Caution:** `install.sh` overwrites the capture files (`INBOX.md`, `FAILURES.md`, `SUCCESSES.md`, `ACTIONS.md`, `DECISIONS.md`, `JOURNAL.md`, `CAREER.md`, `log.md`) from templates — commit your instance to git first (see [backup-and-restore.md](backup-and-restore.md)) so any lost content is recoverable.
+
+**Docker install**
+```bash
+git pull && cd docker && docker compose build && docker compose up -d
+```
+The rebuild refreshes the system files from the new image; everything in the bind-mounted data directory is untouched. No backup step needed — but keeping the data dir in git (above) is still recommended.
 
 ---
 
@@ -151,10 +173,13 @@ Your wiki, raw files, and capture-file contents are preserved; template files ar
 | Streak not tracking | Ensure `~/kbs/log.md` exists and has `SESSION_CLOSE` entries |
 | Due actions not notifying | Check `~/kbs/ACTIONS.md` uses `Due: YYYY-MM-DD` format |
 | Docker build fails | Ensure Docker is running; `docker system prune` |
+| Docker data not visible on host | Set `KBS_HOME` — default bind mount is `<repo>/docker/kbs` |
 
 ## Uninstall
 
 ```bash
-rm -rf ~/kbs
-docker compose -f docker/docker-compose.yml down -v    # if using Docker
+rm -rf ~/kbs                                            # native install
+cd docker && docker compose down                        # Docker: stop container
+rm -rf kbs                                              # Docker: remove the bind-mounted data dir
 ```
+Docker no longer uses named volumes, so `down -v` is not required.

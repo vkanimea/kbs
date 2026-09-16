@@ -56,6 +56,7 @@ echo -e "${CYAN}📝 Installing templates...${NC}"
 for f in "${TEMPLATES[@]}"; do install_file "templates/$f" "$KBS_PATH/$f"; done
 for f in "${REFERENCES[@]}"; do install_file "templates/reference/$f" "$KBS_PATH/reference/$f"; done
 install_file "CHANGELOG.md" "$KBS_PATH/CHANGELOG.md"
+install_file "VERSION" "$KBS_PATH/VERSION"
 
 echo -e "${CYAN}🔧 Installing scripts...${NC}"
 for f in "${SCRIPTS[@]}"; do install_file "scripts/$f" "$KBS_PATH/scripts/$f"; done

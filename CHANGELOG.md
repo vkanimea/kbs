@@ -5,6 +5,12 @@
 - **docs/backup-and-restore.md** — the git-remote backup pattern: private data repo vs public system repo, what a clone restores vs what you rebuild (.env, RAG indexes, cron), restore procedure, operational notes
 - deployment.md backup section superseded — tarball copies replaced by the versioned git-remote pattern (see docs/backup-and-restore.md)
 - Version strings stamped repo-wide (docs, templates, scripts, installers, Dockerfile) — historical entries in this changelog and README's "What's New" sections intentionally keep their original version
+- **Docker: system/data separation** — image carries the system payload (`/opt/kbs-system`); data lives in a host bind mount (`${KBS_HOME:-./kbs}:/root/kbs`); entrypoint refreshes system files and preserves user files. Replaces named volumes (wiki/raw/outputs only), which silently dropped capture files and non-main KBs on rebuild
+- **docker/docker-entrypoint.sh** — seed-if-missing for user files, refresh for system files; `tini` as PID 1
+- **.dockerignore** — keeps `.git`, `.env`, `kb/`, and the host data dir out of the build context
+- **install.sh** — now installs `VERSION` (introspection) and is committed executable (fix: `./install.sh` failed with *Permission denied* on a fresh clone); same fix for `chat-adapter.sh`, `chat-api-adapter.py`, `health-check.sh`, `status.sh`
+- **VERSION** file added at repo root and in instances
+- deployment.md — Docker install now documents the private-data-repo + host-side backup pattern, Docker upgrade path, and the native-upgrade overwrite caution
 
 ## V0.114 — Semantic Retrieval (RAG alongside)
 - **scripts/rag.py** — stdlib-only semantic index/query over `wiki/topics/`, using Ollama embeddings (default `nomic-embed-text`); no pip dependencies

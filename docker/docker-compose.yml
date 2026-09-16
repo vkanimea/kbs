@@ -1,20 +1,33 @@
 version: '3.8'
 
+# KBS — system (image) / data (bind mount) separation
+#
+#   SYSTEM = the image, built from the public repo. Upgrade with:
+#              git pull && docker compose build && docker compose up -d
+#   DATA   = ./kbs on the host (bind mount). Make it YOUR private git repo and
+#            back it up with the host-side nightly-backup.sh (see docs/backup-and-restore.md).
+#
+# Set KBS_HOME to use a different host directory:
+#   KBS_HOME=~/my-kbs docker compose up -d
+
 services:
   kbs:
     build:
       context: ..
       dockerfile: docker/Dockerfile
+    image: kbs:0.115
     container_name: kbs
-    # RAG embeddings: reach host Ollama (option A) — set KBS_RAG_MODEL if not nomic-embed-text
     environment:
+      - KBS_PATH=/root/kbs
+      - KB_NAME=main
+      # RAG embeddings: reach host Ollama (option A) — set KBS_RAG_MODEL if not nomic-embed-text
       - OLLAMA_HOST=http://host.docker.internal:11434
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - kbs-wiki:/root/kbs/kb/main/wiki
-      - kbs-raw:/root/kbs/kb/main/raw
-      - kbs-outputs:/root/kbs/kb/main/outputs
+      # Your instance — private data repo on the host. System files inside are
+      # refreshed from the image on each start; your data files are preserved.
+      - ${KBS_HOME:-./kbs}:/root/kbs
     ports:
       - "8080:8080"    # chat API adapter webhook
     stdin_open: true
@@ -29,8 +42,5 @@ services:
   #   # then point kbs at it instead:
   #   #   OLLAMA_HOST=http://ollama:11434
 
-volumes:
-  kbs-wiki:
-  kbs-raw:
-  kbs-outputs:
-  # ollama-models:
+# volumes:
+#   ollama-models:
