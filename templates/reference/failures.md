@@ -1,4 +1,4 @@
-# Reference: Failure Processing (V0.114)
+# Reference: Failure Processing (V0.115)
 
 Loaded when the owner runs: `Follow agents.md. Process FAILURES.md`
 

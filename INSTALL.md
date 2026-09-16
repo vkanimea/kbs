@@ -1,4 +1,4 @@
-# Installation — KBS V0.114
+# Installation — KBS V0.115
 
 ## One-Command Install
 

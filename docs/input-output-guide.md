@@ -1,4 +1,4 @@
-# KBS Input & Output Guide — V0.114
+# KBS Input & Output Guide — V0.115
 
 Everything a user inputs. Everything the system outputs. How styles work. How patterns work. How they connect. What is acceptable. What is not. How to add your own input style.
 

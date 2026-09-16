@@ -1,4 +1,4 @@
-# FAILURES.md — Learning From What Didn't Work (V0.114)
+# FAILURES.md — Learning From What Didn't Work (V0.115)
 
 A failure not documented is a lesson lost. The mirror of SUCCESSES.md — together they drive confidence up and down based on evidence, not opinion. Never delete entries.
 

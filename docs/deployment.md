@@ -1,4 +1,4 @@
-# KBS Deployment Guide — V0.114
+# KBS Deployment Guide — V0.115
 
 ## Install Options
 
@@ -98,7 +98,7 @@ Register-ScheduledTask -TaskName "KBS Daily Reminder" -Action $Action -Trigger $
 ## Version Control, Backup, Rollback
 
 ```bash
-cd ~/kbs && git init && git add . && git commit -m "KBS V0.114 initial"   # .gitignore pre-configured
+cd ~/kbs && git init && git add . && git commit -m "KBS V0.115 initial"   # .gitignore pre-configured
 
 # backup: git-remote pattern — see docs/backup-and-restore.md (nightly-backup.sh)
 

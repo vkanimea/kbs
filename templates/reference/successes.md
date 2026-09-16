@@ -1,4 +1,4 @@
-# Reference: Success Processing (V0.114)
+# Reference: Success Processing (V0.115)
 
 Loaded when the owner runs: `Follow agents.md. Process SUCCESSES.md`
 

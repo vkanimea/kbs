@@ -1,5 +1,5 @@
 #!/bin/bash
-# KBS Universal Chat Adapter — V0.114
+# KBS Universal Chat Adapter — V0.115
 # Captures chat output from any LLM into CHAT_INBOX.md + raw transcript.
 # The adapter captures; the LLM extracts insights later during processing —
 # this script does NOT pretend to identify "key insights" itself.

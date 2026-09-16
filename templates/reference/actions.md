@@ -1,4 +1,4 @@
-# Reference: Actions Processing (V0.114)
+# Reference: Actions Processing (V0.115)
 
 Loaded when the owner runs: `Follow agents.md. Process ACTIONS.md`
 Also checked automatically during every session close.

@@ -1,4 +1,4 @@
-# KBS Architecture — V0.114
+# KBS Architecture — V0.115
 
 ## Overview
 
@@ -83,7 +83,7 @@ KBS took: session close as the single most important ritual; career portfolio au
 
 ---
 
-## The 6-Step Ingestion Pipeline (V0.114)
+## The 6-Step Ingestion Pipeline (V0.115)
 
 This is the core processing architecture. Every INBOX entry passes through all 6 steps.
 
@@ -123,7 +123,7 @@ ACTIONS.md · CAREER.md · INBOX §Open Questions · INBOX §Held
 
 ---
 
-## The Style Registry — Extensible Input Architecture (V0.114)
+## The Style Registry — Extensible Input Architecture (V0.115)
 
 The Style Registry (defined in `SYSTEM.md §Style Registry`) is the single source of truth for how every input is processed. It defines 5 built-in styles and an open extension point.
 

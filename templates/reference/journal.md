@@ -1,4 +1,4 @@
-# Reference: Journal Operations (V0.114)
+# Reference: Journal Operations (V0.115)
 
 Loaded when the owner runs a chat prefixed with `Journal:` or `Follow agents.md. Process journal`
 

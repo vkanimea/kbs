@@ -1,5 +1,5 @@
 #!/bin/bash
-# KBS Topic Index — Lightweight Local Search (V0.114)
+# KBS Topic Index — Lightweight Local Search (V0.115)
 # Builds a simple grep-friendly index for rapid topic selection before LLM synthesis.
 # Not a replacement for LLM reasoning — an accelerator for large KBs.
 #
