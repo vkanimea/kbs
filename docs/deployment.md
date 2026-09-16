@@ -100,7 +100,7 @@ Register-ScheduledTask -TaskName "KBS Daily Reminder" -Action $Action -Trigger $
 ```bash
 cd ~/kbs && git init && git add . && git commit -m "KBS V0.114 initial"   # .gitignore pre-configured
 
-tar -czf kbs-backup-$(date +%Y%m%d).tar.gz ~/kbs                          # backup
+# backup: git-remote pattern — see docs/backup-and-restore.md (nightly-backup.sh)
 
 # rollback a wiki change from snapshot
 cp -r ~/kbs/kb/main/wiki/snapshots/[date]/* ~/kbs/kb/main/wiki/topics/
