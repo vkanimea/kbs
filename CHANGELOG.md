@@ -13,6 +13,8 @@
 - **install.sh / install.ps1** — version now read from `VERSION` (banner, `.env.template`, log line) so installers never drift from the release; both install `nightly-backup.sh` + `git-credential-env.sh` (previously missing from fresh installs)
 - **VERSION** file added at repo root and in instances
 - deployment.md — Docker install now documents the private-data-repo + host-side backup pattern, Docker upgrade path, and the native-upgrade overwrite caution
+- **docs/architecture.md — new “The Harness Layer” section**: KBS ships instructions + state, not an agent; distinguishes chat clients (max Activity Level 1) from tool-using agent harnesses (up to Level 3, since they can run scripts/git/schedules); reinforces harness-agnosticism and the CHAT_INBOX transcript-capture path
+- **docs/deployment.md** — new “Agent Harnesses” subsection under LLM Client Configuration (what to look for, what it unlocks, capture pattern)
 
 ## V0.114 — Semantic Retrieval (RAG alongside)
 - **scripts/rag.py** — stdlib-only semantic index/query over `wiki/topics/`, using Ollama embeddings (default `nomic-embed-text`); no pip dependencies

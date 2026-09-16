@@ -57,6 +57,16 @@ docker run -d -p 3000:8080 -v open-webui:/app/backend/data ghcr.io/open-webui/op
 ```
 Open http://localhost:3000 and point the workspace at `~/kbs`. Windows: use WSL2 (`wsl --install`).
 
+### Agent Harnesses (enables levels 2–3)
+A chat client can read and write KBS files, but only a **tool-using agent harness** can run the scripts, git operations, and schedules that higher Activity Levels need. Use one when you want routine automation or autonomy:
+
+- **What to look for:** folder access to `~/kbs`, file read/write, a shell, and git. Nothing KBS-specific is required — the interface is markdown + git.
+- **Examples:** opencode, pi, Claude Code, or any agent with shell + file tools.
+- **What it unlocks:** `hourly-ingest.sh` scheduling, semantic index rebuilds, session close that commits/pushes (see [backup-and-restore.md](backup-and-restore.md)), health checks, and the git-remote backup pattern.
+- **Capture:** if the harness persists session transcripts, export them into `kb/<name>/raw/chat-transcripts/` and append to `CHAT_INBOX.md` — the chat-input style then processes them (LOW confidence, verified before the wiki).
+
+See *The Harness Layer* in [architecture.md](architecture.md) for the client-class comparison and Activity Level ceiling.
+
 ### API Keys
 ```bash
 export ANTHROPIC_API_KEY="..."     # ~/.bashrc / ~/.zshrc

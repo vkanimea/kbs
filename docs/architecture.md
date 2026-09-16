@@ -270,6 +270,31 @@ examples/       = exhibition hall (starter KB for learning)
 | `chat-adapter.sh` | Pipe/file capture to CHAT_INBOX.md | On demand |
 | `chat-api-adapter.py` | Webhook server for API capture | On demand |
 
+> Harness session transcripts (opencode, pi, …) can be exported into `raw/chat-transcripts/` + `CHAT_INBOX.md` by an instance-specific exporter — see *The Harness Layer* above. Exporters are not shipped: they depend on the harness's own storage format.
+
+## The Harness Layer — Who Executes KBS
+
+KBS ships **instructions and state, not an agent**. `agents.md` and `reference/*.md` describe procedures; something has to execute them. That executor is your LLM client, and there are two classes:
+
+| | Chat client | Agent harness |
+|---|---|---|
+| Examples | Claude Desktop, Open WebUI, chat apps | opencode, pi, Claude Code, any tool-using agent |
+| Reads/writes KBS files | ✅ | ✅ |
+| Runs scripts (`status.sh`, `rag-index.sh`, `hourly-ingest.sh`) | ❌ | ✅ |
+| Git commit/push (backup, history) | ❌ | ✅ |
+| Scheduled / autonomous operation | ❌ | ✅ |
+| **Max useful Activity Level** | 1 (mid-active) | 3 (autonomous) |
+
+**Why this matters:** the procedures that make KBS compound — session close, ingestion, health check, backup — are not just writing. They involve running scripts and committing to git. A chat client can draft content and reason over the wiki; a harness can *complete the loop*. Activity Levels 2–3 (routine automation, autonomy) are only physically reachable with a harness.
+
+**Harness-agnostic, like model-agnostic.** No KBS file references any harness. Swap clients and the knowledge base is untouched: markdown + git is the interface. A harness needs only folder access, file read/write, a shell, and — for backup — git.
+
+**Transcript capture.** Conversation with any client is a first-class input style (`CHAT_INBOX.md`: LOW confidence, attributed to the LLM and date, verified before it reaches the wiki). Harnesses that persist session transcripts can export them into `kb/<name>/raw/chat-transcripts/` automatically, so the capture loop closes without manual copy-paste.
+
+**Boundary:** which harness you run, and how it is configured, is instance-specific and belongs in your **private data repo** — never in this system.
+
+---
+
 ## The Golden Rules
 
 A session without a close is a session without learning.
