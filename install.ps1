@@ -19,8 +19,18 @@ $RepoUrl   = "https://raw.githubusercontent.com/vkanimea/kbs/main"
 $Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 $ScriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { "" }
 
+# Version — read from the repo's VERSION file so this script never drifts from the release.
+$Version = ""
+if ($ScriptDir -and (Test-Path (Join-Path $ScriptDir "VERSION"))) {
+    $Version = (Get-Content (Join-Path $ScriptDir "VERSION") -Raw).Trim()
+}
+if (-not $Version) {
+    try { $Version = (Invoke-WebRequest -Uri "$RepoUrl/VERSION" -UseBasicParsing -ErrorAction Stop).Content.Trim() } catch { }
+}
+if (-not $Version) { $Version = "0.115" }
+
 Write-Host "╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║       Knowledge Base System (KBS) V0.115 Installer            ║" -ForegroundColor Cyan
+Write-Host ("║{0,-62}║" -f "       Knowledge Base System (KBS) V$Version Installer") -ForegroundColor Cyan
 Write-Host "╚══════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
 Write-Host "📍 Path : $KbsPath" -ForegroundColor Yellow
 Write-Host "📚 KB   : $KbName"  -ForegroundColor Yellow
@@ -39,6 +49,9 @@ Write-Host ""
     "$KbsPath\docs"
 ) | ForEach-Object { New-Item -ItemType Directory -Force -Path $_ | Out-Null }
 Write-Host "✅ Directories created" -ForegroundColor Green
+
+# Detect fresh install vs upgrade (for the audit log event name)
+$InstanceExisted = Test-Path "$KbsPath\log.md"
 
 # ─── File installer ────────────────────────────────────────────────────────────
 $script:Failed = $false
@@ -59,15 +72,35 @@ function Install-KbsFile {
     }
 }
 
-Write-Host "📝 Installing templates..." -ForegroundColor Cyan
-@("agents.md","SYSTEM.md","DECISIONS.md","INBOX.md","CHAT_INBOX.md","FAILURES.md","SUCCESSES.md","CAREER.md","ACTIONS.md","JOURNAL.md","PROMPTS.md","log.md") |
+# Seed a user-owned file only if it does not already exist.
+$script:Kept = @()
+function Install-KbsFilePreserve {
+    param([string]$Src, [string]$Dst)
+    if (Test-Path $Dst) {
+        $script:Kept += (Split-Path $Dst -Leaf)
+        return
+    }
+    Install-KbsFile $Src $Dst
+}
+
+Write-Host "📝 Installing system files..." -ForegroundColor Cyan
+@("agents.md","PROMPTS.md") |
   ForEach-Object { Install-KbsFile "templates/$_" "$KbsPath\$_" }
 @("session-close.md","ingestion.md","chat-input.md","failures.md","successes.md","actions.md","journal.md","health-check.md") |
   ForEach-Object { Install-KbsFile "templates/reference/$_" "$KbsPath\reference\$_" }
 Install-KbsFile "CHANGELOG.md" "$KbsPath\CHANGELOG.md"
+Install-KbsFile "VERSION" "$KbsPath\VERSION"
+
+Write-Host "🗂  Preserving your files (seed if missing)..." -ForegroundColor Cyan
+@("SYSTEM.md","DECISIONS.md","INBOX.md","CHAT_INBOX.md","FAILURES.md","SUCCESSES.md","CAREER.md","ACTIONS.md","JOURNAL.md","log.md") |
+  ForEach-Object { Install-KbsFilePreserve "templates/$_" "$KbsPath\$_" }
+if ($script:Kept.Count -gt 0) {
+    Write-Host "  kept: $($script:Kept -join ' ')" -ForegroundColor Yellow
+    Write-Host "  (shipped templates for these live in templates/ — diff only if you want header updates)" -ForegroundColor Yellow
+}
 
 Write-Host "🔧 Installing scripts..." -ForegroundColor Cyan
-@("chat-adapter.sh","chat-api-adapter.py","health-check.sh","status.sh","auto-close.sh","due-actions.sh","topic-index.sh","youtube-ingest.sh","hourly-ingest.sh") |
+@("chat-adapter.sh","chat-api-adapter.py","health-check.sh","status.sh","auto-close.sh","due-actions.sh","topic-index.sh","youtube-ingest.sh","hourly-ingest.sh","git-credential-env.sh","nightly-backup.sh") |
   ForEach-Object { Install-KbsFile "scripts/$_" "$KbsPath\scripts\$_" }
 Install-KbsFile "scripts/windows/status.ps1" "$KbsPath\scripts\windows\status.ps1"
 
@@ -90,7 +123,7 @@ if ($script:Failed) {
 
 # ─── Generated files ───────────────────────────────────────────────────────────
 @"
-# KBS V0.115 — copy to .env and edit
+# KBS V$Version — copy to .env and edit
 KBS_PATH=$KbsPath
 KB_NAME=$KbName
 AUTO_INGEST=false
@@ -98,9 +131,13 @@ LLM_CLIENT=claude
 ACTIVITY_LEVEL=0
 "@ | Out-File "$KbsPath\.env.template" -Encoding utf8
 
-Add-Content "$KbsPath\log.md" "`n## $Timestamp | SYSTEM_CREATED | V0.115 | Path: $KbsPath | KB: $KbName"
+$Event = if ($InstanceExisted) { "SYSTEM_UPGRADED" } else { "SYSTEM_CREATED" }
+Add-Content "$KbsPath\log.md" "`n## $Timestamp | $Event | V$Version | Path: $KbsPath | KB: $KbName"
 
-".env`n*.log`n*.tmp`nkb/*/wiki/snapshots/" | Out-File "$KbsPath\.gitignore" -Encoding utf8
+# .gitignore: seed only — never overwrite rules you have added
+if (-not (Test-Path "$KbsPath\.gitignore")) {
+    ".env`n*.log`n*.tmp`nkb/*/wiki/snapshots/" | Out-File "$KbsPath\.gitignore" -Encoding utf8
+}
 
 # ─── Done ──────────────────────────────────────────────────────────────────────
 Write-Host ""

@@ -8,7 +8,9 @@
 - **Docker: system/data separation** — image carries the system payload (`/opt/kbs-system`); data lives in a host bind mount (`${KBS_HOME:-./kbs}:/root/kbs`); entrypoint refreshes system files and preserves user files. Replaces named volumes (wiki/raw/outputs only), which silently dropped capture files and non-main KBs on rebuild
 - **docker/docker-entrypoint.sh** — seed-if-missing for user files, refresh for system files; `tini` as PID 1
 - **.dockerignore** — keeps `.git`, `.env`, `kb/`, and the host data dir out of the build context
+- **install.sh / install.ps1 — no more data loss on upgrade.** User-owned files (`INBOX.md`, `FAILURES.md`, `SUCCESSES.md`, `ACTIONS.md`, `DECISIONS.md`, `JOURNAL.md`, `CAREER.md`, `CHAT_INBOX.md`, `SYSTEM.md`, `log.md`, `.gitignore`) are now seeded only when missing and **never overwritten**; system files (`agents.md`, `PROMPTS.md`, `reference/`, `scripts/`, `CHANGELOG.md`, `VERSION`) still refresh. Fixes a latent bug where re-running the installer wiped captures and `log.md` history. Installers now report kept files and log `SYSTEM_UPGRADED` on re-run
 - **install.sh** — now installs `VERSION` (introspection) and is committed executable (fix: `./install.sh` failed with *Permission denied* on a fresh clone); same fix for `chat-adapter.sh`, `chat-api-adapter.py`, `health-check.sh`, `status.sh`
+- **install.sh / install.ps1** — version now read from `VERSION` (banner, `.env.template`, log line) so installers never drift from the release; both install `nightly-backup.sh` + `git-credential-env.sh` (previously missing from fresh installs)
 - **VERSION** file added at repo root and in instances
 - deployment.md — Docker install now documents the private-data-repo + host-side backup pattern, Docker upgrade path, and the native-upgrade overwrite caution
 

@@ -151,7 +151,11 @@ Docker: compose wires host Ollama via `host.docker.internal` (default); a fully 
 ```bash
 cd /path/to/cloned/kbs && git pull && ./install.sh
 ```
-Wiki and raw files are preserved. **Caution:** `install.sh` overwrites the capture files (`INBOX.md`, `FAILURES.md`, `SUCCESSES.md`, `ACTIONS.md`, `DECISIONS.md`, `JOURNAL.md`, `CAREER.md`, `log.md`) from templates — commit your instance to git first (see [backup-and-restore.md](backup-and-restore.md)) so any lost content is recoverable.
+Safe to re-run — the installer separates system from user files:
+- **Refreshed:** `agents.md`, `PROMPTS.md`, `reference/`, `scripts/`, `CHANGELOG.md`, `VERSION`
+- **Seeded only when missing (never overwritten):** `INBOX.md`, `FAILURES.md`, `SUCCESSES.md`, `ACTIONS.md`, `DECISIONS.md`, `JOURNAL.md`, `CAREER.md`, `CHAT_INBOX.md`, `SYSTEM.md`, `log.md`, `.gitignore`
+
+It prints which files it kept, and `log.md` gains a `SYSTEM_UPGRADED` entry. Your wiki, raw files, and captures are never touched.
 
 **Docker install**
 ```bash
@@ -174,6 +178,7 @@ The rebuild refreshes the system files from the new image; everything in the bin
 | Due actions not notifying | Check `~/kbs/ACTIONS.md` uses `Due: YYYY-MM-DD` format |
 | Docker build fails | Ensure Docker is running; `docker system prune` |
 | Docker data not visible on host | Set `KBS_HOME` — default bind mount is `<repo>/docker/kbs` |
+| Want the shipped template for a kept file | Compare against `templates/<file>` in the repo, then merge manually |
 
 ## Uninstall
 

@@ -13,6 +13,10 @@ decisions, actions, and any ingested documents.
 
 ## Setup (once)
 
+Both installers ship the required scripts: `scripts/nightly-backup.sh` and
+`scripts/git-credential-env.sh` are installed by `install.sh` / `install.ps1`
+(Windows: run the backup scripts via Git Bash or WSL — they are bash).
+
 ```bash
 cd ~/kbs
 git init && git add -A && git commit -m "KBS data initial"   # .gitignore pre-configured

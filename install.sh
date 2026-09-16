@@ -17,9 +17,16 @@ REPO_URL="https://raw.githubusercontent.com/vkanimea/kbs/main"
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-/dev/null}")" 2>/dev/null && pwd || echo "")"
 
+# Version — read from the repo's VERSION file so this script never drifts from the release.
+VERSION="$(tr -d '[:space:]' < "$SCRIPT_DIR/VERSION" 2>/dev/null || true)"
+if [ -z "$VERSION" ] && [ -n "$SCRIPT_DIR" ] && command -v curl &>/dev/null; then
+  VERSION="$(curl -fsSL "$REPO_URL/VERSION" 2>/dev/null | tr -d '[:space:]' || true)"
+fi
+VERSION="${VERSION:-0.115}"
+
 echo -e "${CYAN}"
 echo "╔══════════════════════════════════════════════════════════════╗"
-echo "║       Knowledge Base System (KBS) V0.115 Installer            ║"
+printf '║%-62s║\n' "       Knowledge Base System (KBS) V$VERSION Installer"
 echo "╚══════════════════════════════════════════════════════════════╝"
 echo -e "${NC}"
 echo -e "${YELLOW}📍 Path : $KBS_PATH${NC}"
@@ -31,10 +38,16 @@ mkdir -p "$KBS_PATH"/{reference,scripts/windows,docs}
 mkdir -p "$KBS_PATH/kb/$KB_NAME"/{raw/chat-transcripts,raw-assets/{pdfs,images},wiki/{topics,snapshots},outputs}
 echo -e "${GREEN}✅ Directories created${NC}"
 
+# Detect fresh install vs upgrade (for the audit log event name)
+if [ -f "$KBS_PATH/log.md" ]; then INSTANCE_EXISTED=1; else INSTANCE_EXISTED=0; fi
+
 # ─── File installer: local copy if available, else download; abort on failure ──
-TEMPLATES=(agents.md SYSTEM.md DECISIONS.md INBOX.md CHAT_INBOX.md FAILURES.md SUCCESSES.md CAREER.md ACTIONS.md JOURNAL.md PROMPTS.md log.md)
+# System-owned templates — refreshed on every install/upgrade
+SYSTEM_TEMPLATES=(agents.md PROMPTS.md)
+# User-owned files — seeded only when absent, NEVER overwritten (your content lives here)
+USER_FILES=(SYSTEM.md DECISIONS.md INBOX.md CHAT_INBOX.md FAILURES.md SUCCESSES.md CAREER.md ACTIONS.md JOURNAL.md log.md)
 REFERENCES=(session-close.md ingestion.md chat-input.md failures.md successes.md actions.md journal.md health-check.md)
-SCRIPTS=(chat-adapter.sh chat-api-adapter.py health-check.sh status.sh auto-close.sh due-actions.sh topic-index.sh youtube-ingest.sh hourly-ingest.sh rag.py rag-index.sh rag-query.sh)
+SCRIPTS=(chat-adapter.sh chat-api-adapter.py health-check.sh status.sh auto-close.sh due-actions.sh topic-index.sh youtube-ingest.sh hourly-ingest.sh rag.py rag-index.sh rag-query.sh nightly-backup.sh git-credential-env.sh)
 
 FAILED=0
 install_file() {
@@ -52,11 +65,29 @@ install_file() {
   return 0
 }
 
-echo -e "${CYAN}📝 Installing templates...${NC}"
-for f in "${TEMPLATES[@]}"; do install_file "templates/$f" "$KBS_PATH/$f"; done
+# Seed a user-owned file only if it does not already exist.
+KEPT=()
+install_file_preserve() {
+  local src="$1" dst="$2"
+  if [ -e "$dst" ]; then
+    KEPT+=("$(basename "$dst")")
+    return 0
+  fi
+  install_file "$src" "$dst"
+}
+
+echo -e "${CYAN}📝 Installing system files...${NC}"
+for f in "${SYSTEM_TEMPLATES[@]}"; do install_file "templates/$f" "$KBS_PATH/$f"; done
 for f in "${REFERENCES[@]}"; do install_file "templates/reference/$f" "$KBS_PATH/reference/$f"; done
 install_file "CHANGELOG.md" "$KBS_PATH/CHANGELOG.md"
 install_file "VERSION" "$KBS_PATH/VERSION"
+
+echo -e "${CYAN}🗂  Preserving your files (seed if missing)...${NC}"
+for f in "${USER_FILES[@]}"; do install_file_preserve "templates/$f" "$KBS_PATH/$f"; done
+if [ ${#KEPT[@]} -gt 0 ]; then
+  echo -e "${YELLOW}  kept: ${KEPT[*]}${NC}"
+  echo -e "${YELLOW}  (shipped templates for these live in templates/ — diff only if you want header updates)${NC}"
+fi
 
 echo -e "${CYAN}🔧 Installing scripts...${NC}"
 for f in "${SCRIPTS[@]}"; do install_file "scripts/$f" "$KBS_PATH/scripts/$f"; done
@@ -80,7 +111,7 @@ fi
 
 # ─── Generated files ───────────────────────────────────────────────────────────
 cat > "$KBS_PATH/.env.template" <<EOF
-# KBS V0.115 — copy to .env and edit
+# KBS V$VERSION — copy to .env and edit
 KBS_PATH=$KBS_PATH
 KB_NAME=$KB_NAME
 AUTO_INGEST=false
@@ -88,11 +119,14 @@ LLM_CLIENT=claude
 ACTIVITY_LEVEL=0
 EOF
 
+if [ "$INSTANCE_EXISTED" -eq 1 ]; then EVENT="SYSTEM_UPGRADED"; else EVENT="SYSTEM_CREATED"; fi
 cat >> "$KBS_PATH/log.md" <<EOF
 
-## $TIMESTAMP | SYSTEM_CREATED | V0.115 | Path: $KBS_PATH | KB: $KB_NAME
+## $TIMESTAMP | $EVENT | V$VERSION | Path: $KBS_PATH | KB: $KB_NAME
 EOF
 
+# .gitignore: seed only — never overwrite rules you have added
+if [ ! -f "$KBS_PATH/.gitignore" ]; then
 cat > "$KBS_PATH/.gitignore" <<'EOF'
 .env
 *.log
@@ -100,6 +134,7 @@ cat > "$KBS_PATH/.gitignore" <<'EOF'
 kb/*/wiki/snapshots/
 kb/*/rag-index/
 EOF
+fi
 
 # ─── Done ──────────────────────────────────────────────────────────────────────
 echo ""
