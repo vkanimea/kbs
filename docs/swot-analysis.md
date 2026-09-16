@@ -1,4 +1,4 @@
-# KBS SWOT Analysis — V0.114
+# KBS SWOT Analysis — V0.115
 
 Compared against: Obsidian/Logseq, Notion AI, the Reddit "Second Brain" pattern, and vector-RAG systems.
 
@@ -18,9 +18,11 @@ Compared against: Obsidian/Logseq, Notion AI, the Reddit "Second Brain" pattern,
 
 **S6 — INBOX quality gate.** Entries rated at ingestion; poor entries rejected with a rewrite suggestion. Prevents garbage from entering the graph. Unique among compared systems.
 
-**S7 — Lazy-loaded instructions (introduced V11, current V0.114).** An ~800-word core file plus on-demand reference modules keeps the LLM's per-session instruction load small, which measurably improves rule adherence in long instruction sets. The CI enforces the core file stays under 1,200 words.
+**S7 — Lazy-loaded instructions (introduced V11, current V0.115).** An ~800-word core file plus on-demand reference modules keeps the LLM's per-session instruction load small, which measurably improves rule adherence in long instruction sets. The CI enforces the core file stays under 1,200 words.
 
-**S8 — Plain text, audited, recoverable.** Markdown + git + append-only log + snapshots. Survives any technology change; every action traceable.
+**S8 — Plain text, audited, recoverable.** Markdown + git + append-only log + snapshots. Survives any technology change; every action traceable. V0.115 makes recoverability concrete: the data repo pushes to a **private git remote nightly** (`scripts/nightly-backup.sh`), and a fresh host restores from a clone in ~15 minutes (`docs/backup-and-restore.md`) — only `.env` (secrets), regenerable indexes, and cron entries need rebuilding, by design.
+
+**S9 — Data sovereignty by architecture.** The system (public repo) and the knowledge (each person's private repo) are separate by design: the software is shared, the data is self-governed. No central service, no vendor holding your knowledge, no shared account — and no lock-in to KBS's own hosting. Contrast: Notion hosts and controls the data; Obsidian stores locally but ships no governed pipeline around it. KBS is local-first *and* off-site-restorable because you own the remote.
 
 ---
 
@@ -34,7 +36,9 @@ Compared against: Obsidian/Logseq, Notion AI, the Reddit "Second Brain" pattern,
 
 **W4 — No mobile capture app.** Phone capture means a markdown editor plus git sync, or voice-to-text and paste. The `voice` style and `chat-api-adapter.py` webhook improve this, but a native app would be better.
 
-**W5 — No live graph view.** Graphs are generated on demand (text or Mermaid). Workaround: open `wiki/topics/` as a read-only Obsidian vault for an always-on visual graph. The starter KB (`examples/starter-kb/`) gives users an immediate visual reference.
+**W5 — No live graph view.** Graphs are generated on demand (text or Mermaid). Workaround: open `wiki/topics/` as a read-only Obsidian vault for an always-on visual graph — now documented as a first-class optional add-on (README "Obsidian and Other Note Apps — Optional Add-Ons", shipped V0.115): graph, backlinks, and mobile reading with zero conversion, because KBS already writes Obsidian-compatible wikilinks. The starter KB (`examples/starter-kb/`) gives users an immediate visual reference.
+
+**W6 — External corpus ingestion is point-in-time.** Dropping documents into `raw/` processes them once; nothing notices when a source file is added, changed, or renamed upstream, and the hourly cron only watches the KB's own `raw/`. In practice a 89-report corpus was ingested as a manual batch and any later addition needs a deliberate re-run of the ingestion batch. Mitigation: none automated yet — see O9.
 
 ---
 
@@ -42,7 +46,7 @@ Compared against: Obsidian/Logseq, Notion AI, the Reddit "Second Brain" pattern,
 
 | # | Opportunity | Effort | Value |
 |---|------------|--------|-------|
-| O1 | Obsidian-as-viewer guide (open wiki/topics as vault, never edit there) | Trivial | High |
+| O1 | ~~Obsidian-as-viewer guide~~ — **shipped V0.115**: README "Obsidian and Other Note Apps — Optional Add-Ons" (graph view, wikilink compatibility, read-only rule) | Done | High |
 | O2 | Browser extension: one-click chat/article capture | ~2 days | High — biggest daily-friction win |
 | O3 | VS Code extension: capture + close from the command palette | ~3 days | Medium |
 | O4 | Voice pipeline: Whisper → INBOX entry | ~1 day | Medium |
@@ -50,6 +54,7 @@ Compared against: Obsidian/Logseq, Notion AI, the Reddit "Second Brain" pattern,
 | O6 | Community template library (starter KBs per domain) | Low | Medium — starter KB shipped |
 | O7 | Enterprise: SharePoint/Copilot sync | High | Niche |
 | O8 | Mobile app or PWA for capture | High | High — biggest remaining gap |
+| O9 | Incremental corpus sync — detect added/changed/removed source docs and re-ingest deltas (addresses W6) | Medium | Medium-High — largest infrastructure gap after mobile |
 
 ---
 
@@ -69,7 +74,7 @@ Compared against: Obsidian/Logseq, Notion AI, the Reddit "Second Brain" pattern,
 
 ## Capability Matrix
 
-| Capability | Obsidian | Notion AI | Reddit Pattern | RAG | KBS V0.114 |
+| Capability | Obsidian | Notion AI | Reddit Pattern | RAG | KBS V0.115 |
 |------------|---------|-----------|----------------|-----|---------|
 | Activity levels | — | — | — | — | ✅ |
 | Failure learning | — | — | — | — | ✅ (+ implicit detection) |
@@ -87,13 +92,17 @@ Compared against: Obsidian/Logseq, Notion AI, the Reddit "Second Brain" pattern,
 | Local search index | — | — | — | ✅ | ✅ (topic-index.sh) |
 | Journal grounded in wiki | — | — | — | — | ✅ |
 | Hourly auto-ingest | — | — | — | — | ✅ |
+| Versioned off-site backup + fresh-host restore | — | ✅ (cloud-hosted) | — | — | ✅ (V0.115, private git remote) |
+| Data sovereignty (self-governed private repo) | ✅ (local, no remote) | — (vendor-hosted) | ✅ | — | ✅ |
 
 ---
 
 ## Assessment
 
-KBS V0.114 is **production-ready architecture with reflective practice and automation**. The design problems identified in V10.3 — instruction bloat, duplication drift, fictional example data, dishonest installer fallbacks, decorative CI — are resolved. The starter KB, auto-close streaks, due-action reminders, topic index, frontmatter override, journal operations, and hourly ingestion address the most critical onboarding, adherence, and engagement gaps.
+KBS V0.115 is **production-ready architecture with reflective practice and automation**. The design problems identified in V10.3 — instruction bloat, duplication drift, fictional example data, dishonest installer fallbacks, decorative CI — are resolved. The starter KB, auto-close streaks, due-action reminders, topic index, frontmatter override, journal operations, and hourly ingestion address the most critical onboarding, adherence, and engagement gaps.
 
-The remaining weaknesses are primarily ecosystem: mobile capture (W4) and browser extension (O2) are the highest-leverage next investments. The architecture itself — activity levels, failure learning, typed reasoning, lazy-loaded instructions, journal grounded in wiki — is stable and validated.
+The design was additionally validated in real use on a production corpus: 89 maintenance reports were ingested into 18 topics and driven through the full learning loop (22 success/failure entries, 9 open actions, 4 owner decisions), which also surfaced W6 — ingestion is point-in-time, so incremental corpus sync (O9) is the clearest remaining infrastructure gap.
+
+The remaining weaknesses are primarily ecosystem: mobile capture (W4) and browser extension (O2) are the highest-leverage next investments, followed by O9 for corpus upkeep. The architecture itself — activity levels, failure learning, typed reasoning, lazy-loaded instructions, journal grounded in wiki, self-governed recoverable data — is stable and validated.
 
 No numeric self-rating is offered — that judgement belongs to users after sustained use, and to the FAILURES.md file this system ships with.
