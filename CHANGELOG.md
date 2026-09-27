@@ -1,11 +1,13 @@
 # KBS Changelog
 
-## V0.116 — Agentic Capabilities (goal-loop + knowledge-graph)
-- **Make LLM-client setup client-agnostic.** Removed the "Claude Desktop (easiest)" headline from the LLM Client Configuration section; replaced with a general requirement (grant folder read/write to `~/kbs`) plus per-client-class examples (chat/desktop, Ollama + Open WebUI, agent harnesses). Claude Desktop now appears only as one item in a multi-client examples list
+## V0.116.1 — Client-Agnostic Framing (patch)
+- **Make LLM-client setup client-agnostic.** Removed the "Claude Desktop (easiest)" headline from the LLM Client Configuration section; replaced with a general requirement (grant folder read/write to `~/kbs`) plus per-client-class examples (chat/desktop, Ollama + Open WebUI, agent harnesses). Claude Desktop now appears only as one item in a multi-client examples list. Not a feature — a wording/plumbing fix, hence a patch
 - **`.env` / installer defaults now `LLM_CLIENT=any`** (was `claude`). Informational only — KBS scripts never read it — but the default no longer implies a preferred provider. Applied in `install.sh`, `install.ps1`, `docker/docker-entrypoint.sh`, `.env.template`
 - **docs/deployment.md** — generalized the API-keys section (any provider, local models need none) and removed the Claude-only curl example model string
 - **install.sh / install.ps1 / INSTALL.md post-install step 1** — wording now "any LLM client works" instead of a Claude Desktop permission path
 - README already stated "No LLM lock-in — any LLM" and is left intact; `chat-adapter.sh` already detects Claude/ChatGPT/Gemini/Ollama/Mistral for transcript labels
+
+## V0.116 — Agentic Capabilities (goal-loop + knowledge-graph)
 - **scripts/goal-loop.sh** — persistent Ralph//goal loop orchestrator on pi: wraps pi's agent loop, reads a goal contract (objective/read_first/constraints/validate/stop_when/max_iter), runs `pi --print --provider --model`, runs the validate gate via `bash -c`, and feeds failures back each iteration until the gate passes or the budget is exhausted. Provider/model configurable via env (defaults to wired openrouter/deepseek). Exit codes: 0=met, 1=budget exhausted, 2=bad spec, 3=pi couldn't run
 - **docs/goal-spec.md** — the goal-contract format (four required parts: objective, constraints, validate, stop-when) plus a field guide and good/bad examples
 - **examples/goal** — runnable example goal spec

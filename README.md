@@ -1,6 +1,6 @@
 # Knowledge Base System (KBS) V0.116
 
-[![Version](https://img.shields.io/badge/version-0.115-blue.svg)](https://github.com/vkanimea/kbs)
+[![Version](https://img.shields.io/badge/version-0.116.1-blue.svg)](https://github.com/vkanimea/kbs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg)]()
 
