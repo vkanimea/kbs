@@ -1,4 +1,4 @@
-# SYSTEM.md — Configuration & Meta-Cognition (V0.115)
+# SYSTEM.md — Configuration & Meta-Cognition (V0.116)
 
 Single source of truth for: current context, scope, activity levels, policies, metrics targets, style registry, rituals, and learning triggers. Operation procedures live in `reference/`. Prompts live in `PROMPTS.md`.
 

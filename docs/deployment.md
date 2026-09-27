@@ -1,4 +1,4 @@
-# KBS Deployment Guide — V0.115
+# KBS Deployment Guide — V0.116
 
 ## Install Options
 
@@ -24,7 +24,7 @@ docker compose exec kbs bash
 ```
 The compose file ([docker/docker-compose.yml](../docker/docker-compose.yml)) uses the **system/data separation**: the image carries the *system*, and your *data* lives in a host directory bind-mounted at `/root/kbs` (default `<repo>/docker/kbs`; set `KBS_HOME` to move it). Port 8080 is exposed for the chat webhook.
 
-**Make the data directory your private repo** — it is a complete KBS instance, so the V0.115 backup pattern applies unchanged:
+**Make the data directory your private repo** — it is a complete KBS instance, so the V0.116 backup pattern applies unchanged:
 ```bash
 cd kbs/docker/kbs          # the bind-mounted instance
 cp .env.template .env      # add GITHUB_TOKEN
@@ -124,7 +124,7 @@ Register-ScheduledTask -TaskName "KBS Daily Reminder" -Action $Action -Trigger $
 ## Version Control, Backup, Rollback
 
 ```bash
-cd ~/kbs && git init && git add . && git commit -m "KBS V0.115 initial"   # .gitignore pre-configured
+cd ~/kbs && git init && git add . && git commit -m "KBS V0.116 initial"   # .gitignore pre-configured
 
 # backup: git-remote pattern — see docs/backup-and-restore.md (nightly-backup.sh)
 

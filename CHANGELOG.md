@@ -1,5 +1,12 @@
 # KBS Changelog
 
+## V0.116 — Agentic Capabilities (goal-loop + knowledge-graph)
+- **scripts/goal-loop.sh** — persistent Ralph//goal loop orchestrator on pi: wraps pi's agent loop, reads a goal contract (objective/read_first/constraints/validate/stop_when/max_iter), runs `pi --print --provider --model`, runs the validate gate via `bash -c`, and feeds failures back each iteration until the gate passes or the budget is exhausted. Provider/model configurable via env (defaults to wired openrouter/deepseek). Exit codes: 0=met, 1=budget exhausted, 2=bad spec, 3=pi couldn't run
+- **docs/goal-spec.md** — the goal-contract format (four required parts: objective, constraints, validate, stop-when) plus a field guide and good/bad examples
+- **examples/goal** — runnable example goal spec
+- **scripts/graphify-index.sh** — per-project knowledge-graph + agent-crawlable wiki indexer using Graphify (deterministic tree-sitter AST; no LLM, no vector store). Outputs to `kb/projects/<project>/graphs/` (graph.json, GRAPH_REPORT.md, graph.html, analysis.json) and `kb/projects/<project>/wiki/graph/` (agent-crawlable markdown + index.md entry point, with `--wiki`). Community naming needs a wired `claude -p` CLI and degrades gracefully to placeholders
+- **install.sh — installs the two new scripts** (goal-loop.sh, graphify-index.sh) via the SCRIPTS array
+
 ## V0.115 — Git-Remote Backup & Restore
 - **scripts/nightly-backup.sh** — commit + push the data repo to its (private) git remote when changed; repo-local credential helper auto-asserted so fresh clones stay push-capable; logs to `backup.log`
 - **docs/backup-and-restore.md** — the git-remote backup pattern: private data repo vs public system repo, what a clone restores vs what you rebuild (.env, RAG indexes, cron), restore procedure, operational notes

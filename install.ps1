@@ -1,4 +1,4 @@
-# Knowledge Base System (KBS) V0.115 — Windows PowerShell Installer
+# Knowledge Base System (KBS) V0.116 — Windows PowerShell Installer
 # Usage:
 #   powershell -ExecutionPolicy Bypass -File install.ps1
 #   powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/vkanimea/kbs/main/install.ps1 | iex"

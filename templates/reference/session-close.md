@@ -1,4 +1,4 @@
-# Reference: Session Close (V0.115)
+# Reference: Session Close (V0.116)
 
 Loaded when the owner runs: `Follow agents.md. Close session for [KB]`
 

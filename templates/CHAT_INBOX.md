@@ -1,4 +1,4 @@
-# CHAT_INBOX.md — Chat Capture (V0.115)
+# CHAT_INBOX.md — Chat Capture (V0.116)
 
 Dedicated entry point for AI conversations. Processing rules → `reference/chat-input.md`.
 Process weekly: `Follow agents.md. Process CHAT_INBOX.md`

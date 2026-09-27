@@ -1,4 +1,4 @@
-# KBS Audit Log — Append-Only (V0.115)
+# KBS Audit Log — Append-Only (V0.116)
 
 Never edit or delete entries. One line per event, formats below.
 

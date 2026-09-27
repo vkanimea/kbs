@@ -1,4 +1,4 @@
-# Knowledge Base System (KBS) V0.115
+# Knowledge Base System (KBS) V0.116
 
 [![Version](https://img.shields.io/badge/version-0.115-blue.svg)](https://github.com/vkanimea/kbs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -15,9 +15,9 @@ Inspired by Andrej Karpathy's "second brain" pattern — minus the dependencies.
 
 ---
 
-## What's New in V0.115
+## What's New in V0.116
 
-V0.115 adds the **git-remote backup & restore pattern** — your knowledge is versioned off-site and restorable on a fresh host:
+V0.116 adds the **git-remote backup & restore pattern** — your knowledge is versioned off-site and restorable on a fresh host:
 
 - `scripts/nightly-backup.sh` — commits + pushes your **private data repo** when something changed; the repo-local credential helper is auto-asserted so fresh clones stay push-capable
 - `docs/backup-and-restore.md` — the pattern end to end: private data repo vs public system repo, what a clone restores vs what you rebuild (`.env`, RAG indexes, cron), restore procedure
@@ -40,7 +40,7 @@ V0.114 adds **semantic retrieval (RAG alongside)** — optional fuzzy search ove
 
 ## Why This Is Different
 
-| Feature | Traditional Notes | KBS V0.115 |
+| Feature | Traditional Notes | KBS V0.116 |
 |---------|-------------------|-----------|
 | Linking | Manual | Typed relationships (Causes, Leads To, Depends On) |
 | Learning | Success only | Success + failure, with confidence downgrades |

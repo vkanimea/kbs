@@ -1,5 +1,5 @@
 #!/bin/bash
-# Knowledge Base System (KBS) V0.115 — Linux/macOS Installer
+# Knowledge Base System (KBS) V0.116 — Linux/macOS Installer
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/vkanimea/kbs/main/install.sh | bash
 #   KBS_PATH=/custom/path KB_NAME=myproject ./install.sh
@@ -47,7 +47,7 @@ SYSTEM_TEMPLATES=(agents.md PROMPTS.md)
 # User-owned files — seeded only when absent, NEVER overwritten (your content lives here)
 USER_FILES=(SYSTEM.md DECISIONS.md INBOX.md CHAT_INBOX.md FAILURES.md SUCCESSES.md CAREER.md ACTIONS.md JOURNAL.md log.md)
 REFERENCES=(session-close.md ingestion.md chat-input.md failures.md successes.md actions.md journal.md health-check.md)
-SCRIPTS=(chat-adapter.sh chat-api-adapter.py health-check.sh status.sh auto-close.sh due-actions.sh topic-index.sh youtube-ingest.sh hourly-ingest.sh rag.py rag-index.sh rag-query.sh nightly-backup.sh git-credential-env.sh)
+SCRIPTS=(chat-adapter.sh chat-api-adapter.py health-check.sh status.sh auto-close.sh due-actions.sh topic-index.sh youtube-ingest.sh hourly-ingest.sh rag.py rag-index.sh rag-query.sh nightly-backup.sh git-credential-env.sh goal-loop.sh graphify-index.sh)
 
 FAILED=0
 install_file() {
