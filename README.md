@@ -17,7 +17,18 @@ Inspired by Andrej Karpathy's "second brain" pattern — minus the dependencies.
 
 ## What's New in V0.116
 
-V0.116 adds the **git-remote backup & restore pattern** — your knowledge is versioned off-site and restorable on a fresh host:
+V0.116 (and the V0.116.1 patch) adds **agentic capabilities** — autonomous goal loops and a per-project knowledge graph — so KBS can run routine work by itself and structure code for querying:
+
+- `scripts/goal-loop.sh` — a persistent **Ralph//goal loop** on any agent harness: write a goal contract (objective, constraints, a validation command, a stop condition), and it runs `plan → act → validate → iterate` until the gate passes or the budget is exhausted
+- `docs/goal-spec.md` — the goal-contract format (four required parts: objective, constraints, validate, stop-when) plus a field guide and good/bad examples
+- `scripts/graphify-index.sh` — turn a code corpus into a **queryable knowledge graph + agent-crawlable wiki**, stored per-project under `kb/projects/<project>/graphs/` and `wiki/graph/`. Uses deterministic tree-sitter AST parsing — no LLM, no vector store
+- **V0.116.1 patch — client-agnostic framing**: the LLM client setup is now stated as client-agnostic (any LLM with folder read/write works), and the informational `LLM_CLIENT` default is `any` instead of `claude`. Decidedly *not* a feature bump
+
+---
+
+## What's New in V0.115
+
+V0.115 adds the **git-remote backup & restore pattern** — your knowledge is versioned off-site and restorable on a fresh host:
 
 - `scripts/nightly-backup.sh` — commits + pushes your **private data repo** when something changed; the repo-local credential helper is auto-asserted so fresh clones stay push-capable
 - `docs/backup-and-restore.md` — the pattern end to end: private data repo vs public system repo, what a clone restores vs what you rebuild (`.env`, RAG indexes, cron), restore procedure
