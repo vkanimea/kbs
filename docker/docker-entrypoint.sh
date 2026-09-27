@@ -53,7 +53,7 @@ cat > "$DST/.env.template" <<EOF
 KBS_PATH=$DST
 KB_NAME=$KB_NAME
 AUTO_INGEST=false
-LLM_CLIENT=claude
+LLM_CLIENT=any
 ACTIVITY_LEVEL=0
 EOF
 [ -e "$DST/.env" ] || cp "$DST/.env.template" "$DST/.env"

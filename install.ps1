@@ -127,7 +127,7 @@ if ($script:Failed) {
 KBS_PATH=$KbsPath
 KB_NAME=$KbName
 AUTO_INGEST=false
-LLM_CLIENT=claude
+LLM_CLIENT=any
 ACTIVITY_LEVEL=0
 "@ | Out-File "$KbsPath\.env.template" -Encoding utf8
 

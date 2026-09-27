@@ -34,7 +34,7 @@ The installer **aborts with an error** if any file fails to install — a partia
 ## Post-Install (4 Steps)
 
 1. **Grant your LLM client folder access** to `~/kbs`
-   (Claude Desktop: Settings → Permissions → Add Folder. Other clients: docs/deployment.md)
+   (Any LLM works — folder read/write is all that's needed; see `docs/deployment.md` for examples)
 2. **Verify:** `~/kbs/scripts/status.sh` (Linux/macOS) or `powershell -File $env:USERPROFILE\kbs\scripts\windows\status.ps1`
 3. **Run the Initial Setup prompt** from `~/kbs/PROMPTS.md` in your LLM client
 4. **Close your first session:** `Follow agents.md. Close session for main`

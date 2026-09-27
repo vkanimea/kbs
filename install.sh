@@ -115,7 +115,8 @@ cat > "$KBS_PATH/.env.template" <<EOF
 KBS_PATH=$KBS_PATH
 KB_NAME=$KB_NAME
 AUTO_INGEST=false
-LLM_CLIENT=claude
+# LLM_CLIENT is informational only (never read by scripts). Any LLM works.
+LLM_CLIENT=any
 ACTIVITY_LEVEL=0
 EOF
 
@@ -144,7 +145,7 @@ echo -e "${GREEN}╚════════════════════
 echo ""
 echo "Next steps:"
 echo "  1. LLM client: grant folder access to $KBS_PATH"
-echo "     (Claude Desktop: Settings → Permissions → Add Folder)"
+echo "     (any LLM client works — see docs/deployment.md for your client)"
 echo "  2. Optional: copy starter KB → cp -r $KBS_PATH/examples/starter-kb/wiki/topics/* $KBS_PATH/kb/$KB_NAME/wiki/topics/"
 echo "  3. Verify: $KBS_PATH/scripts/status.sh"
 echo "  4. In your LLM client, run the Initial Setup prompt from PROMPTS.md"

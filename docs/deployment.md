@@ -46,8 +46,13 @@ On every container start the entrypoint **refreshes system files** (`scripts/`, 
 
 ## LLM Client Configuration
 
-### Claude Desktop (easiest)
-Settings → Permissions → Add Folder → `~/kbs`. Test with the Initial Setup prompt from PROMPTS.md.
+KBS is **client-agnostic** — the interface is markdown + git, and any LLM client that can read/write `~/kbs` works. Examples below cover a representative range; they are options, not requirements.
+
+### General requirement (all clients)
+Grant your LLM client folder access to `~/kbs` (read/write). The exact mechanism is client-specific — a permissions dialog, a workspace/folder setting, or a `cd ~/kbs` in a shell-based agent. Then test with the Initial Setup prompt from PROMPTS.md.
+
+### Chat/desktop clients (Activity Level 1: read & write files)
+Examples: Claude Desktop, ChatGPT, Gemini, Open WebUI, or any chat app with folder access. Where your client does not expose a shell, the agent-harness path below is what unlocks automation.
 
 ### Ollama + Open WebUI (free, local)
 ```bash
@@ -67,14 +72,17 @@ A chat client can read and write KBS files, but only a **tool-using agent harnes
 
 See *The Harness Layer* in [architecture.md](architecture.md) for the client-class comparison and Activity Level ceiling.
 
-### API Keys
+### Provider credentials
+Set the key for whichever provider you use (e.g. Anthropic, OpenAI, local Ollama needs none):
 ```bash
-export ANTHROPIC_API_KEY="..."     # ~/.bashrc / ~/.zshrc
+export ANTHROPIC_API_KEY="..."     # ~/.bashrc / ~/.zshrc — or your provider's var
 ```
 ```powershell
 [Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", "...", "User")
 ```
-Or copy `.env.template` to `.env` and edit.
+Or, for local models (Ollama/llama.cpp), no key is needed.
+
+> **Note:** `LLM_CLIENT` in `.env.template` is informational only — KBS scripts never read it. Any LLM works.
 
 ---
 
@@ -96,7 +104,7 @@ echo "test insight" | ~/kbs/scripts/chat-adapter.sh
 # webhook server (stdlib only, no pip installs)
 python3 ~/kbs/scripts/chat-api-adapter.py --server --port 8080
 curl -X POST http://localhost:8080/capture -H "Content-Type: application/json" \
-  -d '{"content": "test", "model": "claude"}'
+  -d '{"content": "test", "model": "any-llm"}'
 ```
 
 ---
