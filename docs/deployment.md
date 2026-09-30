@@ -202,6 +202,8 @@ git pull && cd docker && docker compose build && docker compose up -d
 ```
 The rebuild refreshes the system files from the new image; everything in the bind-mounted data directory is untouched. No backup step needed — but keeping the data dir in git (above) is still recommended.
 
+**Before advising or depending on a new version, verify it actually activates** — especially features like goal-loop and graphify-index. See **docs/version-advising.md** for the step-by-step runbook (sync → activate → fix as patch → update examples → sign-off).
+
 ---
 
 ## Troubleshooting
