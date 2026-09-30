@@ -28,8 +28,25 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-FROM="$(cd "$SCRIPT_DIR/.." && pwd)"
 TO="${KBS:-$HOME/kbs}"
+
+# The system repo is NEVER the instance. When this script is run from inside an
+# instance (the normal case — it is installed there), $SCRIPT_DIR/.. is the DATA
+# repo, not the system repo, so it must not be used as the default source.
+# Resolution order for FROM:
+#   1. --from <dir>                 (explicit)
+#   2. $KBS_SYSTEM_REPO             (env)
+#   3. a sibling checkout of the system repo, discovered by looking for VERSION
+#      plus a scripts/kbs-sync.sh at the usual locations
+FROM=""
+for cand in "${KBS_SYSTEM_REPO:-}" "$HOME/AIC/kbs" "$HOME/kbs-system" "$(cd "$SCRIPT_DIR/.." && pwd)"; do
+  [ -n "$cand" ] || continue
+  if [ "$cand" != "$TO" ] && [ -f "$cand/install.sh" ] && [ -f "$cand/VERSION" ]; then
+    FROM="$cand"
+    break
+  fi
+done
+
 DRY_RUN=0
 CHECK=0
 
@@ -44,8 +61,15 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+[ -n "$FROM" ] || {
+  echo "ERROR: could not locate the system repo. Pass --from <dir> or set KBS_SYSTEM_REPO." >&2
+  echo "       Looked in: \$KBS_SYSTEM_REPO, ~/AIC/kbs, ~/kbs-system, $SCRIPT_DIR/.." >&2
+  exit 2
+}
+[ "$FROM" != "$TO" ] || { echo "ERROR: system repo and instance are the same directory ($FROM)." >&2; exit 2; }
 [ -d "$FROM" ] || { echo "ERROR: system repo not found: $FROM" >&2; exit 2; }
 [ -d "$TO" ]   || { echo "ERROR: data instance not found: $TO" >&2; exit 2; }
+[ -f "$FROM/install.sh" ] || { echo "ERROR: $FROM does not look like the system repo (no install.sh)" >&2; exit 2; }
 [ -f "$FROM/VERSION" ] || { echo "ERROR: $FROM does not look like the system repo (no VERSION)" >&2; exit 2; }
 
 # System-owned paths, relative to both repos. Mirrors install.sh's SYSTEM_TEMPLATES,
