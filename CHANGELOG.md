@@ -1,5 +1,11 @@
 # KBS Changelog
 
+## V0.116.3 — System/Data Drift Guard (patch)
+- **scripts/kbs-sync.sh** — refreshes a data instance's system files from the system repo, and detects drift with `--check` (non-zero exit when instance system files differ). Modes: `--dry-run` to preview, `--from`/`--to` to override paths. Mirrors `install.sh`'s contract exactly — system files are overwritten, user files (INBOX, CHAT_INBOX, DECISIONS, FAILURES, SUCCESSES, ACTIONS, JOURNAL, CAREER, SYSTEM, `log.md`, `.gitignore`) are never touched
+- **docs/architecture.md** — new *System repo vs data repo — one source of truth* section stating the rule: system files are edited upstream, then synced down. A system file fixed only in an instance is a fork
+- **docs/version-advising.md** — release step 1 now uses `kbs-sync.sh --check`; drift check added to the verification list
+- **install.sh / install.ps1** — install `kbs-sync.sh`; `install.ps1`'s script list brought in line with `install.sh` (it was missing `goal-loop.sh`, `graphify-index.sh`, and the RAG scripts)
+
 ## V0.116.2 — Graphify Activation Fixes (patch)
 - **scripts/graphify-index.sh** — `--mode` now defaults to `deep` (graphify ≥0.9 rejects `standard`; the old default silently failed to build a graph). The wrapper now passes `--code-only` to graphify when no LLM key is configured, so a code corpus indexes via the deterministic local AST with zero token cost instead of erroring on the semantic-extraction path. Also adds explicit backend selection: `--local` (llama.cpp OpenAI-compatible server), `--openrouter`, and `--backend <name>`, with auto-detection falling back to code-only when no key is present
 - **scripts/nightly-backup.sh** — commit-only by default. The data repo targets an external remote, so it always commits locally (nothing is lost) but pushes only when `KBS_ALLOW_EXTERNAL_PUSH=1` is explicitly set. Prevents accidental publication of org-specific knowledge to an external remote

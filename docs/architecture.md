@@ -293,6 +293,25 @@ KBS ships **instructions and state, not an agent**. `agents.md` and `reference/*
 
 **Boundary:** which harness you run, and how it is configured, is instance-specific and belongs in your **private data repo** — never in this system.
 
+### System repo vs data repo — one source of truth
+
+KBS keeps two repos separate on purpose:
+
+| | System repo (`kbs`, public) | Data repo (`kbs-data`, private) |
+|---|---|---|
+| Holds | `scripts/`, `docs/`, `templates/`, installers, `VERSION`, `CHANGELOG.md` | knowledge (`kb/`, journals, captures) **plus an installed copy** of the system files |
+| Role | **source of truth for system files** | source of truth for *knowledge* only |
+| How system files update | you edit and release here | refreshed from here, never edited in place |
+
+**The one rule:** system files are edited in the system repo, then synced *down*.
+A system file fixed only in an instance is a fork — the next sync either overwrites
+it or silently loses it. Run `scripts/kbs-sync.sh --check` to detect drift and
+`scripts/kbs-sync.sh` to reconcile (`--dry-run` to preview). The sync mirrors
+`install.sh`'s contract: system files are overwritten, user files are never
+touched.
+
+See [version-advising.md](version-advising.md) for the release runbook.
+
 ---
 
 ## The Golden Rules

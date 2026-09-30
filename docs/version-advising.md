@@ -20,13 +20,16 @@ data instance mirror upstream. See *The Harness Layer* in
 
 ## Procedure
 
-1. **Sync system files** into the data instance (run `install.sh`, or the
-   entrypoint refresh for Docker). Confirm the new version landed:
+1. **Sync system files** into the data instance — use `scripts/kbs-sync.sh` (or
+   run `install.sh`, or the entrypoint refresh for Docker). Confirm the new
+   version landed:
    ```bash
-   cd ~/kbs && cat VERSION && git log --oneline -5
+   cd ~/kbs && scripts/kbs-sync.sh --check && cat VERSION
    ```
-   `VERSION` should read the new release (e.g. `0.116.2`), and `CHANGELOG.md`
-   should carry the release heading.
+   `kbs-sync.sh --check` exits non-zero when the instance's system files differ
+   from the system repo, so it doubles as a drift alarm. `VERSION` should read
+   the new release (e.g. `0.116.2`), and `CHANGELOG.md` should carry the release
+   heading.
 
 2. **Activate & verify every new feature before advising it** — don't trust the
    changelog. Two current examples:
@@ -81,6 +84,7 @@ data instance mirror upstream. See *The Harness Layer* in
 
 ## Verification (proves this runbook worked)
 
+- `scripts/kbs-sync.sh --check` exits `0` (instance's system files match the system repo).
 - `cat VERSION` shows the expected release (or a patch on it).
 - `goal-loop.sh examples/goal.md` exits `0` with `GOAL MET`.
 - `graphify-index.sh` exits `0` and `graph.json` is non-empty.
