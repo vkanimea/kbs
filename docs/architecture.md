@@ -287,7 +287,7 @@ KBS ships **instructions and state, not an agent**. `agents.md` and `reference/*
 
 **Why this matters:** the procedures that make KBS compound — session close, ingestion, health check, backup — are not just writing. They involve running scripts and committing to git. A chat client can draft content and reason over the wiki; a harness can *complete the loop*. Activity Levels 2–3 (routine automation, autonomy) are only physically reachable with a harness.
 
-**Harness-agnostic, like model-agnostic.** No KBS file references any harness. Swap clients and the knowledge base is untouched: markdown + git is the interface. A harness needs only folder access, file read/write, a shell, and — for backup — git.
+**Harness-agnostic, like model-agnostic.** No KBS procedure or script depends on a specific harness. Swap clients and the knowledge base is untouched: markdown + git is the interface. A harness needs only folder access, file read/write, a shell, and — for backup — git. For the required-vs-optional capability checklist and how to choose one, see [deployment.md](deployment.md) → *Agent Harnesses*.
 
 **Transcript capture.** Conversation with any client is a first-class input style (`CHAT_INBOX.md`: LOW confidence, attributed to the LLM and date, verified before it reaches the wiki). Harnesses that persist session transcripts can export them into `kb/<name>/raw/chat-transcripts/` automatically, so the capture loop closes without manual copy-paste.
 

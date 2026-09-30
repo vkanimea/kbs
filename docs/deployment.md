@@ -63,12 +63,33 @@ docker run -d -p 3000:8080 -v open-webui:/app/backend/data ghcr.io/open-webui/op
 Open http://localhost:3000 and point the workspace at `~/kbs`. Windows: use WSL2 (`wsl --install`).
 
 ### Agent Harnesses (enables levels 2–3)
-A chat client can read and write KBS files, but only a **tool-using agent harness** can run the scripts, git operations, and schedules that higher Activity Levels need. Use one when you want routine automation or autonomy:
+A chat client can read and write KBS files, but only a **tool-using agent harness** can run the scripts, git operations, and schedules that higher Activity Levels need. Use one when you want routine automation or autonomy.
 
-- **What to look for:** folder access to `~/kbs`, file read/write, a shell, and git. Nothing KBS-specific is required — the interface is markdown + git.
-- **Examples:** opencode, pi, Claude Code, or any agent with shell + file tools.
-- **What it unlocks:** `hourly-ingest.sh` scheduling, semantic index rebuilds, session close that commits/pushes (see [backup-and-restore.md](backup-and-restore.md)), health checks, and the git-remote backup pattern.
-- **Capture:** if the harness persists session transcripts, export them into `kb/<name>/raw/chat-transcripts/` and append to `CHAT_INBOX.md` — the chat-input style then processes them (LOW confidence, verified before the wiki).
+KBS does not name a preferred harness — which one you run is instance-specific (see [architecture.md](architecture.md) → *The Harness Layer*). Pick from the requirements below.
+
+**Required — without these you are still at Activity Level 1:**
+
+| Capability | Why KBS needs it |
+|---|---|
+| Shell access | Runs `status.sh`, `rag-index.sh`, `hourly-ingest.sh`, `health-check.sh` |
+| File read/write on `~/kbs` | Edits wiki, journals, indexes |
+| `git` | Session close, history, backup push |
+| Tool-using agent loop | Chains the above without manual copy-paste |
+
+**Optional — each one compounds the loop further:**
+
+| Capability | Value |
+|---|---|
+| Persists session transcripts | Auto-capture into `kb/<name>/raw/chat-transcripts/` + `CHAT_INBOX.md` |
+| Native skills / procedure memory | Stores the close, ingest, and health procedures for reuse |
+| Scheduled or headless runs | Unlocks the autonomous Activity Level 3 ceiling |
+| Local model support | Works with Ollama/llama.cpp, no provider key needed |
+
+**Choosing one:** use whatever agent your environment already supports — the interface is only markdown + git, so nothing KBS-specific is required. If you have none installed, a shell-capable CLI agent (opencode, pi, Claude Code, or similar) is the lowest-friction start. Document the choice and its configuration in your **private data repo**, not in this system.
+
+**What it unlocks:** `hourly-ingest.sh` scheduling, semantic index rebuilds, session close that commits/pushes (see [backup-and-restore.md](backup-and-restore.md)), health checks, and the git-remote backup pattern.
+
+**Capture:** if the harness persists session transcripts, export them into `kb/<name>/raw/chat-transcripts/` and append to `CHAT_INBOX.md` — the chat-input style then processes them (LOW confidence, verified before the wiki).
 
 See *The Harness Layer* in [architecture.md](architecture.md) for the client-class comparison and Activity Level ceiling.
 
