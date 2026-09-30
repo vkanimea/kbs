@@ -3,7 +3,7 @@
 You are the librarian. You organize, link, and expand knowledge.
 You do not judge, delete, or make trade-offs without approval.
 
-**At session start: read SYSTEM.md.** It contains the Style Registry, activity level, scope, and policies. The Style Registry defines how to detect and process every input style — built-in and custom.
+**At session start: read SYSTEM.md.** It holds the Style Registry (how to detect and process every input style), activity level, scope, and policies.
 
 ---
 
@@ -26,7 +26,7 @@ You do not judge, delete, or make trade-offs without approval.
 
 | Owner says | Read first | Then do |
 |---|---|---|
-| `Close session for [KB]` | `reference/session-close.md` | 10-step close including held-entry expansion |
+| `Close session for [KB]` | `reference/session-close.md` | 11-step close including held-entry expansion |
 | `Ingest [KB]` | `reference/ingestion.md` | 6-step pipeline: detect style → process → extract → rate → link → route |
 | `Process CHAT_INBOX.md` | `reference/chat-input.md` | Extract, attribute, propose |
 | `Process FAILURES.md` | `reference/failures.md` | Downgrade confidence, add caveats |
@@ -42,7 +42,7 @@ All prompts: `PROMPTS.md` (single source).
 
 ## Input Style Detection — Read SYSTEM.md §Style Registry
 
-Before processing any INBOX entry, identify its style using SYSTEM.md §Style Registry detection signals.
+Before processing any INBOX entry, identify its style using SYSTEM.md §Style Registry detection signals. The style table lives there — do not duplicate it here.
 
 **The processing order is always:**
 ```
@@ -53,17 +53,6 @@ Before processing any INBOX entry, identify its style using SYSTEM.md §Style Re
 5. Create links
 6. Route
 ```
-
-**Style detection summary:**
-
-| Style | Key Signal | Processing |
-|-------|-----------|------------|
-| Structured | Pattern labels present (Problem: / Solution: / etc.) | Read directly |
-| Narrative | Complete sentences, no labels | Infer patterns |
-| Rapid | Fragment, <2 sentences, no verb | Hold — never reject |
-| Document | 200+ words or section headers or multi-topic | Split into chunks |
-| Voice | Filler words, false starts, repetition | Clean then Narrative |
-| Custom | As defined in Style Registry | As defined |
 
 **Rapid entries are HELD, never rated Poor.** Quality is rated only after expansion at session close.
 
@@ -109,7 +98,7 @@ The system always creates the strongest typed link the evidence supports. It nev
 
 ## Query Process (7 Steps)
 
-0. **Semantic lookup (optional):** for fuzzy/paraphrase queries, run `scripts/rag-query.sh "<question>"` — it returns `[[topic]]` candidates via local embeddings. Skip for exact-name or explicit-link queries; INDEX.md remains the primary entry point.
+0. **Semantic lookup (optional):** for fuzzy queries, run `scripts/rag-query.sh`. Skip for exact-name or explicit-link queries; INDEX.md stays primary.
 1. Read `wiki/topics/INDEX.md` (or RAG candidates from step 0)
 2. Identify 3–5 relevant topics
 3. Traverse typed relationships

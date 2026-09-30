@@ -27,7 +27,7 @@ if ($ScriptDir -and (Test-Path (Join-Path $ScriptDir "VERSION"))) {
 if (-not $Version) {
     try { $Version = (Invoke-WebRequest -Uri "$RepoUrl/VERSION" -UseBasicParsing -ErrorAction Stop).Content.Trim() } catch { }
 }
-if (-not $Version) { $Version = "0.116.3" }
+if (-not $Version) { $Version = "0.116.4" }
 
 Write-Host "╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
 Write-Host ("║{0,-62}║" -f "       Knowledge Base System (KBS) V$Version Installer") -ForegroundColor Cyan
@@ -100,7 +100,7 @@ if ($script:Kept.Count -gt 0) {
 }
 
 Write-Host "🔧 Installing scripts..." -ForegroundColor Cyan
-@("chat-adapter.sh","chat-api-adapter.py","health-check.sh","status.sh","auto-close.sh","due-actions.sh","topic-index.sh","youtube-ingest.sh","hourly-ingest.sh","git-credential-env.sh","nightly-backup.sh","rag.py","rag-index.sh","rag-query.sh","goal-loop.sh","graphify-index.sh","kbs-sync.sh") |
+@("chat-adapter.sh","chat-api-adapter.py","health-check.sh","status.sh","auto-close.sh","due-actions.sh","topic-index.sh","youtube-ingest.sh","hourly-ingest.sh","git-credential-env.sh","nightly-backup.sh","rag.py","rag-index.sh","rag-query.sh","goal-loop.sh","graphify-index.sh","kbs-sync.sh","kbs-drift-check.sh") |
   ForEach-Object { Install-KbsFile "scripts/$_" "$KbsPath\scripts\$_" }
 Install-KbsFile "scripts/windows/status.ps1" "$KbsPath\scripts\windows\status.ps1"
 

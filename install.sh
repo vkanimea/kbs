@@ -22,7 +22,7 @@ VERSION="$(tr -d '[:space:]' < "$SCRIPT_DIR/VERSION" 2>/dev/null || true)"
 if [ -z "$VERSION" ] && [ -n "$SCRIPT_DIR" ] && command -v curl &>/dev/null; then
   VERSION="$(curl -fsSL "$REPO_URL/VERSION" 2>/dev/null | tr -d '[:space:]' || true)"
 fi
-VERSION="${VERSION:-0.116.3}"
+VERSION="${VERSION:-0.116.4}"
 
 echo -e "${CYAN}"
 echo "╔══════════════════════════════════════════════════════════════╗"
@@ -47,7 +47,7 @@ SYSTEM_TEMPLATES=(agents.md PROMPTS.md)
 # User-owned files — seeded only when absent, NEVER overwritten (your content lives here)
 USER_FILES=(SYSTEM.md DECISIONS.md INBOX.md CHAT_INBOX.md FAILURES.md SUCCESSES.md CAREER.md ACTIONS.md JOURNAL.md log.md)
 REFERENCES=(session-close.md ingestion.md chat-input.md failures.md successes.md actions.md journal.md health-check.md)
-SCRIPTS=(chat-adapter.sh chat-api-adapter.py health-check.sh status.sh auto-close.sh due-actions.sh topic-index.sh youtube-ingest.sh hourly-ingest.sh rag.py rag-index.sh rag-query.sh nightly-backup.sh git-credential-env.sh goal-loop.sh graphify-index.sh kbs-sync.sh)
+SCRIPTS=(chat-adapter.sh chat-api-adapter.py health-check.sh status.sh auto-close.sh due-actions.sh topic-index.sh youtube-ingest.sh hourly-ingest.sh rag.py rag-index.sh rag-query.sh nightly-backup.sh git-credential-env.sh goal-loop.sh graphify-index.sh kbs-sync.sh kbs-drift-check.sh)
 
 FAILED=0
 install_file() {

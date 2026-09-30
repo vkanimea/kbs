@@ -1,5 +1,11 @@
 # KBS Changelog
 
+## V0.116.4 — Drift Guard in the Close Loop (patch)
+- **scripts/kbs-drift-check.sh** — daily wrapper around `kbs-sync.sh --check`, scheduled by cron. Logs to `log.md` **only when drift is found** (a healthy instance stays quiet), and sends a desktop notification where available. Skips quietly if the system repo or `kbs-sync.sh` is unavailable, so cron never mails spuriously
+- **templates/reference/session-close.md** — the close is now **11 steps**: step 11 checks system-file drift after any session that touched `scripts/`, `docs/`, `templates/`, `agents.md`, `PROMPTS.md`, or `reference/`. A fix made only in an instance is a fork; reconcile or promote upstream before closing
+- **templates/agents.md** — **fix: CI word-limit breach.** The file had exceeded its 1,200-word limit since V0.114 (1,239 words), failing the `agents.md stays lean` check on every run since. The duplicated style-detection table (already owned by `SYSTEM.md §Style Registry`) and a verbose session-start line were condensed: 1,239 → 1,138 words. No instruction was removed — the table is still in SYSTEM.md, which agents.md directs the session to read
+- **install.sh / install.ps1** — install `kbs-drift-check.sh`
+
 ## V0.116.3 — System/Data Drift Guard (patch)
 - **scripts/kbs-sync.sh** — refreshes a data instance's system files from the system repo, and detects drift with `--check` (non-zero exit when instance system files differ). Modes: `--dry-run` to preview, `--from`/`--to` to override paths. Mirrors `install.sh`'s contract exactly — system files are overwritten, user files (INBOX, CHAT_INBOX, DECISIONS, FAILURES, SUCCESSES, ACTIONS, JOURNAL, CAREER, SYSTEM, `log.md`, `.gitignore`) are never touched
 - **docs/architecture.md** — new *System repo vs data repo — one source of truth* section stating the rule: system files are edited upstream, then synced down. A system file fixed only in an instance is a fork

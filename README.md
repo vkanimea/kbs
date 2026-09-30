@@ -1,6 +1,6 @@
 # Knowledge Base System (KBS) V0.116
 
-[![Version](https://img.shields.io/badge/version-0.116.3-blue.svg)](https://github.com/vkanimea/kbs)
+[![Version](https://img.shields.io/badge/version-0.116.4-blue.svg)](https://github.com/vkanimea/kbs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg)]()
 
@@ -25,6 +25,7 @@ V0.116 (with the V0.116.1 and V0.116.2 patches) adds **agentic capabilities** �
 - **V0.116.1 patch — client-agnostic framing**: the LLM client setup is now stated as client-agnostic (any LLM with folder read/write works), and the informational `LLM_CLIENT` default is `any` instead of `claude`. Decidedly *not* a feature bump
 - **V0.116.2 patch — graphify activation fixes**: `graphify-index.sh` now defaults to `--mode deep` (graphify ≥0.9 rejects `standard`), falls back to `--code-only` when no LLM key is configured, and accepts `--local` / `--openrouter` / `--backend` for explicit extraction backends. `nightly-backup.sh` is now commit-only by default, pushing to an external remote only when `KBS_ALLOW_EXTERNAL_PUSH=1`
 - **V0.116.3 patch — system/data drift guard**: `scripts/kbs-sync.sh` refreshes an instance's system files from the system repo and detects drift (`--check` exits non-zero when they differ). Makes the "edit upstream, sync down" rule enforceable instead of a convention
+- **V0.116.4 patch — drift guard in the close loop**: `scripts/kbs-drift-check.sh` runs the check daily via cron, logging to `log.md` only when drift is found; the session close gains an 11th step to check drift after any session that touched system files
 
 ---
 

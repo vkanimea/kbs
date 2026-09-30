@@ -6,7 +6,7 @@ Loaded when the owner runs: `Follow agents.md. Close session for [KB]`
 
 ## Pre-Close: Handle Pending Styles First
 
-Before the 10-step close, resolve any entries that were not fully processed during ingestion:
+Before the 11-step close, resolve any entries that were not fully processed during ingestion:
 
 ### A — Expand Held Entries (Rapid Style)
 
@@ -41,7 +41,7 @@ For any custom-style entries, show the extracted content and confirm with the ow
 
 ---
 
-## The 10-Step Close
+## The 11-Step Close
 
 After pre-close is complete:
 
@@ -57,6 +57,29 @@ After pre-close is complete:
 | 8 | Add achievement | — at least one per close + suggest output template | `CAREER.md` |
 | 9 | Flag open questions | — | `INBOX §Open Questions` |
 | 10 | Cross-link, update log, produce report | — | wiki + `log.md` + chat |
+| 11 | Check system-file drift | — | `scripts/kbs-drift-check.sh` (log only if drift) |
+
+### Step 11 — System-File Drift Check
+
+If any system file was touched this session (`scripts/`, `docs/`, `templates/`,
+`agents.md`, `PROMPTS.md`, `reference/`), confirm it was changed in the **system
+repo** and synced down — a fix made only in this instance is a fork that the next
+sync will overwrite or lose.
+
+```bash
+scripts/kbs-drift-check.sh          # exits 1 + logs if drift; silent when in sync
+```
+
+If it reports drift, reconcile before closing:
+
+```bash
+scripts/kbs-sync.sh --dry-run       # see what would change
+scripts/kbs-sync.sh                 # apply, then commit the data repo
+```
+
+If the change belongs upstream instead, promote it to the system repo first, then
+sync down. See [../docs/architecture.md](../docs/architecture.md) → *System repo vs
+data repo* and [../docs/version-advising.md](../docs/version-advising.md).
 
 ### Implicit Failure Detection (Step 5 Enhancement)
 During failure capture, compare newly documented problems against wiki topics with HIGH confidence upgraded in the last 90 days. If keywords, domain, and symptoms match a previously "solved" problem, flag: *"This looks like a recurring instance of [[topic]], which was upgraded to HIGH on [date]. Was the previous solution incomplete, or are the conditions different?"*

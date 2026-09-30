@@ -74,6 +74,7 @@ SYSTEM_PATHS=(
   scripts/graphify-index.sh
   scripts/health-check.sh
   scripts/hourly-ingest.sh
+  scripts/kbs-drift-check.sh
   scripts/kbs-sync.sh
   scripts/nightly-backup.sh
   scripts/rag-index.sh
