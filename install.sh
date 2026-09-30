@@ -22,7 +22,7 @@ VERSION="$(tr -d '[:space:]' < "$SCRIPT_DIR/VERSION" 2>/dev/null || true)"
 if [ -z "$VERSION" ] && [ -n "$SCRIPT_DIR" ] && command -v curl &>/dev/null; then
   VERSION="$(curl -fsSL "$REPO_URL/VERSION" 2>/dev/null | tr -d '[:space:]' || true)"
 fi
-VERSION="${VERSION:-0.116.1}"
+VERSION="${VERSION:-0.116.2}"
 
 echo -e "${CYAN}"
 echo "╔══════════════════════════════════════════════════════════════╗"

@@ -1,6 +1,6 @@
 # Knowledge Base System (KBS) V0.116
 
-[![Version](https://img.shields.io/badge/version-0.116.1-blue.svg)](https://github.com/vkanimea/kbs)
+[![Version](https://img.shields.io/badge/version-0.116.2-blue.svg)](https://github.com/vkanimea/kbs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg)]()
 
@@ -17,12 +17,13 @@ Inspired by Andrej Karpathy's "second brain" pattern — minus the dependencies.
 
 ## What's New in V0.116
 
-V0.116 (and the V0.116.1 patch) adds **agentic capabilities** — autonomous goal loops and a per-project knowledge graph — so KBS can run routine work by itself and structure code for querying:
+V0.116 (with the V0.116.1 and V0.116.2 patches) adds **agentic capabilities** — autonomous goal loops and a per-project knowledge graph — so KBS can run routine work by itself and structure code for querying:
 
 - `scripts/goal-loop.sh` — a persistent **Ralph//goal loop** on any agent harness: write a goal contract (objective, constraints, a validation command, a stop condition), and it runs `plan → act → validate → iterate` until the gate passes or the budget is exhausted
 - `docs/goal-spec.md` — the goal-contract format (four required parts: objective, constraints, validate, stop-when) plus a field guide and good/bad examples
 - `scripts/graphify-index.sh` — turn a code corpus into a **queryable knowledge graph + agent-crawlable wiki**, stored per-project under `kb/projects/<project>/graphs/` and `wiki/graph/`. Uses deterministic tree-sitter AST parsing — no LLM, no vector store
 - **V0.116.1 patch — client-agnostic framing**: the LLM client setup is now stated as client-agnostic (any LLM with folder read/write works), and the informational `LLM_CLIENT` default is `any` instead of `claude`. Decidedly *not* a feature bump
+- **V0.116.2 patch — graphify activation fixes**: `graphify-index.sh` now defaults to `--mode deep` (graphify ≥0.9 rejects `standard`), falls back to `--code-only` when no LLM key is configured, and accepts `--local` / `--openrouter` / `--backend` for explicit extraction backends. `nightly-backup.sh` is now commit-only by default, pushing to an external remote only when `KBS_ALLOW_EXTERNAL_PUSH=1`
 
 ---
 

@@ -27,7 +27,7 @@ if ($ScriptDir -and (Test-Path (Join-Path $ScriptDir "VERSION"))) {
 if (-not $Version) {
     try { $Version = (Invoke-WebRequest -Uri "$RepoUrl/VERSION" -UseBasicParsing -ErrorAction Stop).Content.Trim() } catch { }
 }
-if (-not $Version) { $Version = "0.116.1" }
+if (-not $Version) { $Version = "0.116.2" }
 
 Write-Host "╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
 Write-Host ("║{0,-62}║" -f "       Knowledge Base System (KBS) V$Version Installer") -ForegroundColor Cyan

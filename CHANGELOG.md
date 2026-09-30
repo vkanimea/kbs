@@ -1,5 +1,9 @@
 # KBS Changelog
 
+## V0.116.2 — Graphify Activation Fixes (patch)
+- **scripts/graphify-index.sh** — `--mode` now defaults to `deep` (graphify ≥0.9 rejects `standard`; the old default silently failed to build a graph). The wrapper now passes `--code-only` to graphify when no LLM key is configured, so a code corpus indexes via the deterministic local AST with zero token cost instead of erroring on the semantic-extraction path. Also adds explicit backend selection: `--local` (llama.cpp OpenAI-compatible server), `--openrouter`, and `--backend <name>`, with auto-detection falling back to code-only when no key is present
+- **scripts/nightly-backup.sh** — commit-only by default. The data repo targets an external remote, so it always commits locally (nothing is lost) but pushes only when `KBS_ALLOW_EXTERNAL_PUSH=1` is explicitly set. Prevents accidental publication of org-specific knowledge to an external remote
+
 ## V0.116.1 — Client-Agnostic Framing (patch)
 - **Make LLM-client setup client-agnostic.** Removed the "Claude Desktop (easiest)" headline from the LLM Client Configuration section; replaced with a general requirement (grant folder read/write to `~/kbs`) plus per-client-class examples (chat/desktop, Ollama + Open WebUI, agent harnesses). Claude Desktop now appears only as one item in a multi-client examples list. Not a feature — a wording/plumbing fix, hence a patch
 - **`.env` / installer defaults now `LLM_CLIENT=any`** (was `claude`). Informational only — KBS scripts never read it — but the default no longer implies a preferred provider. Applied in `install.sh`, `install.ps1`, `docker/docker-entrypoint.sh`, `.env.template`

@@ -1,17 +1,17 @@
 #!/bin/bash
-# KBS Nightly Backup — commit + push your KBS data repo to its git remote if anything changed.
-# Schedule: 45 23 * * * ~/kbs/scripts/nightly-backup.sh
+# KBS Nightly Backup — commit the data repo (kbs-data) if anything changed.
+#
+# POLICY (2026-09-23): kbs-data targets an EXTERNAL (GitHub) remote, so its tree
+# and history must stay free of org/SPC-specific data. This script ALWAYS commits
+# LOCALLY (nothing is lost), but only pushes to the external `origin` when
+# KBS_ALLOW_EXTERNAL_PUSH=1 is explicitly set (e.g. in ~/.bashrc or an env file).
+# Default is commit-only — no external push.
+#
+# Generous cron: @reboot + 12:45,16:45 (laptop up ~8-10h/day; 23:45 was missed).
 #
 # Auth: repo-local credential helper (scripts/git-credential-env.sh) serves
 # GITHUB_TOKEN from the git-ignored .env — no interactive login needed.
-# Local run log: <repo>/backup.log (git-ignored via *.log).
-#
-# Setup:
-#   1. Create a PRIVATE remote repo for your KBS data (it contains your knowledge —
-#      keep it private) and add it as origin.
-#   2. cp .env.template .env and add GITHUB_TOKEN (write-capable).
-#   3. git config credential.helper '!bash scripts/git-credential-env.sh'
-#   4. Add the cron entry above.
+# Local run log: ~/kbs/backup.log (git-ignored via *.log).
 
 set -u
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -37,7 +37,13 @@ git commit -q -m "Nightly backup $(date '+%Y-%m-%d')
 
 $SUMMARY"
 
-if git push -q origin HEAD 2>> "$LOG"; then
+# Commit-only unless external push explicitly allowed.
+if [ "${KBS_ALLOW_EXTERNAL_PUSH:-0}" != "1" ]; then
+    echo "[$TS] BACKUP | committed locally (external push disabled; KBS_ALLOW_EXTERNAL_PUSH not set) | $SUMMARY" >> "$LOG"
+    exit 0
+fi
+
+if git push -q origin master 2>> "$LOG"; then
     echo "[$TS] BACKUP | pushed | $SUMMARY" >> "$LOG"
 else
     echo "[$TS] BACKUP | PUSH FAILED | $SUMMARY" >> "$LOG"
