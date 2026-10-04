@@ -26,6 +26,24 @@ git config credential.helper '!bash scripts/git-credential-env.sh'
 git push -u origin master
 ```
 
+A **self-hosted Gitea** works as the offsite remote too, and is the better choice
+when the data is a mix of personal and org material that must not go to either a
+public host or your employer's infrastructure. Point the remote at your own Gitea
+and add its credentials to `.env` (`GITEA_USERNAME` / `GITEA_PASSWORD`), which the
+same credential helper already understands:
+
+```bash
+# HTTP (through whatever proxy/reverse-proxy fronts Gitea):
+git remote add gitea https://git.example.com/<you>/<kbs-data>.git
+# SSH (recommended for large pushes — avoids HTTP proxy body/time limits):
+git remote add gitea ssh://git@<gitea-host>:<ssh-port>/<you>/<kbs-data>.git
+git config core.sshCommand "ssh -i /path/to/key -o StrictHostKeyChecking=accept-new"
+```
+
+For binary artefacts that never belong in git — an OpenViking `.ovpack` pack, for
+instance — keep a **separate private blob repo** and commit the artefact there; the
+`SHA256SUMS` file in that repo is the integrity check. See `RESTORE.md` §7a.
+
 Nightly automation:
 
 ```cron
