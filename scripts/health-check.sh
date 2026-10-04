@@ -15,7 +15,15 @@ echo "[$TIMESTAMP] Health check reminder triggered" >> "$LOG"
 
 # Check pending approvals
 PENDING=$(find "$KBS_PATH/kb/$KB_NAME/outputs" -name "pending-*.md" -mtime -35 2>/dev/null | wc -l | tr -d ' ')
-UNRESOLVED=$(grep -c "Resolved: No" "$KBS_PATH/FAILURES.md" 2>/dev/null || echo "0")
+# NOTE: do not write `grep -c ... || echo "0"`. When grep finds zero matches it
+# exits 1 AND has already printed "0", so the fallback appends a SECOND 0 and
+# the variable becomes "0\n0" — which then fails the [ ... -gt 0 ] test with
+# "integer expression expected". grep -c always prints a count; just coerce.
+UNRESOLVED=$(grep -c "Resolved: No" "$KBS_PATH/FAILURES.md" 2>/dev/null || true)
+UNRESOLVED=${UNRESOLVED:-0}
+case "$UNRESOLVED" in ''|*[!0-9]*) UNRESOLVED=0 ;; esac
+PENDING=${PENDING:-0}
+case "$PENDING" in ''|*[!0-9]*) PENDING=0 ;; esac
 
 MSG="KBS Monthly Health Check due."
 [ "$PENDING" -gt 0 ] && MSG="$MSG $PENDING pending approvals."
