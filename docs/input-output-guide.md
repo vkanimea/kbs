@@ -150,12 +150,12 @@ Proposed: [[lsm-trees]] LOW → MEDIUM (owner demonstrated working model)
 ```
 
 **Detected by:** lesson headers (`Lesson:` / `Teach me:`), a dependency map of unconditional truths → goal, quiz/probe outcomes describing an understanding edge, or a "Captured Back to KBS" / "Confidence Changes Proposed" block. See `SYSTEM.md §Style Registry`.
-**Processing:** captured, then processed like any other entry — **teaching never writes wiki claims directly**. Extract patterns: gaps → Question; misconceptions → Confusion; clicked facts with evidence → Solution; contradicted claims → Confusion/Failure. Confidence changes stay **proposals** (rule 2).
+**Processing:** captured, then processed like any other entry — **teaching never writes wiki claims directly**. Extract patterns: gaps → Question; misconceptions → Confusion; clicked facts with evidence → Solution; contradicted claims → Confusion/Failure; externally-sourced claims from bootstrap mode → Solution/Question with source URL. Confidence changes stay **proposals** (rule 2).
 **Output:** High — gaps, misconceptions, and clicked facts all produce typed links; the lesson DAG maps to Causes / Leads To / Depends On.
 **Fallback:** Structured (if a lesson capture arrives as labelled patterns with no lesson metadata).
 **Session close:** confirm proposed confidence changes and any decision text with the owner; route gaps to INBOX §Open Questions and misconceptions to contradiction review.
 
-> Registration note: Learn/Lesson is defined as a **custom style** in `SYSTEM.md §Style Registry` to demonstrate the extension point. It pairs with the `Teach me [KB]:` operation (`reference/learning.md`) — the style is what makes a lesson **close the loop** by capturing back into KBS.
+> Registration note: Learn/Lesson is defined as a **custom style** in `SYSTEM.md §Style Registry` to demonstrate the extension point. It pairs with the `Teach me [KB]:` operation (`reference/learning.md`) — the style is what makes a lesson **close the loop** by capturing back into KBS. The operation has two modes: **wiki-only** (default — an ungrounded topic is refused and captured) and **bootstrap** (`— from sources` — external research allowed, every asserted claim must be captured).
 
 ---
 

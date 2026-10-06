@@ -1,6 +1,9 @@
 # Reference: Learning Operations (V0.117)
 
-Loaded when the owner runs: `Follow agents.md. Teach me [KB]: [topic]`
+Loaded when the owner runs one of:
+
+- `Follow agents.md. Teach me [KB]: [topic]` — **wiki-only mode** (default)
+- `Follow agents.md. Teach me [KB]: [topic] — from sources` — **bootstrap mode** (explicit override)
 
 This is the **tutor** side of KBS. The librarian organises and preserves knowledge
 (agents.md); this operation **teaches from it**. The wiki is the library, the lesson
@@ -12,11 +15,40 @@ alone — teach from the wiki, and verify every claim against it.
 
 ---
 
+## The Two Modes
+
+Teaching is a **decision**, not an inference: the owner picks the mode in the prompt, and
+the tutor never silently chooses for them. This mirrors how KBS handles other
+safe-default-vs-explicit-override choices (e.g. `KBS_DRIFT_GUARD=off`).
+
+| | **Wiki-only** (default) | **Bootstrap** (`— from sources`) |
+|---|---|---|
+| Prompt | `Teach me [KB]: [topic]` | `Teach me [KB]: [topic] — from sources` |
+| Source of truth | The wiki, and nothing else | Wiki first, external research for genuine gaps |
+| Topic not in the wiki | **Refuse to teach it** — capture a Question and stop | Research it, teach it, and **capture every asserted claim** |
+| KBS rule posture | Pure: teaching reads the library (rule 6, rule 8) | Explicit owner-authorised exception; provenance is marked and captured |
+
+**Why the default is strict.** The wiki is the system's grounded source of truth. A fact
+researched mid-lesson and spoken but never captured is a claim with no confidence level,
+no conditions, and no source — exactly what rule 6 (scope before ingestion) and rule 8
+(chat insights are suggestions, not sources) exist to prevent. So the *default* must not
+introduce ungrounded knowledge. When the owner wants to learn something the library does
+not yet hold, that is a real and useful thing to do — but it is a deliberate exception,
+and it is paid for by mandatory capture (below).
+
+**Mode is never inferred.** If the prompt does not say `— from sources`, run wiki-only.
+Do not upgrade to bootstrap because the wiki is thin; that is the owner's call.
+
+---
+
 ## What This Is (and Is Not)
 
 - **Is:** a structured teaching session that reads the wiki, plans a dependency graph,
   teaches node by node, checks understanding with `quiz`, and captures what was
   learned back into KBS.
+- **Is not:** an open-ended "explain anything" tutor. In wiki-only mode it teaches only
+  what the wiki grounds. The unrestricted tutor from the `learn` package is reachable
+  only via the explicit bootstrap override.
 - **Is not:** a substitute for ingestion. You do not create wiki claims here — you
   *read* them. New claims discovered during a lesson are **captured** (INBOX / open
   questions / Confusion flags), then processed by ingestion later.
@@ -179,16 +211,31 @@ LLMs" can mean ten different things. Interrogate until concrete. No right answer
 
 ### Phase 2 — Plan (think hard; highest-leverage step)
 
-**Scope with the wiki first.** Replace the `learn` package's web-research step with a
-KBS query: run the **Query process** (`reference/ingestion.md` §Query, agents.md
-§Query Process) on the topic. Read `wiki/topics/INDEX.md`, traverse typed relationships,
-and pull the claims, confidence levels, and conditions that already exist.
+**Scope with the wiki first — always.** Run the **Query process**
+(`reference/ingestion.md` §Query, agents.md §Query Process) on the topic. Read
+`wiki/topics/INDEX.md`, traverse typed relationships, and pull the claims, confidence
+levels, and conditions that already exist.
 
-- If the wiki covers the topic: plan from those claims. This is the primary source.
-- If the wiki has **gaps** (Question stubs, open questions, Confusion flags): those are
-  exactly what a `researcher`-style web pass should fill, and they become captures.
-- Only fall back to external research for genuine wiki gaps — never to re-derive what
-  is already grounded in the wiki.
+Then branch on what the wiki holds:
+
+**If the wiki covers the topic** — plan from those claims. This is the primary source in
+*both* modes.
+
+**If the wiki does not cover the topic (or covers only a fragment):**
+
+- **Wiki-only mode (default): stop and refuse.** Do not teach the topic. Instead:
+  1. Capture a Question to `INBOX §Open Questions`: *"Teach '[topic]' — no wiki basis"*.
+  2. Tell the owner plainly: *"'[topic]' isn't grounded in the wiki yet. I can't teach it
+     from nothing. Either ingest a source on it first, or re-run with `— from sources`,
+     which researches it and captures everything I assert."*
+  3. End the lesson. A refusal is a correct outcome, not a failure.
+- **Bootstrap mode (`— from sources`):** research the gaps externally, but **every
+  externally-sourced claim must be captured before or while it is asserted** (see
+  §Mandatory Capture in Bootstrap Mode). Mark its provenance visibly in the lesson:
+  e.g. `[external — ungrounded, captured as [[topic]]]`.
+
+Never fall back to external research in wiki-only mode. Never re-derive what is already
+grounded in the wiki in either mode.
 
 Then plan against the philosophy:
 
@@ -276,6 +323,7 @@ ingest.** The librarian processes these later, under the normal pipeline.
 | A claim the lesson showed to be shaky or wrong | Flag for confidence review (proposal only) | Confusion / Failure |
 | A new topic the lesson surfaced but the wiki lacks | `INBOX` → wiki stub on ingest | Question / Idea |
 | A decision the owner reached mid-lesson | Propose text for `DECISIONS.md` (owner pastes) | Decision |
+| **An externally-sourced claim asserted in bootstrap mode** | `INBOX` with its source URL, **before it is taught** | Solution / Question (LOW) |
 
 Rules for capture:
 
@@ -290,6 +338,21 @@ Rules for capture:
 The lesson artifact itself is an output: write it to
 `outputs/YYYY-MM-DD-lesson-[slug].md` (query outputs already live in `outputs/`),
 including the approach, the dependency map, and the quiz trail.
+
+### Mandatory Capture in Bootstrap Mode
+
+Bootstrap mode's licence to teach beyond the wiki is **paid for by capture**. Every
+claim the tutor asserts that is *not* grounded in the wiki must be written to INBOX —
+with its source URL and LOW confidence — **before or at the moment it is asserted**,
+never deferred to the end (a deferral risks the lesson ending early and the claim
+vanishing).
+
+- Attribute as a chat insight: `(LLM + date)` and the source URL (rule 8).
+- Mark provenance inline in the lesson so the owner always knows which statements are
+  grounded and which are borrowed: `[external — ungrounded, captured as [[topic]]]`.
+- If a claim cannot be sourced, do not assert it. An unsourceable claim is not taught,
+  in either mode.
+- The lesson report must list every externally-sourced claim it captured.
 
 ---
 
@@ -310,7 +373,12 @@ A lesson run as part of a session is closed by the normal session close. In addi
 ## Boundaries (Learning-Specific)
 
 - **Passive.** Never start a lesson without `Teach me [KB]:`.
-- **Wiki-first.** The wiki is the primary source; external research fills wiki gaps only.
+- **Mode is explicit, never inferred.** No `— from sources` in the prompt → wiki-only.
+- **Wiki-only refuses unknown topics.** If the wiki does not ground the topic, capture a
+  Question and stop; do not teach from the web. Bootstrap mode is the only way to teach
+  an ungrounded topic, and it requires capture.
+- **Bootstrap asserts nothing it did not capture.** Every externally-sourced claim is
+  written to INBOX with a source URL (LOW, rule 8) before it is taught.
 - **Verify, never wing it.** Check the wiki before stating any claim.
 - **Confidence ≠ unconditional-truth.** Only HIGH + condition-free claims are presented
   as caveat-free truths.
@@ -328,6 +396,10 @@ A lesson run as part of a session is closed by the normal session close. In addi
 LESSON REPORT — YYYY-MM-DD
 Topic: [topic]
 KB: [name]
+Mode: Wiki-only | Bootstrap (from sources)
+
+### Wiki Coverage (Phase 2)
+- Grounded in: [[topic1]], [[topic2]] — or "NOT COVERED — refused" (wiki-only)
 
 ### Edge Found (Phase 1)
 - [strand] — floor: [what was held] / ceiling: [where it ran out]
@@ -346,6 +418,7 @@ KB: [name]
 - Confusions / misconceptions: [n] — [list]
 - Solution stubs (clicked): [n] — [list]
 - Decision proposals: [n] — [list]
+- External claims captured (bootstrap only): [n] — [claim → source URL]
 
 ### Confidence Changes Proposed (owner approves)
 - [[topic]] MEDIUM → HIGH — [evidence from lesson]

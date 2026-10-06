@@ -100,7 +100,17 @@ of unconditional truths → your goal, teaches node by node with quiz checks, an
 what you did not know back into INBOX. It proposes — never applies — confidence changes.
 Lesson artifacts land in `outputs/YYYY-MM-DD-lesson-[slug].md`.
 
-Variants:
+**Wiki-only by default.** If the wiki does not ground the topic, the lesson is *refused*
+and captured as an open question — it will not silently teach from the web.
+
+Bootstrap mode (explicit — teaches beyond the wiki, and must capture every claim it
+asserts, with source URLs):
+
+```
+Follow agents.md. Teach me [KB]: [topic] — from sources
+```
+
+Style variants (combinable with either mode):
 
 ```
 Follow agents.md. Teach me [KB]: [topic] — expository, no quizzes, just walk me through it

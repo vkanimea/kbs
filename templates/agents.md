@@ -33,7 +33,7 @@ You do not judge, delete, or make trade-offs without approval.
 | `Process SUCCESSES.md` | `reference/successes.md` | Upgrade confidence, add evidence |
 | `Process ACTIONS.md` | `reference/actions.md` | Route completed, flag overdue |
 | `Journal: [text]` | `reference/journal.md` | Save entry, read wiki context, respond grounded, detect patterns |
-| `Teach me [KB]: [topic]` | `reference/learning.md` | Probe → plan → teach from the wiki; capture gaps to INBOX |
+| `Teach me [KB]: [topic]` | `reference/learning.md` | Wiki-only teach from the wiki, gaps captured (`— from sources` allows external) |
 | `Run health check on [KB]` | `reference/health-check.md` | Full audit + proposals |
 | `Query [KB]: ...` | (below) | 7-step query (adds optional RAG semantic lookup) |
 
@@ -55,9 +55,9 @@ Before processing any INBOX entry, identify its style using SYSTEM.md §Style Re
 6. Route
 ```
 
-**Rapid entries are HELD, never rated Poor.** Quality is rated only after expansion at session close.
+**Rapid entries are HELD, never rated Poor.** Quality is rated only after expansion at close.
 
-**Frontmatter override:** `---\nstyle: [name]\n---` at entry top bypasses auto-detection. Unknown style → fallback to auto-detect + log warning.
+**Frontmatter override:** `---\nstyle: [name]\n---` at entry top bypasses auto-detection. Unknown style → fallback + log warning.
 
 **Custom styles** follow the same pipeline. If no style matches, fall back to Narrative.
 
@@ -158,13 +158,12 @@ When owner prefixes chat with `Journal:`:
 4. Detect patterns: same theme ≥3 entries in 30d → flag
 5. Update `journal/index.md` and `log.md`
 Full rules: `reference/journal.md`
-
 ## Learning Operations (V0.117)
 `Teach me [KB]: [topic]` — probe level (`quiz`) and goal (`ask_user_question`); plan from
-the wiki and present a dependency map for approval; teach node by node (motivate →
-establish → connect → quiz-check); capture gaps to INBOX. Full rules:
-`reference/learning.md`. Reads the wiki, never writes claims; confidence changes are
-proposed (rule 2).
+the wiki, present a dependency map for approval; teach node by node (motivate →
+establish → connect → quiz-check); capture gaps. **Wiki-only by default** — an uncovered
+topic is refused and captured; `— from sources` allows external research and must capture
+every claim. Rules: `reference/learning.md`.
 
 ## Topic Aging & Relevance
 For KBs with >100 topics, relevance tracking prevents context overflow:
@@ -175,7 +174,7 @@ Full rules: `reference/health-check.md`
 
 ## Boundaries
 
-**Autonomous:** read files; create topics; append; add links; update INDEX.md; append to log.md; generate outputs (including lesson outputs to `outputs/`); flag issues; reject genuinely Poor entries; hold Rapid entries.
+**Autonomous:** read files; create topics; append; add links; update INDEX.md; append to log.md; generate outputs; flag issues; reject genuinely Poor entries; hold Rapid entries.
 
 **Approval required:** delete; archive; remove wiki content; resolve contradictions; change confidence scores.
 

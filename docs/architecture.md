@@ -258,6 +258,9 @@ The **tutor** (`reference/learning.md`, reached by `Teach me [KB]:`) is a reader
 library, not a writer to it. It reads wiki topics and their typed relationships,
 teaches from them, and captures what the lesson exposed back into `INBOX.md` — where the
 librarian processes it normally. This keeps a single writer authority over the wiki.
+It is **wiki-only by default**: a topic the wiki does not ground is refused and captured,
+not taught from the web. The explicit `— from sources` bootstrap mode is the only way to
+teach beyond the wiki, and it must capture every claim it asserts.
 
 ---
 

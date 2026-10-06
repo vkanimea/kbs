@@ -193,6 +193,19 @@ The librarian works in three phases:
    presents a claim as a caveat-free truth if the wiki marks it HIGH **and** condition-free;
    everything else travels a “how could I have discovered this?” path.
 
+**Wiki-only by default.** If the wiki does not ground the topic, the lesson is **refused**
+and the topic is captured as an open question — it will not quietly teach from the web.
+When you *do* want to learn something the library doesn't hold yet, make it explicit:
+
+```
+Follow agents.md. Teach me main: [topic] — from sources
+```
+
+Bootstrap mode researches externally, teaches it, and is **required to capture every
+claim it asserts** (with source URL, LOW confidence) before you hear it — so the library
+grows as you learn, and nothing you're taught exists only in the chat. You pick the mode;
+the tutor never infers it.
+
 What it leaves behind: everything you *didn't* know is captured back into INBOX (gaps as
 Open Questions, misconceptions as Confusion flags, facts that clicked as Solution stubs),
 and the lesson itself is written to `outputs/YYYY-MM-DD-lesson-[slug].md`. Confidence
@@ -201,6 +214,7 @@ changes are **proposed** — you approve them like any other proposal.
 Useful variants (see PROMPTS.md):
 
 ```
+Follow agents.md. Teach me main: [topic] — from sources   (bootstrap: external allowed)
 Follow agents.md. Teach me main: [topic] — expository, no quizzes
 Follow agents.md. Teach me main: [topic] — I already know [X], start from there
 Follow agents.md. Teach me main: [topic] — focus on where the wiki is weak
@@ -222,7 +236,7 @@ Follow agents.md. Teach me main: [topic] — focus on where the wiki is weak
 | Shallow query answers | More Mode 1 entries; run ingestion after adding structured content |
 | Journal feels generic | Prefix with `Journal:` so the LLM reads wiki context before responding |
 | Lessons always hit the same gaps | The gaps are real wiki gaps — ingest sources that fill them, then re-run `Teach me` |
-| Lesson wants to teach something the wiki has no claim for | It should capture a Question and stop — ingest that gap before teaching it |
+| `Teach me` refuses a topic | That's wiki-only mode working as designed — ingest a source, or re-run with `— from sources` |
 | No patterns detected | Review journal entries weekly; patterns need ≥3 entries in 30 days |
 | CAREER.md empty | Every close must add one entry — small wins count. Health check compiles resume bullets, interview stories, and impact metrics. |
 | Actions piling up | Weekly `Process ACTIONS.md`; cancel stale ones honestly |
