@@ -102,7 +102,7 @@ metadata before crawl — not after
 
 **Rules:**
 - Frontmatter must be the very first content in the entry, before the timestamp heading
-- Valid values: `structured`, `narrative`, `rapid`, `document`, `voice`, or any registered custom style name
+- Valid values: `structured`, `narrative`, `rapid`, `document`, `voice`, `learn`, or any registered custom style name
 - The LLM reads the frontmatter first; if present, it skips auto-detection for that entry
 - If the frontmatter value does not match a registered style, fall back to auto-detection and log a warning
 - Use sparingly — the goal is auto-detection that just works. Frontmatter is for the 5% of edge cases.
@@ -261,6 +261,43 @@ session_close: Confirm cleaned extraction:
 
 ---
 
+### Built-in-Style 6 — Learn/Lesson (registered custom style)
+
+```yaml
+name: Learn/Lesson
+description: A teaching-session artifact or captured lesson outcome — a topic explained, a dependency graph taught, and the quiz checks and gaps it produced
+detection_signals:
+  - Entry contains a lesson header: "Lesson:" or "Teach me:" or a topic taught at the owner's request
+  - Contains a dependency map or typed-relationship DAG of unconditional truths → goal
+  - Contains quiz outcomes (passed / missed) or probe results describing an understanding edge
+  - Contains a "Captured Back to KBS" or "Confidence Changes Proposed" block
+  - References a lesson output file in outputs/YYYY-MM-DD-lesson-*.md
+  - Produced by the `Teach me [KB]:` operation (reference/learning.md)
+processing_rules:
+  - This style is captured, then processed like any other INBOX entry — teaching never writes wiki claims directly
+  - Extract the 8 patterns from the lesson capture:
+      a genuine gap the owner cannot yet do          → Question
+      a misconception the quiz exposed               → Confusion
+      a fact that clicked, with evidence it landed   → Solution (+ conditions/limitations/evidence)
+      a claim the lesson contradicted or weakened    → Confusion / Failure signal
+      a topic surfaced but absent from the wiki      → Question / Idea
+  - Preserve the lesson's confidence metadata: note whether each taught claim was HIGH + condition-free (unconditional truth) or conditional/motivated
+  - Confidence changes surfaced by the lesson are PROPOSALS — never applied during processing (rule 2)
+  - Decisions reached mid-lesson are proposed for DECISIONS.md; never written (rule 4)
+  - Do not re-teach during ingestion — this style is for capture and routing only
+quality_floor: Good (a lesson capture is structured by construction; treat like Structured)
+link_richness: High — gaps, misconceptions, and clicked facts produce typed links; lesson DAG edges map to Causes / Leads To / Depends On
+fallback: Structured (if a lesson capture arrives as labelled patterns with no lesson metadata)
+session_close: Confirm any proposed confidence changes and decision text with the owner; route captured gaps to INBOX §Open Questions and misconceptions to contradiction review
+```
+
+**Note:** the Learn/Lesson style is what makes a teaching session *close the loop*.
+Without it, a lesson leaves nothing behind and the KBS rule "a session without a close
+is a session without learning" is violated in spirit. It is registered here as a custom
+style precisely because the Style Registry is the system's extension point.
+
+---
+
 ### Custom Styles (Add Yours Here)
 
 To add a custom style, copy this template and fill it in:
@@ -402,6 +439,9 @@ Prompts: `PROMPTS.md`.
 | Solution without conditions | "Add conditions and limitations to: [title]" |
 | Custom style detection failure | "Review style registry — [style] not matching correctly" |
 | Frontmatter override mismatch | "Frontmatter style '[name]' not in registry — check spelling or register custom style" |
+| Lesson captured but not ingested | "Process lesson capture from [date] — gaps, misconceptions, and clicked facts awaiting ingestion" |
+| Misconception exposed by a quiz | "Revisit misconception: [claim] — contradicted expectations in lesson [date]" |
+| Lesson-proposed confidence change unapproved | "Review proposed confidence change for [[topic]] from lesson [date]" |
 
 ---
 

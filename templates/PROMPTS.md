@@ -18,6 +18,7 @@ Run after every meaningful work session. This routes everything — successes, f
 | Action | Prompt |
 |--------|--------|
 | Query | `Follow agents.md. Query [KB]: [your question]` |
+| Teach me | `Follow agents.md. Teach me [KB]: [topic]` |
 | Journal | `Journal: [your reflective writing — any topic, any length]` |
 | Compound | `Yes, compound the answer from outputs/[filename] to INBOX.md` |
 
@@ -60,6 +61,7 @@ Run after every meaningful work session. This routes everything — successes, f
 | Hubs & bridges (50+) | `Follow agents.md. Show me hubs and bridges in [KB].` |
 | Solutions summary | `Follow agents.md. Show me all solutions in SUCCESSES.md with their conditions.` |
 | Problem→Solution map | `Follow agents.md. Show me which problems have documented solutions and which do not.` |
+| Resume a lesson | `Follow agents.md. Teach me [KB]: [topic] — I was at [where you left off].` |
 
 ---
 
@@ -83,4 +85,25 @@ in agents.md. There are 8 input patterns — including Solution — and
 Approve all
 Approve items 1,3,5. Reject 2 and 4 because [reason]
 Approve all except #4 because [reason]
+```
+
+---
+
+## Learning (Teach)
+
+```
+Follow agents.md. Teach me [KB]: [topic]
+```
+
+The librarian reads the wiki for that topic (Query process), plans a dependency graph
+of unconditional truths → your goal, teaches node by node with quiz checks, and captures
+what you did not know back into INBOX. It proposes — never applies — confidence changes.
+Lesson artifacts land in `outputs/YYYY-MM-DD-lesson-[slug].md`.
+
+Variants:
+
+```
+Follow agents.md. Teach me [KB]: [topic] — expository, no quizzes, just walk me through it
+Follow agents.md. Teach me [KB]: [topic] — I already know [X], start from there
+Follow agents.md. Teach me [KB]: [topic] — focus on where the wiki is weak
 ```

@@ -46,6 +46,15 @@ data instance mirror upstream. See *The Harness Layer* in
      Expect exit `0`, a non-empty `kb/projects/<project>/graphs/graph.json`, and
      (with `--wiki`) a populated `wiki/graph/` dir.
 
+2b. **Register any new custom style in the instance's `SYSTEM.md`.** `SYSTEM.md` is
+   **user-owned** — `kbs-sync.sh` never overwrites it — so a style added to the system
+   repo's `templates/SYSTEM.md` reaches *fresh installs only*. An existing instance must
+   paste the style block into its own `SYSTEM.md §Style Registry` by hand. V0.117 added
+   the `Learn/Lesson` style this way: after syncing, confirm the instance's `SYSTEM.md`
+   contains `name: Learn/Lesson` before advising `Teach me [KB]:`
+   (`grep -n "Learn/Lesson" SYSTEM.md`). The operation (`reference/learning.md`) *is*
+   synced normally; only the registry entry needs the manual paste.
+
 3. **If a feature is broken on activation** — treat the fix as a **patch**, not a
    feature bump (matching this project's convention, e.g. V0.116.1, V0.116.2):
    - fix the wrapped script, add a patch note to `CHANGELOG.md`, bump `VERSION`

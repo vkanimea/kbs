@@ -87,6 +87,7 @@ SYSTEM_PATHS=(
   templates/reference/health-check.md:reference/health-check.md
   templates/reference/ingestion.md:reference/ingestion.md
   templates/reference/journal.md:reference/journal.md
+  templates/reference/learning.md:reference/learning.md
   templates/reference/session-close.md:reference/session-close.md
   templates/reference/successes.md:reference/successes.md
   scripts/auto-close.sh

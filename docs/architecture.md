@@ -226,6 +226,7 @@ The system always creates whatever links the evidence supports. It never upgrade
 | Input capture | `INBOX.md` (default) + 3 specialist files | — |
 | Commitments | `ACTIONS.md` | populated by close |
 | Journal | `JOURNAL.md` | populated by journal operations |
+| Learning | `reference/learning.md` | tutor reads wiki, captures back to INBOX |
 | Portfolio | `CAREER.md` | populated by close |
 | History | `log.md` | append-only |
 | Input/output reference | `docs/input-output-guide.md` | — |
@@ -241,7 +242,7 @@ raw/            = archive room (originals never touched)
 wiki/topics/    = the library (organised, linked, reasoned)
 wiki/archive/   = basement (cold topics, summarised stubs)
 journal/        = the confessional (reflective entries, pattern detection)
-outputs/        = reading room (answers and synthesis)
+outputs/        = reading room (answers, synthesis, and lesson artifacts)
 FAILURES.md     = incident log
 SUCCESSES.md    = validation log
 DECISIONS.md    = judgement book
@@ -252,6 +253,11 @@ log.md          = security camera
 reference/      = procedure manuals (loaded on demand)
 examples/       = exhibition hall (starter KB for learning)
 ```
+
+The **tutor** (`reference/learning.md`, reached by `Teach me [KB]:`) is a reader of the
+library, not a writer to it. It reads wiki topics and their typed relationships,
+teaches from them, and captures what the lesson exposed back into `INBOX.md` — where the
+librarian processes it normally. This keeps a single writer authority over the wiki.
 
 ---
 

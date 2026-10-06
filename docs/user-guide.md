@@ -173,6 +173,45 @@ Say yes to compounding when the answer is useful — it feeds back into INBOX an
 
 ---
 
+## Learning from the Wiki (Teach)
+
+KBS organises knowledge. This one operation *teaches* it back to you:
+
+```
+Follow agents.md. Teach me main: [topic]
+```
+
+The librarian works in three phases:
+
+1. **Probe** — quiz questions map the edge of what you already know (it escalates until
+   something breaks; all-correct means the questions were too easy). A separate question
+   finds what you actually want taught.
+2. **Plan** — it reads the wiki for that topic, lays out a dependency graph from
+   unconditional truths to your goal, draws it as a mermaid map **and** as typed
+   relationships, and **waits for your go-ahead** before teaching.
+3. **Teach** — node by node: motivate → establish → connect → quiz-check. It only
+   presents a claim as a caveat-free truth if the wiki marks it HIGH **and** condition-free;
+   everything else travels a “how could I have discovered this?” path.
+
+What it leaves behind: everything you *didn't* know is captured back into INBOX (gaps as
+Open Questions, misconceptions as Confusion flags, facts that clicked as Solution stubs),
+and the lesson itself is written to `outputs/YYYY-MM-DD-lesson-[slug].md`. Confidence
+changes are **proposed** — you approve them like any other proposal.
+
+Useful variants (see PROMPTS.md):
+
+```
+Follow agents.md. Teach me main: [topic] — expository, no quizzes
+Follow agents.md. Teach me main: [topic] — I already know [X], start from there
+Follow agents.md. Teach me main: [topic] — focus on where the wiki is weak
+```
+
+> Teaching is **passive and owner-invoked** — it never runs on its own. And it reads the
+> wiki, it never writes claims directly: new knowledge still travels the normal
+> INBOX → ingestion pipeline. That is what keeps the librarian's authority intact.
+
+---
+
 ## Troubleshooting
 
 | Symptom | Fix |
@@ -182,6 +221,8 @@ Say yes to compounding when the answer is useful — it feeds back into INBOX an
 | Many orphan topics | Run missing-links review; approve typed link proposals |
 | Shallow query answers | More Mode 1 entries; run ingestion after adding structured content |
 | Journal feels generic | Prefix with `Journal:` so the LLM reads wiki context before responding |
+| Lessons always hit the same gaps | The gaps are real wiki gaps — ingest sources that fill them, then re-run `Teach me` |
+| Lesson wants to teach something the wiki has no claim for | It should capture a Question and stop — ingest that gap before teaching it |
 | No patterns detected | Review journal entries weekly; patterns need ≥3 entries in 30 days |
 | CAREER.md empty | Every close must add one entry — small wins count. Health check compiles resume bullets, interview stories, and impact metrics. |
 | Actions piling up | Weekly `Process ACTIONS.md`; cancel stale ones honestly |

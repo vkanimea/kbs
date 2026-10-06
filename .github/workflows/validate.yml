@@ -144,7 +144,7 @@ jobs:
       - name: Reference modules complete (fails on missing)
         run: |
           set -e
-          grep -q "10-Step Close" templates/reference/session-close.md || exit 1
+          grep -q "11-Step Close" templates/reference/session-close.md || exit 1
           grep -q "6-Step Pipeline" templates/reference/ingestion.md || exit 1
           grep -q "confidence = LOW\|Default confidence = LOW\|LOW" templates/reference/chat-input.md || exit 1
           grep -q "HIGH | MEDIUM" templates/reference/failures.md || exit 1
@@ -152,6 +152,7 @@ jobs:
           grep -q "confidence upgrade" templates/reference/successes.md || exit 1
           grep -q "Route the outcome" templates/reference/actions.md || exit 1
           grep -q "Journal Operations" templates/reference/journal.md || exit 1
+          grep -q "Phase 3 — Teach" templates/reference/learning.md || exit 1
           echo "✅ reference modules verified"
 
       - name: Examples are clearly marked

@@ -131,6 +131,8 @@ The structure after install:
 │   ├── ingestion.md
 │   ├── chat-input.md
 │   ├── failures.md
+│   ├── journal.md
+│   ├── learning.md
 │   └── health-check.md
 ├── SYSTEM.md         # Config: activity levels, scope, metrics targets
 ├── PROMPTS.md        # All prompts (single source)

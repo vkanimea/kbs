@@ -33,6 +33,7 @@ You do not judge, delete, or make trade-offs without approval.
 | `Process SUCCESSES.md` | `reference/successes.md` | Upgrade confidence, add evidence |
 | `Process ACTIONS.md` | `reference/actions.md` | Route completed, flag overdue |
 | `Journal: [text]` | `reference/journal.md` | Save entry, read wiki context, respond grounded, detect patterns |
+| `Teach me [KB]: [topic]` | `reference/learning.md` | Probe → plan → teach from the wiki; capture gaps to INBOX |
 | `Run health check on [KB]` | `reference/health-check.md` | Full audit + proposals |
 | `Query [KB]: ...` | (below) | 7-step query (adds optional RAG semantic lookup) |
 
@@ -42,7 +43,7 @@ All prompts: `PROMPTS.md` (single source).
 
 ## Input Style Detection — Read SYSTEM.md §Style Registry
 
-Before processing any INBOX entry, identify its style using SYSTEM.md §Style Registry detection signals. The style table lives there — do not duplicate it here.
+Before processing any INBOX entry, identify its style using SYSTEM.md §Style Registry detection signals — do not duplicate the table here.
 
 **The processing order is always:**
 ```
@@ -98,7 +99,7 @@ The system always creates the strongest typed link the evidence supports. It nev
 
 ## Query Process (7 Steps)
 
-0. **Semantic lookup (optional):** for fuzzy queries, run `scripts/rag-query.sh`. Skip for exact-name or explicit-link queries; INDEX.md stays primary.
+0. **Semantic lookup (optional):** for fuzzy queries, run `scripts/rag-query.sh`; INDEX.md stays primary.
 1. Read `wiki/topics/INDEX.md` (or RAG candidates from step 0)
 2. Identify 3–5 relevant topics
 3. Traverse typed relationships
@@ -130,9 +131,7 @@ TLDR: One-paragraph summary.
 ## Open Questions
 
 ## Relevance Tracking (Optional)
-- Last queried: YYYY-MM-DD
-- Query count: n
-- Relevance score: HIGH / MEDIUM / LOW (set by health check based on access patterns)
+- Last queried / Query count / Relevance score (set by health check)
 ```
 
 **Links are explicit only.** Never inferred from filenames or timestamps.
@@ -160,6 +159,13 @@ When owner prefixes chat with `Journal:`:
 5. Update `journal/index.md` and `log.md`
 Full rules: `reference/journal.md`
 
+## Learning Operations (V0.117)
+`Teach me [KB]: [topic]` — probe level (`quiz`) and goal (`ask_user_question`); plan from
+the wiki and present a dependency map for approval; teach node by node (motivate →
+establish → connect → quiz-check); capture gaps to INBOX. Full rules:
+`reference/learning.md`. Reads the wiki, never writes claims; confidence changes are
+proposed (rule 2).
+
 ## Topic Aging & Relevance
 For KBs with >100 topics, relevance tracking prevents context overflow:
 - HIGH: queried within 30d OR linked from >3 HIGH claims
@@ -169,7 +175,7 @@ Full rules: `reference/health-check.md`
 
 ## Boundaries
 
-**Autonomous:** read files; create topics; append; add links; update INDEX.md; append to log.md; generate outputs; flag issues; reject genuinely Poor entries; hold Rapid entries.
+**Autonomous:** read files; create topics; append; add links; update INDEX.md; append to log.md; generate outputs (including lesson outputs to `outputs/`); flag issues; reject genuinely Poor entries; hold Rapid entries.
 
 **Approval required:** delete; archive; remove wiki content; resolve contradictions; change confidence scores.
 

@@ -133,6 +133,32 @@ we can tune after the migration.
 
 ---
 
+### Style 6 — Learn/Lesson (registered custom style)
+
+**What it looks like:** a capture produced by the `Teach me [KB]:` operation — a teaching
+session's gaps, misconceptions, clicked facts, and proposed confidence changes.
+
+```markdown
+### 2026-06-11 19:00
+Lesson: B-tree vs LSM-tree index trade-offs
+Edge found: understands B-tree reads (floor); hit the wall on write-amplification (ceiling)
+Gap: cannot yet explain why LSM compaction bounds read cost
+Confusion: assumed all indexes must be read-optimised — quiz contradicted this
+Solution: write cost vs read cost trade-off — conditions: write-heavy vs read-heavy workload
+Evidence: got 3/4 dependent questions right after the discovery path; missed the compaction one
+Proposed: [[lsm-trees]] LOW → MEDIUM (owner demonstrated working model)
+```
+
+**Detected by:** lesson headers (`Lesson:` / `Teach me:`), a dependency map of unconditional truths → goal, quiz/probe outcomes describing an understanding edge, or a "Captured Back to KBS" / "Confidence Changes Proposed" block. See `SYSTEM.md §Style Registry`.
+**Processing:** captured, then processed like any other entry — **teaching never writes wiki claims directly**. Extract patterns: gaps → Question; misconceptions → Confusion; clicked facts with evidence → Solution; contradicted claims → Confusion/Failure. Confidence changes stay **proposals** (rule 2).
+**Output:** High — gaps, misconceptions, and clicked facts all produce typed links; the lesson DAG maps to Causes / Leads To / Depends On.
+**Fallback:** Structured (if a lesson capture arrives as labelled patterns with no lesson metadata).
+**Session close:** confirm proposed confidence changes and any decision text with the owner; route gaps to INBOX §Open Questions and misconceptions to contradiction review.
+
+> Registration note: Learn/Lesson is defined as a **custom style** in `SYSTEM.md §Style Registry` to demonstrate the extension point. It pairs with the `Teach me [KB]:` operation (`reference/learning.md`) — the style is what makes a lesson **close the loop** by capturing back into KBS.
+
+---
+
 ## Custom Styles — The Extension Point
 
 The 5 built-in styles cover the most common input formats. But any recurring input type not covered by them can be registered as a custom style in `SYSTEM.md §Custom Styles`.
@@ -310,6 +336,11 @@ Voice transcript      →   Voice         →   Cleaned → same as  →  Same a
                                             Narrative
 
 Custom format         →   Custom        →   Per definition      →  Per definition
+
+Lesson capture        →   Learn/Lesson  →   Gaps→Question,      →  Causes/Leads To/
+(custom style)                              misconceptions→         Depends On
+                                            Confusion, clicked
+                                            →Solution stub
 ```
 
 ---
@@ -325,6 +356,7 @@ CUSTOM STYLES      Define in SYSTEM.md §Custom Styles
                    Any format valid if it follows the definition template
                    Detected automatically once registered
                    Fully worked Email Thread example included
+                   Learn/Lesson shipped as a registered custom style
 
 8 PATTERNS         Problem · Solution · Question · Observation→Hypothesis
                    Idea · Input · Confusion · Combination
@@ -341,6 +373,7 @@ LINK TYPES         Causes · Leads To · Depends On · CONSTRAINS · Related
 
 3 COMMANDS         Ingest · Close session · Query
                    (weekly · every session · daily)
+                   + Teach me [KB]: [topic] (on demand — learn from the wiki)
 
 SUPPORT SCRIPTS    status.sh · auto-close.sh · due-actions.sh · topic-index.sh
                    rag-index.sh · rag-query.sh

@@ -86,7 +86,7 @@ function Install-KbsFilePreserve {
 Write-Host "📝 Installing system files..." -ForegroundColor Cyan
 @("agents.md","PROMPTS.md") |
   ForEach-Object { Install-KbsFile "templates/$_" "$KbsPath\$_" }
-@("session-close.md","ingestion.md","chat-input.md","failures.md","successes.md","actions.md","journal.md","health-check.md") |
+@("session-close.md","ingestion.md","chat-input.md","failures.md","successes.md","actions.md","journal.md","learning.md","health-check.md") |
   ForEach-Object { Install-KbsFile "templates/reference/$_" "$KbsPath\reference\$_" }
 Install-KbsFile "CHANGELOG.md" "$KbsPath\CHANGELOG.md"
 Install-KbsFile "VERSION" "$KbsPath\VERSION"
