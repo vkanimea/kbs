@@ -227,6 +227,7 @@ The system always creates whatever links the evidence supports. It never upgrade
 | Commitments | `ACTIONS.md` | populated by close |
 | Journal | `JOURNAL.md` | populated by journal operations |
 | Learning | `reference/learning.md` | tutor reads wiki, captures back to INBOX |
+| Session analysis | `reference/session-analysis.md` | mines agent history → captures |
 | Portfolio | `CAREER.md` | populated by close |
 | History | `log.md` | append-only |
 | Input/output reference | `docs/input-output-guide.md` | — |
@@ -278,6 +279,7 @@ teach beyond the wiki, and it must capture every claim it asserts.
 | `youtube-ingest.sh` | Download YouTube audio + transcribe + INBOX entry | On demand |
 | `chat-adapter.sh` | Pipe/file capture to CHAT_INBOX.md | On demand |
 | `chat-api-adapter.py` | Webhook server for API capture | On demand |
+| `analyze-sessions/*.py` | Analyze agent history: cost rollups, prompt-pattern mining, session search/render | On demand (`Analyze sessions`) |
 
 > Harness session transcripts (opencode, pi, …) can be exported into `raw/chat-transcripts/` + `CHAT_INBOX.md` by an instance-specific exporter — see *The Harness Layer* above. Exporters are not shipped: they depend on the harness's own storage format.
 

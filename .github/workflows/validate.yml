@@ -153,6 +153,8 @@ jobs:
           grep -q "Route the outcome" templates/reference/actions.md || exit 1
           grep -q "Journal Operations" templates/reference/journal.md || exit 1
           grep -q "Phase 3 — Teach" templates/reference/learning.md || exit 1
+          grep -q "Session Analysis" templates/reference/session-analysis.md || exit 1
+          grep -q "Writing Style" templates/reference/writing-style.md || exit 1
           echo "✅ reference modules verified"
 
       - name: Examples are clearly marked

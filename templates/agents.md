@@ -34,6 +34,7 @@ You do not judge, delete, or make trade-offs without approval.
 | `Process ACTIONS.md` | `reference/actions.md` | Route completed, flag overdue |
 | `Journal: [text]` | `reference/journal.md` | Save entry, read wiki context, respond grounded, detect patterns |
 | `Teach me [KB]: [topic]` | `reference/learning.md` | Wiki-only teach from the wiki, gaps captured (`— from sources` allows external) |
+| `Analyze sessions for [KB]` | `reference/session-analysis.md` | Cost, struggle, and prompt-pattern mining → captures |
 | `Run health check on [KB]` | `reference/health-check.md` | Full audit + proposals |
 | `Query [KB]: ...` | (below) | 7-step query (adds optional RAG semantic lookup) |
 
@@ -43,19 +44,12 @@ All prompts: `PROMPTS.md` (single source).
 
 ## Input Style Detection — Read SYSTEM.md §Style Registry
 
-Before processing any INBOX entry, identify its style using SYSTEM.md §Style Registry detection signals — do not duplicate the table here.
+Before processing any INBOX entry, identify its style using SYSTEM.md §Style Registry signals — do not duplicate the table here.
 
-**The processing order is always:**
-```
-1. Detect style (from Style Registry)
-2. Apply style-specific processing
-3. Extract patterns
-4. Rate quality of extracted content
-5. Create links
-6. Route
-```
+The processing order is always: detect style → apply style processing → extract patterns
+→ rate quality → create links → route.
 
-**Rapid entries are HELD, never rated Poor.** Quality is rated only after expansion at close.
+**Rapid entries are HELD, never rated Poor.** Quality is rated only after expansion.
 
 **Frontmatter override:** `---\nstyle: [name]\n---` at entry top bypasses auto-detection. Unknown style → fallback + log warning.
 
@@ -135,7 +129,7 @@ TLDR: One-paragraph summary.
 ```
 
 **Links are explicit only.** Never inferred from filenames or timestamps.
-**Conditions column mandatory for HIGH claims.**
+**Conditions column mandatory for HIGH claims.** Prose follows `reference/writing-style.md`.
 
 ---
 
@@ -157,13 +151,16 @@ When owner prefixes chat with `Journal:`:
 3. Respond grounded in wiki claims (cite confidence + sources)
 4. Detect patterns: same theme ≥3 entries in 30d → flag
 5. Update `journal/index.md` and `log.md`
-Full rules: `reference/journal.md`
+Rules: `reference/journal.md`
 ## Learning Operations (V0.117)
-`Teach me [KB]: [topic]` — probe level (`quiz`) and goal (`ask_user_question`); plan from
-the wiki, present a dependency map for approval; teach node by node (motivate →
-establish → connect → quiz-check); capture gaps. **Wiki-only by default** — an uncovered
-topic is refused and captured; `— from sources` allows external research and must capture
-every claim. Rules: `reference/learning.md`.
+`Teach me [KB]: [topic]` — probe → plan (map for approval) → teach node by node.
+**Wiki-only by default**; `— from sources` allows external research + mandatory capture.
+See `reference/learning.md`.
+
+## Session Analysis (V0.117)
+`Analyze sessions for [KB]` mines agent history (cost, struggles, repeated prompts) via
+`scripts/analyze-sessions/`, capturing findings to INBOX. See
+`reference/session-analysis.md`.
 
 ## Topic Aging & Relevance
 For KBs with >100 topics, relevance tracking prevents context overflow:

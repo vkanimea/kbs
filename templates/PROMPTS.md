@@ -62,6 +62,9 @@ Run after every meaningful work session. This routes everything — successes, f
 | Solutions summary | `Follow agents.md. Show me all solutions in SUCCESSES.md with their conditions.` |
 | Problem→Solution map | `Follow agents.md. Show me which problems have documented solutions and which do not.` |
 | Resume a lesson | `Follow agents.md. Teach me [KB]: [topic] — I was at [where you left off].` |
+| Analyze sessions | `Follow agents.md. Analyze sessions for [KB]` |
+| Session cost | `Follow agents.md. What did my sessions cost for [KB]?` |
+| Mine prompts | `Follow agents.md. Mine my prompts for [KB]` |
 
 ---
 
@@ -116,4 +119,24 @@ Style variants (combinable with either mode):
 Follow agents.md. Teach me [KB]: [topic] — expository, no quizzes, just walk me through it
 Follow agents.md. Teach me [KB]: [topic] — I already know [X], start from there
 Follow agents.md. Teach me [KB]: [topic] — focus on where the wiki is weak
+```
+
+---
+
+## Session Analysis (Mine Your Own History)
+
+```
+Follow agents.md. Analyze sessions for [KB]
+```
+
+Reads your agent history (`~/.pi/agent/sessions/`) for cost, error-heavy sessions, and
+repeated prompts, then captures findings to INBOX. Repeated corrections become proposals
+to sharpen system rules; recurring complaints become open questions. Read-only.
+
+Focused variants:
+
+```
+Follow agents.md. What did my sessions cost for [KB]?
+Follow agents.md. Mine my prompts for [KB]
+Follow agents.md. Where did the agent struggle most in [KB] sessions this month?
 ```

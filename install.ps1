@@ -39,6 +39,7 @@ Write-Host ""
 # ─── Directories ───────────────────────────────────────────────────────────────
 @(
     "$KbsPath\reference",
+    "$KbsPath\scripts\analyze-sessions",
     "$KbsPath\kb\$KbName\raw\chat-transcripts",
     "$KbsPath\kb\$KbName\raw-assets\pdfs",
     "$KbsPath\kb\$KbName\raw-assets\images",
@@ -86,7 +87,7 @@ function Install-KbsFilePreserve {
 Write-Host "📝 Installing system files..." -ForegroundColor Cyan
 @("agents.md","PROMPTS.md") |
   ForEach-Object { Install-KbsFile "templates/$_" "$KbsPath\$_" }
-@("session-close.md","ingestion.md","chat-input.md","failures.md","successes.md","actions.md","journal.md","learning.md","health-check.md") |
+@("session-close.md","ingestion.md","chat-input.md","failures.md","successes.md","actions.md","journal.md","learning.md","session-analysis.md","writing-style.md","health-check.md") |
   ForEach-Object { Install-KbsFile "templates/reference/$_" "$KbsPath\reference\$_" }
 Install-KbsFile "CHANGELOG.md" "$KbsPath\CHANGELOG.md"
 Install-KbsFile "VERSION" "$KbsPath\VERSION"
@@ -102,6 +103,8 @@ if ($script:Kept.Count -gt 0) {
 Write-Host "🔧 Installing scripts..." -ForegroundColor Cyan
 @("chat-adapter.sh","chat-api-adapter.py","health-check.sh","status.sh","auto-close.sh","due-actions.sh","topic-index.sh","youtube-ingest.sh","hourly-ingest.sh","git-credential-env.sh","nightly-backup.sh","rag.py","rag-index.sh","rag-query.sh","goal-loop.sh","graphify-index.sh","kbs-sync.sh","kbs-drift-check.sh") |
   ForEach-Object { Install-KbsFile "scripts/$_" "$KbsPath\scripts\$_" }
+@("sessions.py","cost.py","prompts.py","search.py","show_session.py","README.md") |
+  ForEach-Object { Install-KbsFile "scripts/analyze-sessions/$_" "$KbsPath\scripts\analyze-sessions\$_" }
 Install-KbsFile "scripts/windows/status.ps1" "$KbsPath\scripts\windows\status.ps1"
 
 # Install examples (optional — copy locally if available, never fail on download)

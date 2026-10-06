@@ -88,9 +88,17 @@ SYSTEM_PATHS=(
   templates/reference/ingestion.md:reference/ingestion.md
   templates/reference/journal.md:reference/journal.md
   templates/reference/learning.md:reference/learning.md
+  templates/reference/session-analysis.md:reference/session-analysis.md
+  templates/reference/writing-style.md:reference/writing-style.md
   templates/reference/session-close.md:reference/session-close.md
   templates/reference/successes.md:reference/successes.md
   scripts/auto-close.sh
+  scripts/analyze-sessions/sessions.py
+  scripts/analyze-sessions/cost.py
+  scripts/analyze-sessions/prompts.py
+  scripts/analyze-sessions/search.py
+  scripts/analyze-sessions/show_session.py
+  scripts/analyze-sessions/README.md
   scripts/chat-adapter.sh
   scripts/chat-api-adapter.py
   scripts/due-actions.sh

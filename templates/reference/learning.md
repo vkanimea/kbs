@@ -234,6 +234,23 @@ Then branch on what the wiki holds:
   §Mandatory Capture in Bootstrap Mode). Mark its provenance visibly in the lesson:
   e.g. `[external — ungrounded, captured as [[topic]]]`.
 
+**How to research in bootstrap mode (available tools).** KBS does not ship a search
+extension. Use what the harness provides, in this order:
+
+1. **Search** — a web-grounded model turn (on this machine: an OpenRouter model with the
+   `:online` suffix, e.g. `openrouter/deepseek/deepseek-chat-v3.1:online`, which routes
+   through Exa search). Ask for sources; require URLs in the answer.
+2. **Read full pages** — the `web_fetch` tool (Readability + Turndown; also handles PDFs
+   and JS-rendered pages via a Jina Reader fallback). Fetch the primary sources the
+   search surfaced rather than trusting snippets.
+3. **Prefer primary sources** — official docs, specs, papers over blog posts and SEO
+   filler. Vary the query angles: direct answer, authoritative source, practical
+   experience, recent developments (only if time-sensitive).
+
+If neither a search model nor `web_fetch` is available, **stop and say so** — do not
+improvise research with raw `bash`/`curl`. Bootstrap mode requires real retrieval, and
+the harness's own tools are the only sanctioned path.
+
 Never fall back to external research in wiki-only mode. Never re-derive what is already
 grounded in the wiki in either mode.
 

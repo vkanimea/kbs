@@ -34,7 +34,7 @@ echo -e "${YELLOW}📚 KB   : $KB_NAME${NC}"
 echo ""
 
 # ─── Directories ───────────────────────────────────────────────────────────────
-mkdir -p "$KBS_PATH"/{reference,scripts/windows,docs}
+mkdir -p "$KBS_PATH"/{reference,scripts/windows,scripts/analyze-sessions,docs}
 mkdir -p "$KBS_PATH/kb/$KB_NAME"/{raw/chat-transcripts,raw-assets/{pdfs,images},wiki/{topics,snapshots},outputs}
 echo -e "${GREEN}✅ Directories created${NC}"
 
@@ -46,8 +46,9 @@ if [ -f "$KBS_PATH/log.md" ]; then INSTANCE_EXISTED=1; else INSTANCE_EXISTED=0; 
 SYSTEM_TEMPLATES=(agents.md PROMPTS.md)
 # User-owned files — seeded only when absent, NEVER overwritten (your content lives here)
 USER_FILES=(SYSTEM.md DECISIONS.md INBOX.md CHAT_INBOX.md FAILURES.md SUCCESSES.md CAREER.md ACTIONS.md JOURNAL.md log.md)
-REFERENCES=(session-close.md ingestion.md chat-input.md failures.md successes.md actions.md journal.md learning.md health-check.md)
+REFERENCES=(session-close.md ingestion.md chat-input.md failures.md successes.md actions.md journal.md learning.md session-analysis.md writing-style.md health-check.md)
 SCRIPTS=(chat-adapter.sh chat-api-adapter.py health-check.sh status.sh auto-close.sh due-actions.sh topic-index.sh youtube-ingest.sh hourly-ingest.sh rag.py rag-index.sh rag-query.sh nightly-backup.sh git-credential-env.sh goal-loop.sh graphify-index.sh kbs-sync.sh kbs-drift-check.sh)
+SESSION_ANALYSIS_SCRIPTS=(sessions.py cost.py prompts.py search.py show_session.py README.md)
 
 FAILED=0
 install_file() {
@@ -91,6 +92,7 @@ fi
 
 echo -e "${CYAN}🔧 Installing scripts...${NC}"
 for f in "${SCRIPTS[@]}"; do install_file "scripts/$f" "$KBS_PATH/scripts/$f"; done
+for f in "${SESSION_ANALYSIS_SCRIPTS[@]}"; do install_file "scripts/analyze-sessions/$f" "$KBS_PATH/scripts/analyze-sessions/$f"; done
 install_file "scripts/windows/status.ps1" "$KBS_PATH/scripts/windows/status.ps1"
 
 # Install examples (optional — copy locally if available, never fail on download)

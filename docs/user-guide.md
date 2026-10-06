@@ -237,6 +237,7 @@ Follow agents.md. Teach me main: [topic] — focus on where the wiki is weak
 | Journal feels generic | Prefix with `Journal:` so the LLM reads wiki context before responding |
 | Lessons always hit the same gaps | The gaps are real wiki gaps — ingest sources that fill them, then re-run `Teach me` |
 | `Teach me` refuses a topic | That's wiki-only mode working as designed — ingest a source, or re-run with `— from sources` |
+| Sessions feel expensive / repetitive | Run `Analyze sessions` — it mines prompt patterns and error-heavy sessions into captures |
 | No patterns detected | Review journal entries weekly; patterns need ≥3 entries in 30 days |
 | CAREER.md empty | Every close must add one entry — small wins count. Health check compiles resume bullets, interview stories, and impact metrics. |
 | Actions piling up | Weekly `Process ACTIONS.md`; cancel stale ones honestly |

@@ -159,6 +159,30 @@ Proposed: [[lsm-trees]] LOW → MEDIUM (owner demonstrated working model)
 
 ---
 
+### Style 7 — Session Analysis (registered custom style)
+
+**What it looks like:** a capture produced by `Analyze sessions for [KB]` — cost rollups,
+error-heavy sessions, and prompt patterns mined from your agent history.
+
+```markdown
+### 2026-10-06 15:30
+Session Analysis: 30-day window
+Cost: $38.48 over 126 sessions · top project ansible $16.54 (298 errors)
+Pattern: "deploy the rack/network change" correction re-typed in 4 sessions → candidate system rule
+Struggle: 3 sessions with >50 errors, all around graphify-index setup
+Captured: Question "resolve recurring graphify-index setup friction"
+```
+
+**Detected by:** session-analysis headers (`Session Analysis:` / `Analyze sessions:`), cost figures with session counts, mined prompt themes, error-heavy session ids, or references to `scripts/analyze-sessions/`. See `SYSTEM.md §Style Registry`.
+**Processing:** captured, then processed like any other entry — analysis never writes wiki claims directly. Repeated corrections → Solution/Idea (a *proposal* to sharpen a system rule); recurring complaints → Problem/Question; recurring errors → Confusion; now-smooth workflows → Solution.
+**Output:** Medium — repeated themes and recurring errors produce typed links; cost/struggle findings route to ACTIONS.
+**Fallback:** Structured.
+**Session close:** confirm any proposed system-rule sharpening and actions with the owner; route recurring complaints to INBOX §Open Questions.
+
+> The Session Analysis style is the **meta loop**: the system learning from how the agent is *actually used*. A repeated correction is evidence the instructions are missing something; a recurring error is evidence a problem is unresolved.
+
+---
+
 ## Custom Styles — The Extension Point
 
 The 5 built-in styles cover the most common input formats. But any recurring input type not covered by them can be registered as a custom style in `SYSTEM.md §Custom Styles`.

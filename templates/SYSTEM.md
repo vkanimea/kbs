@@ -298,6 +298,42 @@ style precisely because the Style Registry is the system's extension point.
 
 ---
 
+### Built-in-Style 7 — Session Analysis (registered custom style)
+
+```yaml
+name: Session Analysis
+description: A capture produced by the `Analyze sessions for [KB]` operation — cost rollups, error-heavy sessions, and prompt patterns mined from your agent history
+detection_signals:
+  - Entry contains a session-analysis header: "Session Analysis:" or "Analyze sessions:"
+  - Contains cost figures with session counts (e.g. "$x over n sessions", "by project/model/day")
+  - Contains mined prompt themes ("repeated [n]x — [prompt]") or error-heavy session ids
+  - References scripts/analyze-sessions/ or a session id (8-char prefix)
+  - Produced by the `Analyze sessions for [KB]` operation (reference/session-analysis.md)
+processing_rules:
+  - Captured then processed like any other INBOX entry — analysis never writes wiki claims directly
+  - Extract the 8 patterns:
+      a correction/instruction the owner keeps re-typing  → Solution / Idea (proposal to sharpen a system rule)
+      a recurring complaint or repeated struggle           → Problem / Question
+      a recurring error pattern in sessions                → Confusion
+      a topic the sessions keep circling                   → Question
+      a workflow that is now smooth (was a struggle)       → Solution (+ evidence)
+  - A repeated correction is a PROPOSAL to change agents.md/SYSTEM.md — never a silent edit (rule 2)
+  - Never retain raw transcripts — quote only the specific prompt/error that evidences a finding
+  - Never report human qualities — cost, patterns, and agent struggles only (rule 5)
+quality_floor: Good (a session-analysis capture is structured by construction)
+link_richness: Medium — repeated themes and recurring errors produce typed links; cost/struggle findings route to ACTIONS
+fallback: Structured
+session_close: Confirm any proposed system-rule sharpening and actions with the owner; route recurring complaints to INBOX §Open Questions
+```
+
+**Note:** the Session Analysis style is the *meta* loop — the system learning from how the
+agent is actually used, not just from what is captured by hand. A repeated correction is
+evidence the instructions are missing something; a recurring error is evidence a problem
+is unresolved. Registering it as a style makes that signal flow through the same pipeline
+as everything else.
+
+---
+
 ### Custom Styles (Add Yours Here)
 
 To add a custom style, copy this template and fill it in:
@@ -442,6 +478,8 @@ Prompts: `PROMPTS.md`.
 | Lesson captured but not ingested | "Process lesson capture from [date] — gaps, misconceptions, and clicked facts awaiting ingestion" |
 | Misconception exposed by a quiz | "Revisit misconception: [claim] — contradicted expectations in lesson [date]" |
 | Lesson-proposed confidence change unapproved | "Review proposed confidence change for [[topic]] from lesson [date]" |
+| Recurring prompt correction | "Consider a system-rule change: you keep re-typing '[correction]' — see session analysis [date]" |
+| Repeated session error pattern | "Investigate recurring error: [pattern] — seen in sessions [ids]" |
 
 ---
 
