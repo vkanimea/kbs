@@ -24,6 +24,12 @@ Loaded when the owner runs: `Follow agents.md. Process FAILURES.md`
 
 **Never delete failure entries.** They are permanent records.
 **Never auto-mark `Resolved: Yes`** — only the owner judges resolution.
+**Resolution requires evidence.** An entry may only move to §Resolved Failures when the `**Resolution:**`
+line cites verifiable evidence that the fix actually worked — a command output, a log line with a
+timestamp, a test/report ID, or a SUCCESSES.md link. A fix that was *applied* is not a fix that was
+*verified*: "restarted the service", "ran the playbook", or "the change was deployed" are not
+evidence on their own and must remain `Resolved: No`. When the owner reports a resolution without
+evidence, propose the evidence-gathering step instead of marking it resolved.
 
 ---
 
@@ -34,6 +40,8 @@ While processing, flag (in the report, and as INBOX learning triggers):
 - Contradictions that re-emerged after a prior resolution
 - Repeated rejections of the same source type
 - Entries with `Resolved: No` older than 30 days
+- Resolved entries whose `**Resolution:**` line cites no verifiable evidence → flag for re-verification
+- Failures whose stated lesson is "verify the outcome" yet recur → the verification step itself is missing
 
 ---
 

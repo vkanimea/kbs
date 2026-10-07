@@ -127,6 +127,21 @@ done < <(cd "$FROM" && find docs -name '*.md' -type f | sort)
 changed=0
 copied=0
 missing_src=0
+self_deferred=0
+
+# Absolute path of the file bash is currently executing. Overwriting this file
+# mid-run corrupts bash's incremental parse of it ("syntax error near unexpected
+# token"): bash reads a script in chunks, so a changed file on disk yields a
+# shifted/mixed region on the next read. We handle this by copying ourselves to a
+# temp file and re-execing from there BEFORE any copy loop runs, so the file on
+# disk is never the one being interpreted. (Fix for FAILURES.md 2026-10-06.)
+SELF_REAL="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+if [ "${KBS_SYNC_REEXEC:-0}" != "1" ] && [ "$DRY_RUN" -eq 0 ] && [ "$CHECK" -eq 0 ]; then
+  _self_copy="$(mktemp "${TMPDIR:-/tmp}/kbs-sync-run.XXXXXX")"
+  cp "$SELF_REAL" "$_self_copy"
+  chmod +x "$_self_copy"
+  KBS_SYNC_REEXEC=1 exec "$_self_copy" "$@"
+fi
 
 for rel in "${SYSTEM_PATHS[@]}"; do
   # "src:dest" — source from the system repo, land at dest in the instance.
@@ -152,18 +167,40 @@ for rel in "${SYSTEM_PATHS[@]}"; do
   fi
 
   changed=$((changed+1))
-  if [ -f "$dst" ]; then
-    echo "  update: $dst_rel"
-  else
-    echo "  add:    $dst_rel"
+  is_self=0
+  if [ -f "$dst" ] && [ "$(cd "$(dirname "$dst")" && pwd)/$(basename "$dst")" = "$SELF_REAL" ]; then
+    is_self=1
+  fi
+  if [ "$is_self" -eq 0 ]; then
+    if [ -f "$dst" ]; then
+      echo "  update: $dst_rel"
+    else
+      echo "  add:    $dst_rel"
+    fi
   fi
 
   if [ "$DRY_RUN" -eq 0 ] && [ "$CHECK" -eq 0 ]; then
     mkdir -p "$(dirname "$dst")"
+    # Guard: the running script is a temp copy, but keep this for safety in case
+    # re-exec did not happen (e.g. env override) — never cp over the running file.
+    if [ "$is_self" -eq 1 ]; then
+      self_deferred=1
+      continue
+    fi
     cp "$src" "$dst"
     copied=$((copied+1))
   fi
 done
+
+# Self-update fallback: only reached if re-exec was skipped. Safe to copy now.
+if [ "$self_deferred" -eq 1 ]; then
+  self_src="$FROM/scripts/kbs-sync.sh"
+  if [ -f "$self_src" ]; then
+    cp "$self_src" "$SELF_REAL"
+    copied=$((copied+1))
+    echo "  update: scripts/kbs-sync.sh (deferred self-update)"
+  fi
+fi
 
 FROM_V="$(tr -d '[:space:]' < "$FROM/VERSION" 2>/dev/null || echo '?')"
 TO_V="$(tr -d '[:space:]' < "$TO/VERSION" 2>/dev/null || echo '(none)')"

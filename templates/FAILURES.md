@@ -19,6 +19,9 @@ A failure not documented is a lesson lost. The mirror of SUCCESSES.md — togeth
 **Confidence change:** HIGH/MEDIUM/LOW → HIGH/MEDIUM/LOW
 **Lesson:** [one sentence — what to do differently]
 **Resolved:** No
+**Resolution:** [required when set to Yes — cite verifiable evidence the fix worked: command
+output, timestamped log line, test/report ID, or SUCCESSES.md link. "Applied/deployed/restarted"
+is not evidence.]
 ```
 
 **Quick capture** (flesh out at session close):
