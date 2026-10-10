@@ -1,4 +1,4 @@
-# KBS Conventions — Read This Before Acting (V0.119)
+# KBS Conventions — Read This Before Acting (V0.120)
 
 **Why this file exists.** KBS is a long-lived knowledge system operated by *whatever
 model the owner has wired*. Nothing here assumes a particular model, provider, or
@@ -68,6 +68,20 @@ A model new to the system should **copy the existing shape** of a nearby entry r
 than derive a fresh one. If the shape seems wrong, propose a system change — do not
 fork the format in one entry.
 
+**Run the linter, then fix what it reports.** `scripts/kbs-lint.sh [instance]` is a
+deterministic, offline shape checker (no LLM, no network). It reports `file:line`
+problems for ACTIONS/DECISIONS/FAILURES/SUCCESSES/INBOX/CHAT_INBOX and exits non-zero
+when any are found. Treat it as a required close-out step:
+
+```
+~/kbs/scripts/kbs-lint.sh ~/kbs      # 0 = clean, 1 = problems, 2 = usage error
+```
+
+This is what makes shape-correctness **model-agnostic**: you do not need to *notice*
+your own malformation, only to follow a fix-list. Run it after writing entries and
+again at session close. A clean lint is the objective evidence that the output
+contract was met — prefer it over a claim that the format looks right.
+
 ---
 
 ## 4. Close-out must flip status
@@ -104,8 +118,30 @@ Never change configuration to work around a problem unless asked.
 
 ---
 
+## 7. Worked exemplars — copy, don't derive
+
+Each operation has a canonical real example in `reference/`. When producing a new
+entry, open the matching exemplar and mirror its shape. Copying is faster and more
+reliable than reconstructing the format from the rules, and it is exactly the kind of
+task a weaker model does well.
+
+| You are writing | Exemplar |
+|---|---|
+| An action | `reference/actions.md` (end: a complete worked entry) |
+| A failure | `reference/failures.md` (a real, resolved failure) |
+| A success | `reference/successes.md` (a real, validated success) |
+| A chat-insight capture | `reference/chat-input.md` |
+| A close-out | `reference/session-close.md` |
+
+If the exemplar and the prose rules ever disagree, the exemplar wins — it is the
+shape the pipeline actually consumed. Report the disagreement so the rules get fixed.
+
+---
+
 ## Changelog
 
 - **V0.119 (2026-10-11)** — created. Names the two-repo rule, model wiring, output
   contracts, close-out status flipping, and provenance expectations, so a model new
-  to KBS does not have to rediscover them by trial and error.
+  to KBS does not have to rediscover them by trial and error. Added §7 (worked
+  exemplars) and the `kbs-lint.sh` close-out step in §3 — the two levers that make
+  entry *shape* model-agnostic.

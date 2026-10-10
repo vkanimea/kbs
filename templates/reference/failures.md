@@ -56,3 +56,20 @@ Patterns detected: [list or none]
 Unresolved >30 days: [n] — [list]
 Awaiting approval: outputs/pending-[date].md
 ```
+
+---
+
+## Worked Exemplar — copy this shape
+
+Required fields: `What failed`, `Root cause`, `Expected vs actual`, `Lesson`, `Resolved`.
+`Evidence` / `Wiki impact` are optional; `Resolution:` appears only once resolved.
+
+```markdown
+## 2026-10-04 | CLI reported absence via an error line; stderr filtering turned it into "no backups anywhere"
+**What failed:** A backup-verification script reported "no backups found" when the underlying CLI had actually errored; the error text was on stderr and was filtered out, so a failed probe looked like a successful empty result.
+**Expected vs actual:** Expected "found nothing" to mean the probe ran and there was nothing to find. Actual: the probe never ran successfully — absence and failure were indistinguishable.
+**Root cause:** Treating a non-zero exit as "no results" without distinguishing it from "the check could not run at all."
+**Lesson:** A verification tool must fail loudly when it cannot run, not report a clean negative; check exit status before interpreting empty output.
+**Resolved:** Yes
+**Resolution:** Added an explicit exit-status check and made "could not run" a hard error, distinct from "ran and found none."
+```

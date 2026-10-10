@@ -37,3 +37,24 @@ Completed since last check: [n]
   Routed to FAILURES.md: [n]
 Blocked by unresolved failures: [n]
 ```
+
+---
+
+## Worked Exemplar — copy this shape
+
+A complete, lint-clean entry. Fields are **inline**; `Done` non-`No` requires an `Outcome`.
+
+```markdown
+## 2026-10-11 | Rate-limit the two hot DigitalLibrary API endpoints
+**Decided:** Add edge rate-limiting to `…/GetCollectionDocumentsForCountry/*/FAME` and `…/SPC/SPC_PCCOS` rather than blocking the caller ASNs.
+**Why:** The 2.47M + 2.14M requests (89% of traffic) are SPC's own Drupal sites calling server-to-server; an ASN block would break internal FAME/PCCOS traffic. Rate-limit/cache is the correct fix for legitimate internal load.
+**Due:** 2026-10-25
+**Done:** No
+**Outcome:**
+```
+
+Retire an action that will never be done with an explicit reason, not by leaving it open:
+
+```markdown
+**Done:** N/A — installer seed example (not a real commitment)
+```

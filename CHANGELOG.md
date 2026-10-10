@@ -1,5 +1,13 @@
 # KBS Changelog
 
+## V0.120 — Shape linter + worked exemplars (model-agnosticism, phase 2)
+- **scripts/kbs-lint.sh — new file.** Deterministic, offline shape validator for owner-data files (no LLM, no network). Reports `file:line` problems and exits non-zero: ACTIONS (required `Decided`/`Why`/`Due`/`Done`; `Outcome` when done; overdue open actions), DECISIONS (`## YYYY-MM-DD: …` + body), FAILURES/SUCCESSES (required field sets), INBOX/CHAT_INBOX (timestamped entries). `--json` and `--quiet` modes. This is the key lever that makes format fidelity **model-agnostic**: correctness moves from "notice your own malformation" (latent skill) to "run the checker and fix the list" (any model can).
+- **templates/reference/{actions,failures,successes}.md** — worked exemplars appended. One canonical, lint-clean real entry per operation, so a fresh model **copies the shape** rather than deriving it from prose rules. `CONVENTIONS.md §7` indexes them.
+- **templates/CONVENTIONS.md** — §3 now requires running `kbs-lint.sh` as a close-out step; new §7 lists the per-operation exemplars.
+- **scripts/kbs-sync.sh, install.sh, install.ps1** — ship `kbs-lint.sh` with the system files.
+- **.github/workflows/validate.yml** — new CI step lints the freshly-installed seed instance (proves shipped shapes conform) and asserts the linter is executable.
+- **Defect found and fixed during development:** Ubuntu's default `awk` is `mawk`, which does **not** support ERE interval quantifiers (`{4}`, `{3,4}`). Awk-based date/heading matches silently never fired, so the first builds "passed" everything. All awk regexes rewritten with explicit character classes; validation re-tested against a deliberately-broken fixture (catches 7 seeded defects, stays silent on valid entries).
+
 ## V0.119 — Model-agnostic wiring + CONVENTIONS.md
 - **templates/CONVENTIONS.md — new file.** The conventions a fresh model needs but cannot infer from the files alone: the **two-repo rule** (`~/AIC/kbs` system source-of-truth vs `~/kbs` data instance — fix upstream, sync down; system-owned paths never edited in the instance), model wiring, output contracts, close-out status flipping, provenance/verification expectations, and posture. Referenced at session start from `agents.md`; synced to instances as `CONVENTIONS.md`.
 - **scripts/model-config.sh — new file.** Single, model-agnostic resolver (`kbs_resolve_model`) for `PI_PROVIDER`/`PI_MODEL`. Resolution order: environment → `$KBS/model.conf` → **fail loudly**. Never silently assumes one vendor. Seeded from `templates/model.conf.example`.

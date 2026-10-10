@@ -47,7 +47,7 @@ SYSTEM_TEMPLATES=(agents.md PROMPTS.md CONVENTIONS.md)
 # User-owned files — seeded only when absent, NEVER overwritten (your content lives here)
 USER_FILES=(SYSTEM.md DECISIONS.md INBOX.md CHAT_INBOX.md FAILURES.md SUCCESSES.md CAREER.md ACTIONS.md JOURNAL.md log.md)
 REFERENCES=(session-close.md ingestion.md chat-input.md failures.md successes.md actions.md journal.md learning.md session-analysis.md writing-style.md health-check.md)
-SCRIPTS=(chat-adapter.sh chat-api-adapter.py health-check.sh status.sh auto-close.sh due-actions.sh topic-index.sh youtube-ingest.sh hourly-ingest.sh rag.py rag-index.sh rag-query.sh nightly-backup.sh git-credential-env.sh goal-loop.sh graphify-index.sh kbs-sync.sh kbs-drift-check.sh model-config.sh)
+SCRIPTS=(chat-adapter.sh chat-api-adapter.py health-check.sh status.sh auto-close.sh due-actions.sh topic-index.sh youtube-ingest.sh hourly-ingest.sh rag.py rag-index.sh rag-query.sh nightly-backup.sh git-credential-env.sh goal-loop.sh graphify-index.sh kbs-sync.sh kbs-drift-check.sh model-config.sh kbs-lint.sh)
 SESSION_ANALYSIS_SCRIPTS=(sessions.py cost.py prompts.py search.py show_session.py README.md)
 
 FAILED=0

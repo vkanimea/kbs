@@ -56,3 +56,19 @@ Conditions/Limitations noted: [n]
 Contradictions with FAILURES.md: [n] — [list]
 Awaiting approval: outputs/pending-[date].md
 ```
+
+---
+
+## Worked Exemplar — copy this shape
+
+Required fields: `What worked`, `Lesson`, `Expected vs actual`. `Evidence` is
+**optional**; `Repeatable` is conditional (set it when the method is reusable).
+
+```markdown
+## 2026-10-04 | Fail-closed pre-commit secret scan that reports the cause
+**What worked:** A staged-only pre-commit hook that scans changes, blocks the commit with a readable reason, and fails closed (blocks) when the scanner is missing rather than allowing the commit; it documents a deliberate one-off bypass.
+**Expected vs actual:** Expected an install-and-forget tool — the value is in the failure behaviour (closed, explained), not the scanning itself.
+**Evidence:** Staged a realistic fake secret: commit blocked, HEAD unchanged; bypass verified; hiding the scanner blocked the commit with an explanatory message.
+**Repeatable:** Yes
+**Lesson:** Make the guard fail closed and say why — a hook that silently does nothing is indistinguishable from a clean repository; test it with a realistic fake, not a vendor's documented example value.
+```

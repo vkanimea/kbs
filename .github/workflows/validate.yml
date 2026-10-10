@@ -54,8 +54,16 @@ jobs:
           test -x "${{ runner.temp }}/kbs-test/scripts/topic-index.sh" || exit 1
           test -x "${{ runner.temp }}/kbs-test/scripts/youtube-ingest.sh" || exit 1
           test -x "${{ runner.temp }}/kbs-test/scripts/hourly-ingest.sh" || exit 1
+          test -x "${{ runner.temp }}/kbs-test/scripts/kbs-lint.sh" || exit 1
           test -f "${{ runner.temp }}/kbs-test/scripts/chat-api-adapter.py" || exit 1
           echo "✅ scripts verified"
+
+      - name: Run shape linter on the fresh install
+        run: |
+          set -e
+          # A seed instance must lint clean — proves the shipped entry shapes conform.
+          bash "${{ runner.temp }}/kbs-test/scripts/kbs-lint.sh" "${{ runner.temp }}/kbs-test"
+          echo "✅ owner-data shapes conform"
 
       - name: Run status check
         run: KBS_PATH=${{ runner.temp }}/kbs-test bash ${{ runner.temp }}/kbs-test/scripts/status.sh
