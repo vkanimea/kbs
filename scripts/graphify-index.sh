@@ -108,8 +108,18 @@ if [ "$OPENROUTER_BACKEND" = "1" ] || [ "$BACKEND" = "openrouter" ]; then
   export OPENAI_BASE_URL="https://openrouter.ai/api/v1"
   export OPENAI_API_KEY="$OR_KEY"
   EXTRACT_ARGS=(--backend openai)
+  # Model is model-agnostic: --model wins, else $OPENROUTER_MODEL, else the
+  # instance's configured PI_MODEL (model.conf) so we never bake in a vendor.
+  if [ -z "$OPENROUTER_MODEL" ]; then
+    _mcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    if [ -f "$_mcdir/model-config.sh" ]; then
+      # shellcheck source=scripts/model-config.sh
+      . "$_mcdir/model-config.sh"
+      kbs_resolve_model --quiet 2>/dev/null && OPENROUTER_MODEL="$PI_MODEL"
+    fi
+  fi
   [ -n "$OPENROUTER_MODEL" ] && EXTRACT_ARGS+=(--model "$OPENROUTER_MODEL")
-  echo "(semantic extraction via OpenRouter -> ${OPENROUTER_MODEL:-deepseek (default)})"
+  echo "(semantic extraction via OpenRouter -> ${OPENROUTER_MODEL:-provider default})"
 elif [ -n "$BACKEND" ] && [ "$BACKEND" != "local" ]; then
   # Explicit cloud backend (e.g. deepseek) -> semantic extraction of docs + code.
   EXTRACT_ARGS=(--backend "$BACKEND")

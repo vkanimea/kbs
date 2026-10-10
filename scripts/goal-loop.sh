@@ -34,9 +34,14 @@ set -uo pipefail
 
 KBS="${KBS:-$HOME/kbs}"
 PI_BIN="${PI_BIN:-pi}"
-# Provider wiring (configurable via env; defaults to the project's wired openrouter)
-PI_PROVIDER="${PI_PROVIDER:-openrouter}"
-PI_MODEL="${PI_MODEL:-deepseek/deepseek-v4-flash-0731}"
+# Provider/model wiring is model-agnostic: resolved from env or $KBS/model.conf,
+# never hardcoded (see CONVENTIONS.md §Model Wiring). Fails loudly if unset.
+# shellcheck source=scripts/model-config.sh
+dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$dir/model-config.sh" ]; then
+  . "$dir/model-config.sh"
+  kbs_resolve_model --quiet || exit 3
+fi
 SPEC="${1:?usage: goal-loop.sh <goalspec.md> [max_iterations]}"
 MAX_ITER="${2:-$(awk -F: '/^max_iter:/{gsub(/[[:space:]]/,"",$2); print $2}' "$SPEC" 2>/dev/null || echo 8)}"
 : "${MAX_ITER:=8}"

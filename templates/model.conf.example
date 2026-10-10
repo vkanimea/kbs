@@ -1,0 +1,18 @@
+# model.conf.example — copy to <instance>/model.conf and edit.
+#
+# KBS is model-agnostic: scripts read provider/model wiring from here (or from
+# the environment) instead of hardcoding one. See CONVENTIONS.md §Model Wiring.
+#
+# Copy:  cp <system-repo>/templates/model.conf.example ~/kbs/model.conf
+# Then set both keys. Any provider/model pi supports works, e.g.:
+#
+#   openrouter + deepseek/deepseek-v4-flash-0731
+#   openrouter + z-ai/glm-4.6
+#   anthropic  + claude-sonnet-4-5
+#   openai     + gpt-5
+#
+# Leave a key commented out to force the env to supply it (resolution order:
+# env -> this file -> fail loudly).
+
+PI_PROVIDER=openrouter
+PI_MODEL=deepseek/deepseek-v4-flash-0731

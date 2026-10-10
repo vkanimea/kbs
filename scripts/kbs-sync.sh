@@ -77,6 +77,7 @@ done
 # Entries as "src:dest" are sourced from templates/ in the system repo and land at
 # dest in the instance (matching install.sh).
 SYSTEM_PATHS=(
+  templates/CONVENTIONS.md:CONVENTIONS.md
   templates/agents.md:agents.md
   templates/PROMPTS.md:PROMPTS.md
   CHANGELOG.md
@@ -108,7 +109,7 @@ SYSTEM_PATHS=(
   scripts/health-check.sh
   scripts/hourly-ingest.sh
   scripts/kbs-drift-check.sh
-  scripts/kbs-sync.sh
+  scripts/model-config.sh
   scripts/nightly-backup.sh
   scripts/rag-index.sh
   scripts/rag-query.sh

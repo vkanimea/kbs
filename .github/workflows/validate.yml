@@ -31,7 +31,7 @@ jobs:
       - name: Verify core files (fails on missing)
         run: |
           set -e
-          for f in agents.md SYSTEM.md DECISIONS.md INBOX.md CHAT_INBOX.md FAILURES.md SUCCESSES.md CAREER.md ACTIONS.md JOURNAL.md log.md PROMPTS.md CHANGELOG.md; do
+          for f in agents.md CONVENTIONS.md SYSTEM.md DECISIONS.md INBOX.md CHAT_INBOX.md FAILURES.md SUCCESSES.md CAREER.md ACTIONS.md JOURNAL.md log.md PROMPTS.md CHANGELOG.md; do
             test -f "${{ runner.temp }}/kbs-test/$f" || { echo "❌ missing: $f"; exit 1; }
             echo "✅ $f"
           done

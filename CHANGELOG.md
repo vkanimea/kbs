@@ -1,5 +1,15 @@
 # KBS Changelog
 
+## V0.119 — Model-agnostic wiring + CONVENTIONS.md
+- **templates/CONVENTIONS.md — new file.** The conventions a fresh model needs but cannot infer from the files alone: the **two-repo rule** (`~/AIC/kbs` system source-of-truth vs `~/kbs` data instance — fix upstream, sync down; system-owned paths never edited in the instance), model wiring, output contracts, close-out status flipping, provenance/verification expectations, and posture. Referenced at session start from `agents.md`; synced to instances as `CONVENTIONS.md`.
+- **scripts/model-config.sh — new file.** Single, model-agnostic resolver (`kbs_resolve_model`) for `PI_PROVIDER`/`PI_MODEL`. Resolution order: environment → `$KBS/model.conf` → **fail loudly**. Never silently assumes one vendor. Seeded from `templates/model.conf.example`.
+- **scripts/goal-loop.sh, scripts/graphify-index.sh** — removed hardcoded defaults (`deepseek/deepseek-v4-flash-0731`; the `OPENROUTER_MODEL` "deepseek (default)" label). Both now source `model-config.sh`; graphify falls back to the instance's configured `PI_MODEL`. Swapping models is a one-line `model.conf` edit.
+- **templates/agents.md** — session-start line now reads CONVENTIONS.md before SYSTEM.md (kept under the 1,200-word CI budget: tightened rules 7/9/10 to make room).
+- **templates/model.conf.example — new file.** Documented template naming several valid provider/model pairs (OpenRouter/DeepSeek, OpenRouter/GLM, Anthropic, OpenAI).
+- **scripts/kbs-sync.sh** — system-path list now includes `templates/CONVENTIONS.md` and `scripts/model-config.sh`.
+- **install.sh, install.ps1, .github/workflows/validate.yml** — ship and verify `CONVENTIONS.md` + `model-config.sh`; CI core-files check covers `CONVENTIONS.md`.
+- **Rationale:** the system was implicitly tuned around one incumbent model (accumulated context + unwritten conventions), which made switching models costly and error-prone. This change removes the *accidental* coupling (hardcoded model, undocumented rules) while leaving the *deliberate* choice of incumbent to the owner.
+
 ## V0.118 — Pre-backup system-file sync
 - **scripts/nightly-backup.sh** — runs a best-effort `kbs-sync.sh` step ahead of `git add -A`, so the data repo is always committed at the current system version ("fix upstream, sync down"). Without it, system-file drift lands as a data-repo commit. Sync failure is non-fatal (the data commit still proceeds) but is logged; opt out with `KBS_PREBACKUP_SYNC=0`. Resolves the deferred action of 2026-10-01, now that the off-host store is in service.
 

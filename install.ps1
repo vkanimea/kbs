@@ -85,7 +85,7 @@ function Install-KbsFilePreserve {
 }
 
 Write-Host "📝 Installing system files..." -ForegroundColor Cyan
-@("agents.md","PROMPTS.md") |
+@("agents.md","PROMPTS.md","CONVENTIONS.md") |
   ForEach-Object { Install-KbsFile "templates/$_" "$KbsPath\$_" }
 @("session-close.md","ingestion.md","chat-input.md","failures.md","successes.md","actions.md","journal.md","learning.md","session-analysis.md","writing-style.md","health-check.md") |
   ForEach-Object { Install-KbsFile "templates/reference/$_" "$KbsPath\reference\$_" }
@@ -101,7 +101,7 @@ if ($script:Kept.Count -gt 0) {
 }
 
 Write-Host "🔧 Installing scripts..." -ForegroundColor Cyan
-@("chat-adapter.sh","chat-api-adapter.py","health-check.sh","status.sh","auto-close.sh","due-actions.sh","topic-index.sh","youtube-ingest.sh","hourly-ingest.sh","git-credential-env.sh","nightly-backup.sh","rag.py","rag-index.sh","rag-query.sh","goal-loop.sh","graphify-index.sh","kbs-sync.sh","kbs-drift-check.sh") |
+@("chat-adapter.sh","chat-api-adapter.py","health-check.sh","status.sh","auto-close.sh","due-actions.sh","topic-index.sh","youtube-ingest.sh","hourly-ingest.sh","git-credential-env.sh","nightly-backup.sh","rag.py","rag-index.sh","rag-query.sh","goal-loop.sh","graphify-index.sh","kbs-sync.sh","kbs-drift-check.sh","model-config.sh") |
   ForEach-Object { Install-KbsFile "scripts/$_" "$KbsPath\scripts\$_" }
 @("sessions.py","cost.py","prompts.py","search.py","show_session.py","README.md") |
   ForEach-Object { Install-KbsFile "scripts/analyze-sessions/$_" "$KbsPath\scripts\analyze-sessions\$_" }
