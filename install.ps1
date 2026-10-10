@@ -101,7 +101,7 @@ if ($script:Kept.Count -gt 0) {
 }
 
 Write-Host "🔧 Installing scripts..." -ForegroundColor Cyan
-@("chat-adapter.sh","chat-api-adapter.py","health-check.sh","status.sh","auto-close.sh","due-actions.sh","topic-index.sh","youtube-ingest.sh","hourly-ingest.sh","git-credential-env.sh","nightly-backup.sh","rag.py","rag-index.sh","rag-query.sh","goal-loop.sh","graphify-index.sh","kbs-sync.sh","kbs-drift-check.sh","model-config.sh","kbs-lint.sh") |
+@("chat-adapter.sh","chat-api-adapter.py","health-check.sh","status.sh","auto-close.sh","due-actions.sh","topic-index.sh","youtube-ingest.sh","hourly-ingest.sh","git-credential-env.sh","nightly-backup.sh","rag.py","rag-index.sh","rag-query.sh","goal-loop.sh","graphify-index.sh","kbs-sync.sh","kbs-drift-check.sh","model-config.sh","kbs-lint.sh","kbs-provenance.sh") |
   ForEach-Object { Install-KbsFile "scripts/$_" "$KbsPath\scripts\$_" }
 @("sessions.py","cost.py","prompts.py","search.py","show_session.py","README.md") |
   ForEach-Object { Install-KbsFile "scripts/analyze-sessions/$_" "$KbsPath\scripts\analyze-sessions\$_" }

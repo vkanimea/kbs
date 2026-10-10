@@ -55,6 +55,7 @@ jobs:
           test -x "${{ runner.temp }}/kbs-test/scripts/youtube-ingest.sh" || exit 1
           test -x "${{ runner.temp }}/kbs-test/scripts/hourly-ingest.sh" || exit 1
           test -x "${{ runner.temp }}/kbs-test/scripts/kbs-lint.sh" || exit 1
+          test -x "${{ runner.temp }}/kbs-test/scripts/kbs-provenance.sh" || exit 1
           test -f "${{ runner.temp }}/kbs-test/scripts/chat-api-adapter.py" || exit 1
           echo "✅ scripts verified"
 
@@ -185,5 +186,6 @@ jobs:
           bash -n scripts/topic-index.sh
           bash -n scripts/youtube-ingest.sh
           bash -n scripts/hourly-ingest.sh
+          bash -n scripts/kbs-provenance.sh
           python3 -m py_compile scripts/chat-api-adapter.py
           echo "✅ all scripts pass syntax check"

@@ -110,6 +110,7 @@ SYSTEM_PATHS=(
   scripts/hourly-ingest.sh
   scripts/kbs-drift-check.sh
   scripts/kbs-lint.sh
+  scripts/kbs-provenance.sh
   scripts/model-config.sh
   scripts/nightly-backup.sh
   scripts/rag-index.sh
