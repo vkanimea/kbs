@@ -32,6 +32,19 @@ if [ "$(git config credential.helper)" != "!bash scripts/git-credential-env.sh" 
     git config credential.helper '!bash scripts/git-credential-env.sh'
 fi
 
+# Refresh system-owned files from the system repo before committing, so the
+# data repo is always committed at the current system version ("fix upstream,
+# sync down"). Without this, system-file drift lands as a data-repo commit.
+# Best-effort: a sync failure must never abort the backup, but it is logged.
+# Set KBS_PREBACKUP_SYNC=0 to skip.
+if [ "${KBS_PREBACKUP_SYNC:-1}" = "1" ] && [ -x "$ROOT/scripts/kbs-sync.sh" ]; then
+    if SYNC_OUT="$(bash "$ROOT/scripts/kbs-sync.sh" 2>&1)"; then
+        echo "[$TS] BACKUP | pre-backup sync: $(printf '%s' "$SYNC_OUT" | tail -1)" >> "$LOG"
+    else
+        echo "[$TS] BACKUP | PRE-BACKUP SYNC FAILED (continuing): $(printf '%s' "$SYNC_OUT" | tail -3 | tr '\n' ' ')" >> "$LOG"
+    fi
+fi
+
 git add -A
 
 if git diff --cached --quiet; then
