@@ -47,15 +47,49 @@ fi
 
 git add -A
 
+# Decide whether there is anything to do. Two distinct cases, and conflating
+# them silently skips the push:
+#   1. uncommitted working-tree changes  -> commit then push
+#   2. already-committed, unpushed local commits -> push only
+# A bare `git diff --cached --quiet` guard catches only case 1. When the owner
+# commits manually before the backup runs, the index is clean, the guard trips,
+# and the script exits WITHOUT pushing — leaving the offsite remote behind while
+# the log cheerfully reports "no changes". Ops must therefore also compare HEAD
+# against the upstream tracking ref.
+COMMITTED_ONLY=0
 if git diff --cached --quiet; then
-    echo "[$TS] BACKUP | no changes" >> "$LOG"
-    exit 0
+    # Nothing staged. Is HEAD ahead of the offsite remote (or is there no
+    # upstream ref locally yet)? If so there are still commits to publish.
+    if git remote get-url gitea >/dev/null 2>&1; then
+        AHEAD="$(git rev-list --count 'refs/remotes/gitea/master..HEAD' 2>/dev/null || echo unknown)"
+        if [ "$AHEAD" = "unknown" ]; then
+            # No local tracking ref (e.g. never fetched/pushed from here): ask the
+            # remote directly, so a fresh clone still publishes correctly.
+            REMOTE_HEAD="$(git ls-remote gitea refs/heads/master 2>/dev/null | cut -f1)"
+            if [ -n "$REMOTE_HEAD" ] && [ "$REMOTE_HEAD" != "$(git rev-parse HEAD)" ]; then
+                COMMITTED_ONLY=1
+            fi
+        elif [ "${AHEAD:-0}" -gt 0 ] 2>/dev/null; then
+            COMMITTED_ONLY=1
+        fi
+    fi
+
+    if [ "$COMMITTED_ONLY" -eq 0 ]; then
+        echo "[$TS] BACKUP | no changes" >> "$LOG"
+        exit 0
+    fi
 fi
 
-SUMMARY="$(git diff --cached --stat | tail -1 | sed 's/^ *//')"
-git commit -q -m "Nightly backup $(date '+%Y-%m-%d')
+if [ "$COMMITTED_ONLY" -eq 1 ]; then
+    # Case 2: nothing to commit. Publish the commits that already exist locally.
+    SUMMARY="$(git log --oneline -1 | sed 's/^ */committed: /')"
+    echo "[$TS] BACKUP | pending commits, no working-tree changes" >> "$LOG"
+else
+    SUMMARY="$(git diff --cached --stat | tail -1 | sed 's/^ *//')"
+    git commit -q -m "Nightly backup $(date '+%Y-%m-%d')
 
 $SUMMARY"
+fi
 
 # Offsite push to the self-hosted remote (`gitea`) when configured.
 # Generic form: no host is hardcoded. The pre-push probe derives the endpoint
