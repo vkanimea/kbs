@@ -76,8 +76,13 @@ entry_headings() { # file
 }
 
 # inline value of '**Field:**' on a given line (trimmed); empty if absent/blank
+#
+# Strip the literal label token only. Do NOT use a greedy /^.*\*\*[^*]*\*\*/ here:
+# it would also swallow a leading bold phrase in the VALUE, and when that phrase
+# ends the line (e.g. "**Outcome:** **Closed for now.**") the whole value reduces
+# to empty and the field is falsely reported as blank.
 inline_value() { # file lineno field_label
-  awk -v s="$2" -v lab="$3" 'NR==s{ needle="**" lab ":**"; if(index($0,needle)){ v=$0; sub(/^.*\*\*[^*]*\*\*[[:space:]]*/,"",v); gsub(/^[[:space:]]+|[[:space:]]+$/,"",v); print v } }' "$1"
+  awk -v s="$2" -v lab="$3" 'NR==s{ needle="**" lab ":**"; n=index($0,needle); if(n){ v=substr($0, n+length(needle)); gsub(/^[[:space:]]+|[[:space:]]+$/,"",v); print v } }' "$1"
 }
 
 # does a field label appear anywhere in the entry block [start,end)?

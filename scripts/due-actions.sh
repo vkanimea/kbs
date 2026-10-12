@@ -89,10 +89,20 @@ if [ -f "$ACTIONS_FILE" ]; then
         # Prefer the LAST YYYY-MM-DD on the **Due:** line. Annotated entries can
         # read "awaiting X (re-dated from YYYY-MM-DD)" where the earlier date is
         # history, not the live deadline.
+        #
+        # EXCEPT when the line is a deliberate deferral: "unscheduled (deferred by
+        # owner YYYY-MM-DD)" / "unscheduled (on hold)" carry a date that is the
+        # date of the DEFERRAL, not a deadline. Treating it as one makes a
+        # deliberately-unscheduled item report as permanently overdue. Such lines
+        # have no deadline, so clear CURRENT_DUE and let the entry be ignored.
         if printf '%s' "$line" | grep -qE '^\*\*Due:\*\*'; then
-            CURRENT_DUE=$(printf '%s' "$line" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | tail -n1)
-            if printf '%s' "$line" | grep -q 'next session'; then
-                CURRENT_DUE=$(date +%Y-%m-%d)
+            if printf '%s' "$line" | grep -qiE 'unscheduled|deferred|on hold'; then
+                CURRENT_DUE=""
+            else
+                CURRENT_DUE=$(printf '%s' "$line" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | tail -n1)
+                if printf '%s' "$line" | grep -q 'next session'; then
+                    CURRENT_DUE=$(date +%Y-%m-%d)
+                fi
             fi
         fi
     done < "$ACTIONS_FILE"
