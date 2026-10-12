@@ -106,6 +106,9 @@ ships them. Retire one with `Done: N/A — installer seed example` if it causes 
 - Verify before asserting, especially about *this* system's structure (which repo,
   which path is authoritative) — the two-repo rule in §1 exists because this is
   easy to get wrong.
+- This is **rule 11** in `agents.md`, global since 2026-10-12: factual/technical claims
+  are grounded in a named source or labelled `[unverified — no source]`; opinions, plans,
+  and proposals are exempt.
 
 ---
 

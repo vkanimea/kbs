@@ -1,5 +1,13 @@
 # KBS Changelog
 
+## V0.124 — Verify-before-assert becomes global rule 11 (scoped to factual claims)
+- **`agents.md` — new rule 11; "The 10 Rules" → "The 11 Rules".** The 2026-10-06 session analysis found 39 prompts asking the agent to cite a source, recurrent across azure, kbs, and infra turns *outside* lessons — where no standing rule applied. Rule 11 makes the demand a property of the system rather than a reprimand the owner repeats: factual/technical claims (numbers, names, dates, paths, config, API behaviour) are grounded in a named source, or labelled `[unverified — no source]`. Opinions, plans, and proposals are exempt.
+- **`reference/learning.md` — Non-Negotiables #1 cross-references rule 11.** The lesson rule is now visibly a *stricter instance*: in a lesson the source is the wiki specifically (not any source), and "I could not find it" means stop, not label.
+- **`templates/CONVENTIONS.md` §5 — rule 11 indexed.** The existing "Provenance and verification" section now names rule 11 and its scope, so the index stays complete.
+- **Cost:** none to the owner. The rule is a precondition on the agent's *output*, not an approval gate — no added owner time, no checkpoint. The extra work (retrieval/latency on factual claims) lands on the agent.
+- **Decision recorded:** the DECISIONS.md entry (owner pastes) is staged in `outputs/pending-2026-10-12-verify-before-assert.md`, with Source and Review date.
+- **VERSION → 0.124.**
+
 ## V0.123 — Settle the remaining unbacked state: back up per-project memory
 - **pi-state-backup.sh — new tree.** Backs up the live `projects-memory/<project>/MEMORY.md` for each project (`project_memory_files` in MANIFEST + backup summary). The 2026-10-12 recovery-gap audit listed `projects-memory` (23 MB) as unbacked, but the tree is almost entirely redundant history: 18 MB of `.MEMORY.md.retired-*`/`.recovery-*` churn (the same pattern already excluded for pi-hermes memory) and 4 MB of transient `.pi-hermes-locks.sqlite` (+ `-wal`/`-shm`). The only non-regenerable content with no other offsite copy is the live `MEMORY.md` per project — two files, ~836 KB — so that is what is now carried offsite.
 - **backup-verify.sh `--drill` — new assertion.** The fresh-clone drill now requires at least one `pi-state/projects-memory/*/MEMORY.md` in the offsite clone, so the newly-backed-up tree is actually verified rather than assumed. `tests/test-backup-verify.sh` gains the matching negative case (missing project memory must fail) — now 7 cases, both directions.

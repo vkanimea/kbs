@@ -64,7 +64,9 @@ two principles, a fixed three-phase shape, and the quiz-option construction proc
 1. **Teach from the wiki, not from memory.** The moment you are even slightly unsure of
    a fact, name, date, formula, definition, or claim, stop and check the wiki. Working
    from memory is where LLMs invent things, and one confidently-delivered hallucination
-   poisons the owner's trust.
+   poisons the owner's trust. Rule 11 (verify before you assert) is the general form; in
+   a lesson the standard is higher — the source is the wiki specifically, not any source,
+   and "I could not find it" means stop, not label.
 2. **Wiki confidence is not the same axis as "unconditional truth."** Confidence
    (HIGH/MEDIUM/LOW + conditions) measures *epistemic reliability*. An "unconditional
    truth" measures *whether the fact is safe to accept at face value without caveats*.
