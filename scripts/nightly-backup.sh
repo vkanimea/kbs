@@ -127,6 +127,17 @@ if [ "${KBS_OFFSITE_PUSH:-1}" = "1" ] && git remote get-url gitea >/dev/null 2>&
 
     if git push -q gitea master 2>> "$LOG"; then
         echo "[$TS] BACKUP | pushed to offsite gitea | $SUMMARY" >> "$LOG"
+        # Post-push ASSERTION: confirm the remote ref actually advanced to our
+        # HEAD. A push can be accepted locally while the remote ref is rewritten
+        # out-of-band or a push policy silently changes; trusting the local exit
+        # code alone re-creates the same "green schedule, stale offsite" gap this
+        # action exists to close. (2026-10-12 action: enforce the backup outcome.)
+        if [ -x "$ROOT/scripts/backup-verify.sh" ]; then
+            if ! "$ROOT/scripts/backup-verify.sh" --assert --quiet 2>>"$LOG"; then
+                echo "[$TS] BACKUP | POST-PUSH ASSERTION FAILED — offsite copy is behind or unreachable | $SUMMARY" >> "$LOG"
+                OFFSITE_FAIL=1
+            fi
+        fi
     else
         ERR="$(git push gitea master 2>&1 | tail -3 | tr '\n' ' ')"
         echo "[$TS] BACKUP | OFFSITE PUSH FAILED | $SUMMARY | cause: ${ERR:0:300}" >> "$LOG"

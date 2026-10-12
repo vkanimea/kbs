@@ -56,6 +56,8 @@ jobs:
           test -x "${{ runner.temp }}/kbs-test/scripts/hourly-ingest.sh" || exit 1
           test -x "${{ runner.temp }}/kbs-test/scripts/kbs-lint.sh" || exit 1
           test -x "${{ runner.temp }}/kbs-test/scripts/kbs-provenance.sh" || exit 1
+          test -x "${{ runner.temp }}/kbs-test/scripts/backup-catchup.sh" || exit 1
+          test -x "${{ runner.temp }}/kbs-test/scripts/backup-verify.sh" || exit 1
           test -f "${{ runner.temp }}/kbs-test/scripts/chat-api-adapter.py" || exit 1
           echo "✅ scripts verified"
 
@@ -74,7 +76,15 @@ jobs:
           # fixed false positive (bold Outcome ending a line) and the fixed
           # false alarm (a deferral date parsed as a deadline).
           bash tests/test-checkers.sh "${{ runner.temp }}/kbs-test"
-         
+
+      - name: Run backup-verifier behavioural regression tests
+        run: |
+          set -e
+          # Proves backup-verify.sh catches the 2026-10-12 silent failures in
+          # BOTH directions: an unpushed/divered remote and a recovery gap must
+          # fail, while a healthy remote must pass. Fully offline (throwaway
+          # bare repos), so it needs no harbor01 and no GitHub.
+          bash tests/test-backup-verify.sh "${{ runner.temp }}/kbs-test"
 
       - name: Run status check
         run: KBS_PATH=${{ runner.temp }}/kbs-test bash ${{ runner.temp }}/kbs-test/scripts/status.sh

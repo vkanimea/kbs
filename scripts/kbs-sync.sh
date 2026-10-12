@@ -99,6 +99,7 @@ SYSTEM_PATHS=(
   scripts/analyze-sessions/prompts.py
   scripts/analyze-sessions/search.py
   scripts/backup-catchup.sh
+  scripts/backup-verify.sh
   scripts/analyze-sessions/show_session.py
   scripts/analyze-sessions/README.md
   scripts/chat-adapter.sh
