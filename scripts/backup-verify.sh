@@ -223,6 +223,16 @@ if clone_repo "$RAW_REPO" "$WORK/kbs-raw" "kbs-raw"; then
         say "FAIL  kbs-raw — MEMORY.md missing/empty"
         DRILL_FAIL=1
     fi
+    # Per-project memory: assert at least one project MEMORY.md survives, so the
+    # tree added 2026-10-12 (action: settle the remaining unbacked state) is
+    # really carried offsite rather than assumed.
+    if ! find "$WORK/kbs-raw/pi-state/projects-memory" -type f -name 'MEMORY.md' 2>/dev/null | grep -q .; then
+        log "drill | kbs-raw | FAIL: no project MEMORY.md in pi-state/projects-memory"
+        say "FAIL  kbs-raw — no project MEMORY.md"
+        DRILL_FAIL=1
+    else
+        say "OK    kbs-raw — project memory present"
+    fi
     # OpenViking pack: expect at least one .ovpack plus SHA256SUMS.
     if ! find "$WORK/kbs-raw/openviking" -name '*.ovpack' -type f 2>/dev/null | grep -q .; then
         log "drill | kbs-raw | FAIL: no .ovpack in openviking/"

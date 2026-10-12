@@ -47,7 +47,7 @@ make_repo() {
   ( cd "$work"
     git remote add gitea "$bare"
     # seed plausible recovery content
-    mkdir -p pi-state/sessions pi-state/chat-transcripts pi-state/pi-hermes-memory openviking
+    mkdir -p pi-state/sessions pi-state/chat-transcripts pi-state/pi-hermes-memory openviking pi-state/projects-memory/demo
     echo "# ACTIONS"      > ACTIONS.md
     echo "# FAILURES"     > FAILURES.md
     echo "# SUCCESSES"    > SUCCESSES.md
@@ -55,6 +55,7 @@ make_repo() {
     echo "{}"             > pi-state/sessions/sess.jsonl
     echo "tx"             > pi-state/chat-transcripts/t.md
     echo "# MEMORY"       > pi-state/pi-hermes-memory/MEMORY.md
+    echo "# proj"         > pi-state/projects-memory/demo/MEMORY.md
     echo "pack"           > openviking/openviking-pack-test.ovpack
     echo "sums"           > openviking/SHA256SUMS
     git -c user.email=test@kbs -c user.name=test add -A
@@ -113,6 +114,13 @@ THIN3="$(make_repo thin3)"
 RC="$(run_verify --drill KBS_VERIFY_KBS="$THIN3" KBS_VERIFY_RAW="$THIN3")"
 [ "$RC" != "0" ] && ok "missing openviking pack → drill fails" \
                  || bad "missing .ovpack was NOT caught by --drill"
+
+# No per-project memory: the tree added 2026-10-12. MUST fail.
+THIN4="$(make_repo thin4)"
+( cd "$THIN4" && git rm -rq pi-state/projects-memory && $GIT commit -q -m "drop project memory" && git push -q gitea master )
+RC="$(run_verify --drill KBS_VERIFY_KBS="$THIN4" KBS_VERIFY_RAW="$THIN4")"
+[ "$RC" != "0" ] && ok "missing project MEMORY.md → drill fails" \
+                 || bad "missing project memory was NOT caught by --drill"
 
 echo
 echo "── summary ──"
