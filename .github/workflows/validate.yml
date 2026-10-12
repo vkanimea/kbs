@@ -66,6 +66,16 @@ jobs:
           bash "${{ runner.temp }}/kbs-test/scripts/kbs-lint.sh" "${{ runner.temp }}/kbs-test"
           echo "✅ owner-data shapes conform"
 
+      - name: Run checker behavioural regression tests
+        run: |
+          set -e
+          # Proves the checkers themselves are CORRECT, in both directions:
+          # cases that must error/flag and cases that must not. Guards the
+          # fixed false positive (bold Outcome ending a line) and the fixed
+          # false alarm (a deferral date parsed as a deadline).
+          bash tests/test-checkers.sh "${{ runner.temp }}/kbs-test"
+         
+
       - name: Run status check
         run: KBS_PATH=${{ runner.temp }}/kbs-test bash ${{ runner.temp }}/kbs-test/scripts/status.sh
 
