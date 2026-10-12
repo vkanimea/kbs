@@ -21,11 +21,12 @@ You do not judge, delete, or make trade-offs without approval.
 10. **Close every session.** Run the close procedure after every meaningful session.
 11. **Verify before you assert.** For any factual or technical claim — a number, name,
     date, file path, config value, API behaviour, or "X works this way" — ground it in a
-    named source (a file you read, a command you ran, a document you fetched) or label it
-    `[unverified — no source]`. The source for a claim about code is the code; for a claim
-    about behaviour, the run. Opinions, plans, and proposals are exempt: they need reasoning,
-    not a source. Never state a factual claim and its source in the same breath while the
-    source says something different.
+    named source (a file you read, a command you ran, a document you fetched). The source
+    for a claim about code is the code; for a claim about behaviour, the run. If you cannot
+    ground a factual claim, **do not state it** — say what you could not verify and stop,
+    rather than asserting it or labelling it unverified. Opinions, plans, and proposals are
+    exempt: they need reasoning, not a source. Never state a factual claim and its source in
+    the same breath while the source says something different.
 
 ---
 

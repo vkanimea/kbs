@@ -1,5 +1,12 @@
 # KBS Changelog
 
+## V0.125 — Rule 11: refuse, do not label unsourced factual claims
+- **`agents.md` rule 11 sharpened.** The `[unverified — no source]` marker is removed. When a factual/technical claim cannot be grounded in a named source, the agent says so and **stops** — it does not assert the claim, and it does not assert it with an unverified label. Refusal over labelling: an unsourced fact stated with a caveat still plants the fact; a refusal does not.
+- **`CONVENTIONS.md` §5** updated to match (grounded, or say it could not verify and stop).
+- **`reference/learning.md`** unchanged — its "means stop, not label" wording already agreed with the stricter rule; the two now match exactly.
+- **Owner decision (2026-10-12):** the marker-vs-refusal fork left open in `outputs/pending-2026-10-12-verify-before-assert.md` was resolved in favour of refusal.
+- **VERSION → 0.125.**
+
 ## V0.124 — Verify-before-assert becomes global rule 11 (scoped to factual claims)
 - **`agents.md` — new rule 11; "The 10 Rules" → "The 11 Rules".** The 2026-10-06 session analysis found 39 prompts asking the agent to cite a source, recurrent across azure, kbs, and infra turns *outside* lessons — where no standing rule applied. Rule 11 makes the demand a property of the system rather than a reprimand the owner repeats: factual/technical claims (numbers, names, dates, paths, config, API behaviour) are grounded in a named source, or labelled `[unverified — no source]`. Opinions, plans, and proposals are exempt.
 - **`reference/learning.md` — Non-Negotiables #1 cross-references rule 11.** The lesson rule is now visibly a *stricter instance*: in a lesson the source is the wiki specifically (not any source), and "I could not find it" means stop, not label.
