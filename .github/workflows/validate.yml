@@ -162,6 +162,12 @@ jobs:
           echo "agents.md: $WORDS words"
           test "$WORDS" -lt 1200 || { echo "❌ agents.md has bloated past 1200 words — move detail to reference/"; exit 1; }
 
+      - name: Doc/script version consistency (fails on stale V-prefixes)
+        run: |
+          # Guards against doc titles, script descriptions and docstrings
+          # hard-coding a version that has since drifted from VERSION.
+          bash scripts/check-doc-versions.sh
+
       - name: SYSTEM.md owns activity levels (fails on missing)
         run: |
           set -e
