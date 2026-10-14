@@ -1,6 +1,6 @@
-# Knowledge Base System (KBS) V0.116
+# Knowledge Base System (KBS)
 
-[![Version](https://img.shields.io/badge/version-0.116.4-blue.svg)](https://github.com/vkanimea/kbs)
+[![Version](https://img.shields.io/badge/version-0.125-blue.svg)](https://github.com/vkanimea/kbs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg)]()
 
@@ -15,46 +15,30 @@ Inspired by Andrej Karpathy's "second brain" pattern — minus the dependencies.
 
 ---
 
-## What's New in V0.116
+## Which Client Do You Need?
 
-V0.116 (with the V0.116.1 and V0.116.2 patches) adds **agentic capabilities** — autonomous goal loops and a per-project knowledge graph — so KBS can run routine work by itself and structure code for querying:
+KBS works with any LLM, but what it can do depends on whether you run a chat client or an agent harness:
 
-- `scripts/goal-loop.sh` — a persistent **Ralph//goal loop** on any agent harness: write a goal contract (objective, constraints, a validation command, a stop condition), and it runs `plan → act → validate → iterate` until the gate passes or the budget is exhausted
-- `docs/goal-spec.md` — the goal-contract format (four required parts: objective, constraints, validate, stop-when) plus a field guide and good/bad examples
-- `scripts/graphify-index.sh` — turn a code corpus into a **queryable knowledge graph + agent-crawlable wiki**, stored per-project under `kb/projects/<project>/graphs/` and `wiki/graph/`. Uses deterministic tree-sitter AST parsing — no LLM, no vector store
-- **V0.116.1 patch — client-agnostic framing**: the LLM client setup is now stated as client-agnostic (any LLM with folder read/write works), and the informational `LLM_CLIENT` default is `any` instead of `claude`. Decidedly *not* a feature bump
-- **V0.116.2 patch — graphify activation fixes**: `graphify-index.sh` now defaults to `--mode deep` (graphify ≥0.9 rejects `standard`), falls back to `--code-only` when no LLM key is configured, and accepts `--local` / `--openrouter` / `--backend` for explicit extraction backends. `nightly-backup.sh` is now commit-only by default, pushing to an external remote only when `KBS_ALLOW_EXTERNAL_PUSH=1`
-- **V0.116.3 patch — system/data drift guard**: `scripts/kbs-sync.sh` refreshes an instance's system files from the system repo and detects drift (`--check` exits non-zero when they differ). Makes the "edit upstream, sync down" rule enforceable instead of a convention
-- **V0.116.4 patch — drift guard in the close loop**: `scripts/kbs-drift-check.sh` runs the check daily via cron, logging to `log.md` only when drift is found; the session close gains an 11th step to check drift after any session that touched system files
+| Capability | Chat client | Agent harness |
+|------------|-------------|---------------|
+| Read/write KBS files | ✅ | ✅ |
+| Run scripts, git, backups | ❌ | ✅ |
+| Max Activity Level | 1 | 3 |
+| Scheduled / autonomous operation | ❌ | ✅ |
 
----
-
-## What's New in V0.115
-
-V0.115 adds the **git-remote backup & restore pattern** — your knowledge is versioned off-site and restorable on a fresh host:
-
-- `scripts/nightly-backup.sh` — commits + pushes your **private data repo** when something changed; the repo-local credential helper is auto-asserted so fresh clones stay push-capable
-- `docs/backup-and-restore.md` — the pattern end to end: private data repo vs public system repo, what a clone restores vs what you rebuild (`.env`, RAG indexes, cron), restore procedure
-- Supersedes the old tarball-copy advice in `docs/deployment.md`
+A **chat client** (Claude.ai, ChatGPT, Gemini) can read and propose, but cannot run `scripts/`, push git, or take scheduled actions. An **agent harness** (Claude Code, pi, Aider, opencode) is required for the full pipeline — scripts, backups, and Activity Levels 2–3. See [docs/security.md](docs/security.md) for what each level can touch.
 
 ---
 
-## What's New in V0.114
+## What's New in V0.125
 
-V0.114 adds **semantic retrieval (RAG alongside)** — optional fuzzy search over `wiki/topics/`, while markdown + git stays the system of record:
-
-- `scripts/rag.py` — stdlib-only index/query, Ollama embeddings (default `nomic-embed-text`), no pip deps
-- `scripts/rag-index.sh` / `rag-query.sh` — thin wrappers; index at `kb/<name>/rag-index/` (git-ignored, regenerable)
-- `hourly-ingest.sh` post-step rebuilds the RAG index automatically (logged as `RAG_INDEX`)
-- Query procedure now 7 steps — step 0 optional semantic lookup; link rules in `reference/ingestion.md` gained a semantic assist
-- Docker compose wires host Ollama (option A) or a self-contained sidecar (option B, commented)
-- git credential helper serves `GITHUB_TOKEN` from the git-ignored `.env`
+Latest changes; full history in [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
 ## Why This Is Different
 
-| Feature | Traditional Notes | KBS V0.116 |
+| Feature | Traditional Notes | KBS |
 |---------|-------------------|-----------|
 | Linking | Manual | Typed relationships (Causes, Leads To, Depends On) |
 | Learning | Success only | Success + failure, with confidence downgrades |
@@ -83,6 +67,8 @@ Installing KBS copies the system into `~/kbs` and you make that folder **your ow
 - **Keep your data repo private.** It contains your knowledge, decisions, and any ingested documents. The system repo is safe to fork and share.
 - **Each person governs their own data** — no central service, no shared account, no one else's access.
 - **Backups are yours to own** — see [docs/backup-and-restore.md](docs/backup-and-restore.md) and `scripts/nightly-backup.sh`.
+
+> **Data sovereignty, clarified:** KBS never phones home and each person governs their own data repo. But when a **cloud LLM** processes your content, that content leaves your machine as prompt text. Only fully-local setups (Ollama, llama.cpp) keep content on-device end-to-end. See [docs/security.md](docs/security.md).
 
 ---
 
@@ -125,7 +111,7 @@ The structure after install:
 
 ```
 ~/kbs/
-├── agents.md            # Core rules (~800 words) — LLM reads every session
+├── agents.md            # Core rules (1,052 words) — LLM reads every session
 ├── reference/        # Operation detail — loaded only when needed
 │   ├── session-close.md
 │   ├── ingestion.md
@@ -176,7 +162,7 @@ Daily/weekly/monthly rituals: [docs/user-guide.md](docs/user-guide.md)
 
 **Starter KB:** 20 pre-built cross-linked topics demonstrate wiki structure, confidence levels, and typed relationships. Copy and explore before writing your own.
 
-**Self-improving system:** The same principles it applies to knowledge — lazy loading, failure learning, compounding — are applied to its own instructions: `agents.md` stays at ~800 words with a CI-enforced bloat guard (<1,200 words); operation detail lives in `reference/` and loads only when an operation runs.
+**Self-improving system:** The same principles it applies to knowledge — lazy loading, failure learning, compounding — are applied to its own instructions: `agents.md` stays compact (1,052 words; CI-enforced bloat guard <1,200) and operation detail lives in `reference/` and loads only when an operation runs.
 
 **Local search index:** For 100+ topic KBs, `scripts/topic-index.sh` accelerates topic selection before LLM synthesis.
 
@@ -210,6 +196,12 @@ KBS is not a note-taking app, and **it does not depend on one**. Everything is p
 | [docs/deployment.md](docs/deployment.md) | Install options, LLM clients, scheduling |
 | [docs/backup-and-restore.md](docs/backup-and-restore.md) | Git-remote backup pattern and fresh-host restore |
 | [docs/swot-analysis.md](docs/swot-analysis.md) | Honest comparison vs alternatives |
+| [docs/input-output-guide.md](docs/input-output-guide.md) | What enters and leaves the graph |
+| [docs/goal-spec.md](docs/goal-spec.md) | Goal-loop contract format |
+| [docs/version-advising.md](docs/version-advising.md) | When to bump the version |
+| [docs/security.md](docs/security.md) | Trust boundaries, data locality, token scoping |
+| [docs/glossary.md](docs/glossary.md) | Terminology for newcomers |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to improve KBS |
 
 ---
 

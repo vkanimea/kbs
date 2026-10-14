@@ -33,10 +33,10 @@ and add its credentials to `.env` (`GITEA_USERNAME` / `GITEA_PASSWORD`), which t
 same credential helper already understands:
 
 ```bash
-# HTTP (through whatever proxy/reverse-proxy fronts Gitea):
-git remote add gitea https://git.example.com/<you>/<kbs-data>.git
+# HTTP (through whatever proxy/reverse-proxy fronts your git host):
+git remote add offsite https://git.example.com/<you>/<kbs-data>.git
 # SSH (recommended for large pushes — avoids HTTP proxy body/time limits):
-git remote add gitea ssh://git@<gitea-host>:<ssh-port>/<you>/<kbs-data>.git
+git remote add offsite ssh://git@git-host:<ssh-port>/<you>/<kbs-data>.git
 git config core.sshCommand "ssh -i /path/to/key -o StrictHostKeyChecking=accept-new"
 ```
 

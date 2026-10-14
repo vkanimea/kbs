@@ -1,4 +1,4 @@
-# Installation — KBS V0.116
+# Installation — KBS
 
 ## One-Command Install
 
@@ -7,10 +7,22 @@
 curl -fsSL https://raw.githubusercontent.com/vkanimea/kbs/main/install.sh | bash
 ```
 
-**Windows (PowerShell as Administrator)**
+**Windows (PowerShell)**
 ```powershell
 powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/vkanimea/kbs/main/install.ps1 | iex"
 ```
+
+> **Inspect before you run (recommended).** Piping a remote script straight into a shell is the most convenient but least auditable path. For anything but a throwaway install, download the installer, read it, then run it from a pinned release tag with a verified checksum:
+>
+> ```bash
+> # Linux/macOS
+> curl -fsSL -o install.sh https://raw.githubusercontent.com/vkanimea/kbs/v0.125/install.sh
+> less install.sh                      # review
+> sha256sum -c SHA256SUMS --ignore-missing   # verify against the release checksums (if published)
+> bash install.sh
+> ```
+>
+> **Administrator is only needed on Windows** if KBS writes to a system-owned path; installing to your user folder does not require elevation.
 
 **From a clone (no network needed for templates)**
 ```bash
@@ -50,6 +62,7 @@ The installer **aborts with an error** if any file fails to install — a partia
 | ExecutionPolicy error (Windows) | Run PowerShell as Administrator |
 | Installer reports FAILED files | Check network, or clone the repo and install locally |
 | LLM can't read files | Add `~/kbs` to client folder permissions |
+| Sceptical of piping remote code | Download, inspect, then run from a pinned tag (see above) |
 
 ## Uninstall
 

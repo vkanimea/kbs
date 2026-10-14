@@ -1,4 +1,4 @@
-# KBS Conventions — Read This Before Acting (V0.120)
+# KBS Conventions — Read This Before Acting
 
 **Why this file exists.** KBS is a long-lived knowledge system operated by *whatever
 model the owner has wired*. Nothing here assumes a particular model, provider, or
@@ -89,7 +89,7 @@ contract was met — prefer it over a claim that the format looks right.
 The recurring defect: work is completed but its `ACTIONS.md` row is never moved to
 `Done: Yes`, so it reports as open forever. When closing a session, for every action
 touched, set `Done:` and fill `Outcome:` — completed work with an unclosed row is a
-bug, not a rounding error. (Observed 2026-10-11: two rows — harbor01 store and
+bug, not a rounding error. (Observed 2026-10-11: two rows — offsite store and
 pre-backup sync — were done on 2026-10-08 but still counted as open.)
 
 Installer **seed rows** (the `20XX-01-01` examples byte-identical to `templates/…`)

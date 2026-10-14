@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-KBS Universal Chat API Adapter — V0.116
+KBS Universal Chat API Adapter
 
 Captures chat output from any LLM API via webhook or stdin.
 
@@ -43,6 +43,10 @@ KB_NAME      = os.environ.get("KB_NAME", "main")
 CHAT_INBOX   = Path(os.environ.get("CHAT_INBOX", KBS_PATH / "CHAT_INBOX.md"))
 CHAT_RAW_DIR = Path(os.environ.get("CHAT_RAW_DIR", KBS_PATH / "kb" / KB_NAME / "raw" / "chat-transcripts"))
 AUTO_INGEST  = os.environ.get("AUTO_INGEST", "false").lower() == "true"
+
+# Webhook security
+WEBHOOK_TOKEN = os.environ.get("KBS_WEBHOOK_TOKEN", "")
+MAX_BODY_SIZE = int(os.environ.get("KBS_WEBHOOK_MAX_BODY", str(64 * 1024)))
 
 
 def ensure_dirs():
@@ -151,13 +155,38 @@ def capture(payload: dict | str, source: str = "API") -> bool:
 
 # ─── HTTP Webhook Server ───────────────────────────────────────────────────────
 class WebhookHandler(BaseHTTPRequestHandler):
+    def _reply(self, code: int, message: str):
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps({"status": "error", "message": message}).encode())
+
     def do_POST(self):
+        # Auth: require shared secret header
+        if WEBHOOK_TOKEN:
+            import hmac
+            if not hmac.compare_digest(self.headers.get("X-KBS-Token", ""), WEBHOOK_TOKEN):
+                return self._reply(401, "unauthorized")
+        elif os.environ.get("KBS_WEBHOOK_REQUIRE_TOKEN", "").lower() in ("1", "true"):
+            return self._reply(401, "unauthorized — KBS_WEBHOOK_TOKEN not set")
+
+        # Content type: JSON only
+        ct = self.headers.get("Content-Type", "").split(";")[0].strip()
+        if ct and ct != "application/json":
+            return self._reply(415, "json only")
+
+        # Body size limit
         length = int(self.headers.get("Content-Length", 0))
-        body   = self.rfile.read(length)
+        if length > MAX_BODY_SIZE:
+            return self._reply(413, f"too large (max {MAX_BODY_SIZE} bytes)")
+        if length == 0:
+            return self._reply(400, "empty body")
+
+        body = self.rfile.read(length)
         try:
             payload = json.loads(body)
         except json.JSONDecodeError:
-            payload = {"text": body.decode("utf-8", errors="replace")}
+            return self._reply(400, "invalid JSON")
 
         capture(payload, "API webhook")
 
@@ -171,16 +200,19 @@ class WebhookHandler(BaseHTTPRequestHandler):
 
 
 def run_server(port: int = 8080):
+    if not WEBHOOK_TOKEN:
+        print("⚠️  KBS_WEBHOOK_TOKEN not set — webhook accepts unauthenticated POSTs")
+        print("   Set KBS_WEBHOOK_TOKEN in .env to require X-KBS-Token header")
     print(f"KBS Chat API Adapter — listening on port {port}")
     print(f"POST to: http://localhost:{port}/capture")
-    print("Send: curl -X POST http://localhost:{port}/capture -H 'Content-Type: application/json' -d '{{\"text\":\"chat text\"}}'")
+    print(f"Send: curl -X POST http://localhost:{port}/capture -H 'Content-Type: application/json' -H 'X-KBS-Token: YOUR_TOKEN' -d '{{\"text\":\"chat text\"}}'")
     print("Press Ctrl+C to stop.")
     HTTPServer(("localhost", port), WebhookHandler).serve_forever()
 
 
 # ─── Entry Point ───────────────────────────────────────────────────────────────
 def main():
-    parser = argparse.ArgumentParser(description="KBS Chat API Adapter V0.116")
+    parser = argparse.ArgumentParser(description="KBS Chat API Adapter")
     parser.add_argument("--server", action="store_true", help="Run as HTTP webhook server")
     parser.add_argument("--port",   type=int, default=8080, help="Webhook server port")
     parser.add_argument("--file",   type=str, help="Path to transcript file")

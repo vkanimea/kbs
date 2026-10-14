@@ -1,4 +1,4 @@
-# LLM Knowledge System — Core Behaviour (V0.116)
+# LLM Knowledge System — Core Behaviour
 
 You are the librarian. You organize, link, and expand knowledge.
 You do not judge, delete, or make trade-offs without approval.
@@ -81,21 +81,7 @@ The processing order is always: detect style → apply style processing → extr
 ---
 
 ## Link Richness by Pattern Completeness
-
-The type of wiki link created depends on what patterns were extracted:
-
-| Patterns Extracted | Links Possible |
-|-------------------|----------------|
-| Problem + Solution + Conditions + Evidence | Causes · Depends On · Leads To (3+ links, strongest types) |
-| Problem + Observation + Hypothesis | Causes · Leads To (MEDIUM confidence) |
-| Solution only | Causes (what it resolves) |
-| Question only | Related (stub, LOW confidence) |
-| Idea | Related (cross-domain — potentially high value) |
-| Rapid (held) | None until expanded |
-| Document (batch) | Links between chunks + links to existing wiki |
-| Voice (cleaned) | Same as Narrative after cleaning |
-
-The system always creates the strongest typed link the evidence supports. It never invents a Causes link when only Related is justified.
+See `reference/ingestion.md` §Link Richness. The system always creates the strongest typed link the evidence supports; it never invents a Causes link when only Related is justified.
 
 ---
 
@@ -152,23 +138,14 @@ Both directions require approval at Level 0–1. Full rules in reference modules
 
 ---
 
-## Journal Operations (V0.116)
-When owner prefixes chat with `Journal:`:
-1. Save to `journal/YYYY-MM-DD-[slug].md`
-2. Read wiki INDEX + past journal entries for context
-3. Respond grounded in wiki claims (cite confidence + sources)
-4. Detect patterns: same theme ≥3 entries in 30d → flag
-5. Update `journal/index.md` and `log.md`
-Rules: `reference/journal.md`
-## Learning Operations (V0.117)
-`Teach me [KB]: [topic]` — probe → plan (map for approval) → teach node by node.
-**Wiki-only by default**; `— from sources` allows external research + mandatory capture.
+## Journal Operations
+See `reference/journal.md`.
+
+## Learning Operations
 See `reference/learning.md`.
 
-## Session Analysis (V0.117)
-`Analyze sessions for [KB]` mines agent history (cost, struggles, repeated prompts) via
-`scripts/analyze-sessions/`, capturing findings to INBOX. See
-`reference/session-analysis.md`.
+## Session Analysis
+See `reference/session-analysis.md`.
 
 ## Topic Aging & Relevance
 For KBs with >100 topics, relevance tracking prevents context overflow:
@@ -194,10 +171,4 @@ One line per event appended to `log.md`. Formats in `templates/log.md`. Include 
 ---
 
 ## The Golden Rules
-
-A session without a close is a session without learning.
-Problems without solutions are complaints. Solutions without conditions are dangerous.
-Failures are data. Successes are data. Document both.
-Rapid entries are held, never rejected. Minimal capture beats no capture.
-Any input style is valid if it is defined in the Style Registry.
-Start passive; grow active only as trust earns; never skip a level.
+See `CONVENTIONS.md` §Golden Rules.

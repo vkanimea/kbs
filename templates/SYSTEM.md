@@ -1,4 +1,4 @@
-# SYSTEM.md — Configuration & Meta-Cognition (V0.116)
+# SYSTEM.md — Configuration & Meta-Cognition
 
 Single source of truth for: current context, scope, activity levels, policies, metrics targets, style registry, rituals, and learning triggers. Operation procedures live in `reference/`. Prompts live in `PROMPTS.md`.
 
@@ -20,10 +20,10 @@ Single source of truth for: current context, scope, activity levels, policies, m
 - [What to work on]
 
 ### Last Session
-Date: YYYY-MM-DD | Closed: Yes/No
-Problems captured: [n] | Solutions captured: [n] | Failures: [n] | Successes: [n]
+Date: 2026-10-06 | Closed: Yes
+Problems captured: 1 | Solutions captured: 1 | Failures: 1 | Successes: 2
 
-### Last Updated: YYYY-MM-DD
+### Last Updated: 2026-10-06
 ```
 
 ---
@@ -474,12 +474,12 @@ Prompts: `PROMPTS.md`.
 | No solutions this month | "Document what worked this month" |
 | Solution without conditions | "Add conditions and limitations to: [title]" |
 | Custom style detection failure | "Review style registry — [style] not matching correctly" |
-| Frontmatter override mismatch | "Frontmatter style '[name]' not in registry — check spelling or register custom style" |
 | Lesson captured but not ingested | "Process lesson capture from [date] — gaps, misconceptions, and clicked facts awaiting ingestion" |
 | Misconception exposed by a quiz | "Revisit misconception: [claim] — contradicted expectations in lesson [date]" |
 | Lesson-proposed confidence change unapproved | "Review proposed confidence change for [[topic]] from lesson [date]" |
 | Recurring prompt correction | "Consider a system-rule change: you keep re-typing '[correction]' — see session analysis [date]" |
 | Repeated session error pattern | "Investigate recurring error: [pattern] — seen in sessions [ids]" |
+| Frontmatter override mismatch | "Frontmatter style '[name]' not in registry — check spelling or register custom style" |
 
 ---
 

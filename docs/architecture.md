@@ -1,8 +1,20 @@
-# KBS Architecture — V0.116
+# KBS Architecture
 
 ## Overview
 
 KBS is a governed, evolving knowledge graph: plain markdown transformed into a reasoning system that learns from successes and failures, compounds every session, and auto-maintains a career portfolio. Model-agnostic. Works with any LLM.
+
+### Which Client Do You Need?
+
+| Capability | Chat client | Agent harness |
+|------------|-------------|---------------|
+| Read/write KBS files | ✅ | ✅ |
+| Scripts, git, backups | ❌ | ✅ |
+| Max Activity Level | 1 | 3 |
+| Session close | Manual | Automatic |
+| Nightly backup | ❌ | ✅ (cron) |
+
+A **chat client** (Claude.ai, ChatGPT) can read and propose but cannot run scripts or push git. An **agent harness** (Claude Code, pi, Aider) is required for the full pipeline.
 
 ---
 
@@ -15,7 +27,7 @@ See [CHANGELOG.md](../CHANGELOG.md) for the full version history.
 ## Where the Ideas Come From
 
 ### Zettelkasten (Niklas Luhmann, 1950s–1990s)
-A German sociologist who wrote 70+ books using 90,000 physical index cards. Each card held one idea, linked to others by reference number. He navigated by following links, never by searching. **Links are more valuable than the notes themselves.**
+A German sociologist who wrote 70+ books using 90,000 physical index cards. Each card held one idea, linked to others by reference number. He navigated primarily by following links, supplemented by a keyword index. **Links are more valuable than the notes themselves.**
 
 KBS took: one topic per wiki page; every page links to others; navigation over search.
 
@@ -75,7 +87,7 @@ KBS took: session close as the single most important ritual; career portfolio au
 
 4 BUILD      wiki/topics/ — typed knowledge graph with confidence levels
 
-5 QUERY      6-step: INDEX → topics → relationships → synthesise → cite → save → compound?
+5 QUERY      7-step: INDEX → topics → relationships → synthesise → cite → save → compound?
 
 6 IMPROVE    Session close: expand held, confirm batches, route everything, compound
              → loops back to Stage 1
@@ -83,7 +95,7 @@ KBS took: session close as the single most important ritual; career portfolio au
 
 ---
 
-## The 6-Step Ingestion Pipeline (V0.116)
+## The 6-Step Ingestion Pipeline
 
 This is the core processing architecture. Every INBOX entry passes through all 6 steps.
 
@@ -123,7 +135,7 @@ ACTIONS.md · CAREER.md · INBOX §Open Questions · INBOX §Held
 
 ---
 
-## The Style Registry — Extensible Input Architecture (V0.116)
+## The Style Registry — Extensible Input Architecture
 
 The Style Registry (defined in `SYSTEM.md §Style Registry`) is the single source of truth for how every input is processed. It defines 5 built-in styles and an open extension point.
 
@@ -278,7 +290,17 @@ teach beyond the wiki, and it must capture every claim it asserts.
 | `hourly-ingest.sh` | Auto-process raw/ files + move to raw/processed/ + rebuild RAG index | Hourly |
 | `youtube-ingest.sh` | Download YouTube audio + transcribe + INBOX entry | On demand |
 | `chat-adapter.sh` | Pipe/file capture to CHAT_INBOX.md | On demand |
-| `chat-api-adapter.py` | Webhook server for API capture | On demand |
+| `chat-api-adapter.py` | Webhook server for API capture (auth-gated) | On demand |
+| `kbs-lint.sh` | Validate wiki pages, INBOX entries, and conventions | On demand / pre-commit |
+| `kbs-provenance.sh` | Detect fabricated dates in proposed entries | On demand |
+| `kbs-sync.sh` | Sync system files from upstream repo to data repo | On demand |
+| `kbs-drift-check.sh` | Detect divergence between system and data repo | Daily (09:15 cron) |
+| `model-config.sh` | Configure LLM provider and model settings | On demand |
+| `nightly-backup.sh` | Commit + push data repo to offsite remote | @reboot + 12:45/16:45 |
+| `backup-verify.sh` | Verify backup outcome (assert + drill) | After push / periodic |
+| `backup-catchup.sh` | Run periodic job only if overdue (sleep-safe) | Hourly wrapper |
+| `goal-loop.sh` | Autonomous goal-loop contract execution | On demand |
+| `graphify-index.sh` | Build knowledge graph from code/docs corpus | On demand |
 | `analyze-sessions/*.py` | Analyze agent history: cost rollups, prompt-pattern mining, session search/render | On demand (`Analyze sessions`) |
 
 > Harness session transcripts (opencode, pi, …) can be exported into `raw/chat-transcripts/` + `CHAT_INBOX.md` by an instance-specific exporter — see *The Harness Layer* above. Exporters are not shipped: they depend on the harness's own storage format.

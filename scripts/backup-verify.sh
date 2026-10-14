@@ -79,12 +79,13 @@ remote_ref() {
 }
 
 # pick_remote <dir> — first configured remote that is the backup target. The
-# curated repo pushes to `gitea` (falling back to `origin`); the raw repo uses
-# `origin`. Preferring gitea keeps the assertion pointed at the offsite copy.
+# curated repo pushes to the offsite remote (falling back to `origin`); the raw repo uses
+# `origin`. Preferring the offsite remote keeps the assertion pointed at the offsite copy.
 pick_remote() {
     local dir="$1"
-    if git -C "$dir" remote get-url gitea >/dev/null 2>&1; then
-        echo "gitea"; return
+    local offsite="${KBS_OFFSITE_REMOTE:-offsite}"
+    if git -C "$dir" remote get-url "$offsite" >/dev/null 2>&1; then
+        echo "$offsite"; return
     fi
     echo "origin"
 }
@@ -159,7 +160,7 @@ clone_repo() {
     # mirror. For kbs-data that is `gitea`; `origin` (GitHub over HTTPS) needs
     # interactive credentials and is not the durability target. The recovery
     # question is "can the offsite copy rebuild the state?", so drill that one.
-    remote="$(git -C "$src" remote get-url gitea 2>/dev/null)"
+    remote="$(git -C "$src" remote get-url "${KBS_OFFSITE_REMOTE:-offsite}" 2>/dev/null)"
     [ -n "$remote" ] || remote="$(git -C "$src" remote get-url origin 2>/dev/null)"
     if [ -z "$remote" ]; then
         log "drill | $label | FAIL: no remote URL configured in $src"
@@ -216,30 +217,34 @@ if clone_repo "$KBS_REPO" "$WORK/kbs-data" "kbs-data"; then
 fi
 
 if clone_repo "$RAW_REPO" "$WORK/kbs-raw" "kbs-raw"; then
-    expect_nonempty "$WORK/kbs-raw" "pi-state/sessions" "kbs-raw" || DRILL_FAIL=1
-    expect_nonempty "$WORK/kbs-raw" "pi-state/chat-transcripts" "kbs-raw" || DRILL_FAIL=1
-    if [ ! -s "$WORK/kbs-raw/pi-state/pi-hermes-memory/MEMORY.md" ]; then
-        log "drill | kbs-raw | FAIL: pi-hermes-memory/MEMORY.md missing or empty"
+    # Configurable drill paths: what the recovery must contain.
+    # Defaults cover the standard layout; override via KBS_VERIFY_PATHS (space-separated).
+    RAW_SESSIONS="${KBS_RAW_SESSIONS:-pi-state/sessions}"
+    RAW_CHAT="${KBS_RAW_CHAT:-pi-state/chat-transcripts}"
+    RAW_MEMORY="${KBS_RAW_MEMORY:-pi-state/pi-hermes-memory/MEMORY.md}"
+    RAW_PROJECTS="${KBS_RAW_PROJECTS:-pi-state/projects-memory}"
+    RAW_OVPACK="${KBS_RAW_OVPACK:-openviking}"
+
+    expect_nonempty "$WORK/kbs-raw" "$RAW_SESSIONS" "kbs-raw" || DRILL_FAIL=1
+    expect_nonempty "$WORK/kbs-raw" "$RAW_CHAT" "kbs-raw" || DRILL_FAIL=1
+    if [ ! -s "$WORK/kbs-raw/$RAW_MEMORY" ]; then
+        log "drill | kbs-raw | FAIL: $RAW_MEMORY missing or empty"
         say "FAIL  kbs-raw — MEMORY.md missing/empty"
         DRILL_FAIL=1
     fi
-    # Per-project memory: assert at least one project MEMORY.md survives, so the
-    # tree added 2026-10-12 (action: settle the remaining unbacked state) is
-    # really carried offsite rather than assumed.
-    if ! find "$WORK/kbs-raw/pi-state/projects-memory" -type f -name 'MEMORY.md' 2>/dev/null | grep -q .; then
-        log "drill | kbs-raw | FAIL: no project MEMORY.md in pi-state/projects-memory"
+    if ! find "$WORK/kbs-raw/$RAW_PROJECTS" -type f -name 'MEMORY.md' 2>/dev/null | grep -q .; then
+        log "drill | kbs-raw | FAIL: no project MEMORY.md in $RAW_PROJECTS"
         say "FAIL  kbs-raw — no project MEMORY.md"
         DRILL_FAIL=1
     else
         say "OK    kbs-raw — project memory present"
     fi
-    # OpenViking pack: expect at least one .ovpack plus SHA256SUMS.
-    if ! find "$WORK/kbs-raw/openviking" -name '*.ovpack' -type f 2>/dev/null | grep -q .; then
-        log "drill | kbs-raw | FAIL: no .ovpack in openviking/"
-        say "FAIL  kbs-raw — no .ovpack in openviking/"
+    if ! find "$WORK/kbs-raw/$RAW_OVPACK" -name '*.ovpack' -type f 2>/dev/null | grep -q .; then
+        log "drill | kbs-raw | FAIL: no .ovpack in $RAW_OVPACK/"
+        say "FAIL  kbs-raw — no .ovpack in $RAW_OVPACK/"
         DRILL_FAIL=1
     else
-        say "OK    kbs-raw — openviking pack present"
+        say "OK    kbs-raw — pack present"
     fi
 fi
 
