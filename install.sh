@@ -1,8 +1,9 @@
 #!/bin/bash
-# Knowledge Base System (KBS) V0.116 — Linux/macOS Installer
+# Knowledge Base System (KBS) — Linux/macOS Installer
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/vkanimea/kbs/main/install.sh | bash
 #   KBS_PATH=/custom/path KB_NAME=myproject ./install.sh
+#   KBS_REF=v0.126 ./install.sh         # pin to a specific tag
 #
 # If run from a cloned repo, templates are copied locally (no network needed).
 # If run standalone (curl pipe), templates are downloaded; any failure aborts loudly.
@@ -18,17 +19,26 @@ TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-/dev/null}")" 2>/dev/null && pwd || echo "")"
 
 # Version — read from the repo's VERSION file so this script never drifts from the release.
+# If KBS_REF is set, fetch from that tag instead of main.
+REF="${KBS_REF:-main}"
 VERSION="$(tr -d '[:space:]' < "$SCRIPT_DIR/VERSION" 2>/dev/null || true)"
 if [ -z "$VERSION" ] && [ -n "$SCRIPT_DIR" ] && command -v curl &>/dev/null; then
-  VERSION="$(curl -fsSL "$REPO_URL/VERSION" 2>/dev/null | tr -d '[:space:]' || true)"
+  VERSION="$(curl -fsSL "${REPO_URL/main/$REF}/VERSION" 2>/dev/null | tr -d '[:space:]' || true)"
 fi
-VERSION="${VERSION:-0.116.4}"
+# Fallback to 'unknown' instead of a stale hard-coded version
+VERSION="${VERSION:-unknown}"
 
 echo -e "${CYAN}"
-echo "╔══════════════════════════════════════════════════════════════╗"
+echo "╔═══════════════════════════════════════════════════════════════╗"
 printf '║%-62s║\n' "       Knowledge Base System (KBS) V$VERSION Installer"
-echo "╚══════════════════════════════════════════════════════════════╝"
+echo "╚═══════════════════════════════════════════════════════════════╝"
 echo -e "${NC}"
+
+# If version is unknown, warn the user
+if [ "$VERSION" = "unknown" ]; then
+  echo -e "${YELLOW}⚠️  Could not determine version from repo — install may be from unpinned source${NC}"
+fi
+
 echo -e "${YELLOW}📍 Path : $KBS_PATH${NC}"
 echo -e "${YELLOW}📚 KB   : $KB_NAME${NC}"
 echo ""
@@ -48,109 +58,119 @@ SYSTEM_TEMPLATES=(agents.md PROMPTS.md CONVENTIONS.md)
 USER_FILES=(SYSTEM.md DECISIONS.md INBOX.md CHAT_INBOX.md FAILURES.md SUCCESSES.md CAREER.md ACTIONS.md JOURNAL.md log.md)
 REFERENCES=(session-close.md ingestion.md chat-input.md failures.md successes.md actions.md journal.md learning.md session-analysis.md writing-style.md health-check.md)
 SCRIPTS=(chat-adapter.sh chat-api-adapter.py health-check.sh status.sh auto-close.sh due-actions.sh topic-index.sh youtube-ingest.sh hourly-ingest.sh rag.py rag-index.sh rag-query.sh nightly-backup.sh git-credential-env.sh goal-loop.sh graphify-index.sh kbs-sync.sh kbs-drift-check.sh model-config.sh kbs-lint.sh kbs-provenance.sh backup-catchup.sh backup-verify.sh)
-SESSION_ANALYSIS_SCRIPTS=(sessions.py cost.py prompts.py search.py show_session.py README.md)
 
-FAILED=0
-install_file() {
-  local src="$1" dst="$2"
-  if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/$src" ]; then
-    cp "$SCRIPT_DIR/$src" "$dst" && echo -e "${GREEN}  ✓ $src (local)${NC}" && return 0
+# SHA256SUMS support (optional) — if present in repo at the pinned REF, verify downloads
+SHA256SUMS_URL="${REPO_URL/main/$REF}/SHA256SUMS"
+SHA256SUMS_FILE=""
+if command -v curl &>/dev/null; then
+  SHA256SUMS_FILE=$(curl -fsSL "$SHA256SUMS_URL" 2>/dev/null || true)
+fi
+
+download() {
+  local dest="$1"
+  local relpath="$2"
+  local url="${REPO_URL/main/$REF}/$relpath"
+  if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/$relpath" ]; then
+    cp "$SCRIPT_DIR/$relpath" "$dest"
+  else
+    curl -fsSL "$url" -o "$dest" || { echo -e "${RED}❌ Failed to download $relpath${NC}"; exit 1; }
   fi
-  if command -v curl &>/dev/null; then
-    curl -fsSL "$REPO_URL/$src" -o "$dst" && echo -e "${GREEN}  ✓ $src${NC}" && return 0
-  elif command -v wget &>/dev/null; then
-    wget -q "$REPO_URL/$src" -O "$dst" && echo -e "${GREEN}  ✓ $src${NC}" && return 0
+  # Verify checksum if SHA256SUMS available
+  if [ -n "$SHA256SUMS_FILE" ]; then
+    expected=$(echo "$SHA256SUMS_FILE" | grep " $relpath$" | awk '{print $1}')
+    if [ -n "$expected" ]; then
+      actual=$(sha256sum "$dest" | awk '{print $1}')
+      if [ "$actual" != "$expected" ]; then
+        echo -e "${RED}❌ Checksum mismatch for $relpath (expected $expected, got $actual)${NC}"
+        exit 1
+      fi
+    fi
   fi
-  echo -e "${RED}  ✗ $src — FAILED${NC}"
-  FAILED=1
-  return 0
 }
 
-# Seed a user-owned file only if it does not already exist.
-KEPT=()
-install_file_preserve() {
-  local src="$1" dst="$2"
-  if [ -e "$dst" ]; then
-    KEPT+=("$(basename "$dst")")
-    return 0
-  fi
-  install_file "$src" "$dst"
-}
+# System templates (always refresh)
+for f in "${SYSTEM_TEMPLATES[@]}"; do
+  download "$KBS_PATH/$f" "templates/$f"
+done
+echo -e "${GREEN}✅ System templates installed${NC}"
 
-echo -e "${CYAN}📝 Installing system files...${NC}"
-for f in "${SYSTEM_TEMPLATES[@]}"; do install_file "templates/$f" "$KBS_PATH/$f"; done
-for f in "${REFERENCES[@]}"; do install_file "templates/reference/$f" "$KBS_PATH/reference/$f"; done
-install_file "CHANGELOG.md" "$KBS_PATH/CHANGELOG.md"
-install_file "VERSION" "$KBS_PATH/VERSION"
+# User files (seed only)
+for f in "${USER_FILES[@]}"; do
+  [ -f "$KBS_PATH/$f" ] || download "$KBS_PATH/$f" "templates/$f"
+done
+echo -e "${GREEN}✅ User files seeded${NC}"
 
-echo -e "${CYAN}🗂  Preserving your files (seed if missing)...${NC}"
-for f in "${USER_FILES[@]}"; do install_file_preserve "templates/$f" "$KBS_PATH/$f"; done
-if [ ${#KEPT[@]} -gt 0 ]; then
-  echo -e "${YELLOW}  kept: ${KEPT[*]}${NC}"
-  echo -e "${YELLOW}  (shipped templates for these live in templates/ — diff only if you want header updates)${NC}"
+# References
+mkdir -p "$KBS_PATH/reference"
+for f in "${REFERENCES[@]}"; do
+  download "$KBS_PATH/reference/$f" "templates/reference/$f"
+done
+echo -e "${GREEN}✅ Reference modules installed${NC}"
+
+# Scripts
+mkdir -p "$KBS_PATH/scripts"
+mkdir -p "$KBS_PATH/scripts/windows"
+mkdir -p "$KBS_PATH/scripts/analyze-sessions"
+for f in "${SCRIPTS[@]}"; do
+  download "$KBS_PATH/scripts/$f" "scripts/$f"
+  chmod +x "$KBS_PATH/scripts/$f" 2>/dev/null || true
+done
+echo -e "${GREEN}✅ Scripts installed${NC}"
+
+# Docs
+mkdir -p "$KBS_PATH/docs"
+for f in backup-and-restore.md RESTORE.md version-advising.md; do
+  [ -f "$KBS_PATH/docs/$f" ] || download "$KBS_PATH/docs/$f" "docs/$f"
+done
+echo -e "${GREEN}✅ Docs installed${NC}"
+
+# Ensure .gitignore
+if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/.gitignore" ]; then
+  cp "$SCRIPT_DIR/.gitignore" "$KBS_PATH/.gitignore"
+elif command -v curl &>/dev/null; then
+  curl -fsSL "${REPO_URL/main/$REF}/.gitignore" -o "$KBS_PATH/.gitignore" 2>/dev/null || true
 fi
 
-echo -e "${CYAN}🔧 Installing scripts...${NC}"
-for f in "${SCRIPTS[@]}"; do install_file "scripts/$f" "$KBS_PATH/scripts/$f"; done
-for f in "${SESSION_ANALYSIS_SCRIPTS[@]}"; do install_file "scripts/analyze-sessions/$f" "$KBS_PATH/scripts/analyze-sessions/$f"; done
-install_file "scripts/windows/status.ps1" "$KBS_PATH/scripts/windows/status.ps1"
-
-# Install examples (optional — copy locally if available, never fail on download)
-echo -e "${CYAN}📦 Installing starter KB...${NC}"
-if [ -n "$SCRIPT_DIR" ] && [ -d "$SCRIPT_DIR/examples/starter-kb" ]; then
-    mkdir -p "$KBS_PATH/examples"
-    cp -r "$SCRIPT_DIR/examples/starter-kb" "$KBS_PATH/examples/starter-kb" && echo -e "${GREEN}  ✓ examples/starter-kb (local)${NC}"
-fi
-chmod +x "$KBS_PATH/scripts/"*.sh "$KBS_PATH/scripts/"*.py 2>/dev/null || true
-
-if [ "$FAILED" -eq 1 ]; then
-  echo ""
-  echo -e "${RED}❌ INSTALLATION INCOMPLETE — one or more files failed to install.${NC}"
-  echo -e "${RED}   Check your network, or clone the repo and run ./install.sh locally:${NC}"
-  echo "   git clone https://github.com/vkanimea/kbs.git && cd kbs && ./install.sh"
-  exit 1
+# Ensure .env.template
+if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/.env.template" ]; then
+  cp "$SCRIPT_DIR/.env.template" "$KBS_PATH/.env.template"
+elif command -v curl &>/dev/null; then
+  curl -fsSL "${REPO_URL/main/$REF}/.env.template" -o "$KBS_PATH/.env.template" 2>/dev/null || true
 fi
 
-# ─── Generated files ───────────────────────────────────────────────────────────
-cat > "$KBS_PATH/.env.template" <<EOF
-# KBS V$VERSION — copy to .env and edit
-KBS_PATH=$KBS_PATH
-KB_NAME=$KB_NAME
-AUTO_INGEST=false
-# LLM_CLIENT is informational only (never read by scripts). Any LLM works.
-LLM_CLIENT=any
-ACTIVITY_LEVEL=0
-EOF
-
-if [ "$INSTANCE_EXISTED" -eq 1 ]; then EVENT="SYSTEM_UPGRADED"; else EVENT="SYSTEM_CREATED"; fi
-cat >> "$KBS_PATH/log.md" <<EOF
-
-## $TIMESTAMP | $EVENT | V$VERSION | Path: $KBS_PATH | KB: $KB_NAME
-EOF
-
-# .gitignore: seed only — never overwrite rules you have added
-if [ ! -f "$KBS_PATH/.gitignore" ]; then
-cat > "$KBS_PATH/.gitignore" <<'EOF'
-.env
-*.log
-*.tmp
-kb/*/wiki/snapshots/
-kb/*/rag-index/
-EOF
+# Ensure VERSION file
+if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/VERSION" ]; then
+  cp "$SCRIPT_DIR/VERSION" "$KBS_PATH/VERSION"
+elif command -v curl &>/dev/null; then
+  curl -fsSL "${REPO_URL/main/$REF}/VERSION" -o "$KBS_PATH/VERSION" 2>/dev/null || true
 fi
 
-# ─── Done ──────────────────────────────────────────────────────────────────────
-echo ""
-echo -e "${GREEN}╔══════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║                 INSTALLATION COMPLETE  ✅                    ║${NC}"
-echo -e "${GREEN}╚══════════════════════════════════════════════════════════════╝${NC}"
-echo ""
-echo "Next steps:"
-echo "  1. LLM client: grant folder access to $KBS_PATH"
-echo "     (any LLM client works — see docs/deployment.md for your client)"
-echo "  2. Optional: copy starter KB → cp -r $KBS_PATH/examples/starter-kb/wiki/topics/* $KBS_PATH/kb/$KB_NAME/wiki/topics/"
-echo "  3. Verify: $KBS_PATH/scripts/status.sh"
-echo "  4. In your LLM client, run the Initial Setup prompt from PROMPTS.md"
-echo "  5. After every session: Follow agents.md. Close session for $KB_NAME"
-echo ""
-echo -e "${YELLOW}A session without a close is a session without learning.${NC}"
+# Ensure SHA256SUMS if available
+if [ -n "$SHA256SUMS_FILE" ] && [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/SHA256SUMS" ]; then
+  cp "$SCRIPT_DIR/SHA256SUMS" "$KBS_PATH/SHA256SUMS"
+elif [ -n "$SHA256SUMS_FILE" ] && command -v curl &>/dev/null; then
+  echo "$SHA256SUMS_FILE" > "$KBS_PATH/SHA256SUMS"
+fi
+
+# Credential helper registration (idempotent)
+git -C "$KBS_PATH" config credential.helper '!bash scripts/git-credential-env.sh' 2>/dev/null || true
+
+# Log the event
+if [ "$INSTANCE_EXISTED" -eq 1 ]; then
+  EVENT="UPGRADE"
+else
+  EVENT="INSTALL"
+fi
+echo "## $TIMESTAMP | $EVENT | V$VERSION" >> "$KBS_PATH/log.md"
+echo "- Path: $KBS_PATH" >> "$KBS_PATH/log.md"
+echo "- KB: $KB_NAME" >> "$KBS_PATH/log.md"
+[ "$INSTANCE_EXISTED" -eq 1 ] && echo "- Upgraded from previous version" >> "$KBS_PATH/log.md"
+echo "" >> "$KBS_PATH/log.md"
+
+echo -e "${GREEN}✅ Install/upgrade complete — KBS V$VERSION ready at $KBS_PATH${NC}"
+echo -e "${CYAN}Next steps:${NC}"
+echo "  cd $KBS_PATH"
+echo "  cp .env.template .env    # add your tokens"
+echo "  git init && git add -A && git commit -m 'KBS initial commit'"
+echo "  git remote add origin <your-private-repo>"
+echo "  git push -u origin main"

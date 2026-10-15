@@ -9,7 +9,7 @@
 # instance.
 #
 # These tests are fully OFFLINE: they build throwaway bare repos and wire them
-# as the `gitea` / `origin` remotes, so no network, no harbor01, no GitHub.
+# as the `offsite` / `origin` remotes, so no network required.
 #
 # backup-verify.sh exists to catch the two silent-failure modes found on
 # 2026-10-12 — a push accepted locally while the remote ref stayed behind, and a
@@ -37,7 +37,7 @@ GIT="git -c user.email=test@kbs -c user.name=test"
 QUIET_ENV=(KBS_VERIFY_LOG="$WORK/backup.log" KBS_VERIFY_STATE="$WORK/state")
 
 # make_repo <name> — create a bare "remote" plus a working clone wired to it as
-# `gitea`, seeded with the files a recovery must contain.
+# `offsite`, seeded with the files a recovery must contain.
 make_repo() {
   local name="$1"
   local bare="$WORK/$name.git"
@@ -45,25 +45,26 @@ make_repo() {
   git init -q --bare "$bare"
   git init -q "$work"
   ( cd "$work"
-    git remote add gitea "$bare"
-    # seed plausible recovery content
-    mkdir -p pi-state/sessions pi-state/chat-transcripts pi-state/pi-hermes-memory openviking pi-state/projects-memory/demo
+    git remote add offsite "$bare"
+    # seed plausible recovery content (generic names, no instance specifics)
+    mkdir -p sessions chat-transcripts memory projects-memory/demo ovpack
+    # kbs-data required files
     echo "# ACTIONS"      > ACTIONS.md
     echo "# FAILURES"     > FAILURES.md
     echo "# SUCCESSES"    > SUCCESSES.md
     echo "# DECISIONS"    > DECISIONS.md
-    echo "{}"             > pi-state/sessions/sess.jsonl
-    echo "tx"             > pi-state/chat-transcripts/t.md
-    echo "# MEMORY"       > pi-state/pi-hermes-memory/MEMORY.md
-    echo "# proj"         > pi-state/projects-memory/demo/MEMORY.md
-    echo "pack"           > openviking/openviking-pack-test.ovpack
-    echo "sums"           > openviking/SHA256SUMS
+    # kbs-raw content
+    echo "{}"             > sessions/sess.jsonl
+    echo "tx"             > chat-transcripts/t.md
+    echo "# MEMORY"       > memory/MEMORY.md
+    echo "# proj"         > projects-memory/demo/MEMORY.md
+    echo "pack"           > ovpack/openviking-pack-test.ovpack
+    echo "sums"           > ovpack/SHA256SUMS
     git -c user.email=test@kbs -c user.name=test add -A
     git -c user.email=test@kbs -c user.name=test commit -q -m seed
-    git push -q -u gitea master 2>/dev/null || git push -q -u gitea HEAD:master
-    # make sure the checked-out branch is named master
+    git push -q -u offsite master 2>/dev/null || git push -q -u offsite HEAD:master
     git branch -M master 2>/dev/null || true
-    git push -q -u gitea master
+    git push -q -u offsite master
   ) >/dev/null 2>&1
   echo "$work"
 }
@@ -96,28 +97,28 @@ RC="$(run_verify --drill KBS_VERIFY_KBS="$GOOD2" KBS_VERIFY_RAW="$GOOD2")"
 
 # Missing sessions tree: clone succeeds but is not a usable recovery. MUST fail.
 THIN="$(make_repo thin)"
-( cd "$THIN" && git rm -rq pi-state/sessions && $GIT commit -q -m "drop sessions" && git push -q gitea master )
+( cd "$THIN" && git rm -rq sessions && $GIT commit -q -m "drop sessions" && git push -q offsite master )
 RC="$(run_verify --drill KBS_VERIFY_KBS="$THIN" KBS_VERIFY_RAW="$THIN")"
-[ "$RC" != "0" ] && ok "missing pi-state/sessions → drill fails (gap caught)" \
+[ "$RC" != "0" ] && ok "missing sessions → drill fails (gap caught)" \
                  || bad "missing sessions tree was NOT caught by --drill"
 
 # Missing MEMORY.md: memory is the thing most costly to lose. MUST fail.
 THIN2="$(make_repo thin2)"
-( cd "$THIN2" && git rm -q pi-state/pi-hermes-memory/MEMORY.md && $GIT commit -q -m "drop memory" && git push -q gitea master )
+( cd "$THIN2" && git rm -q memory/MEMORY.md && $GIT commit -q -m "drop memory" && git push -q offsite master )
 RC="$(run_verify --drill KBS_VERIFY_KBS="$THIN2" KBS_VERIFY_RAW="$THIN2")"
 [ "$RC" != "0" ] && ok "missing MEMORY.md → drill fails" \
                  || bad "missing MEMORY.md was NOT caught by --drill"
 
-# No .ovpack: the OpenViking pack is unbacked. MUST fail.
+# No .ovpack: the pack is unbacked. MUST fail.
 THIN3="$(make_repo thin3)"
-( cd "$THIN3" && git rm -rq openviking && $GIT commit -q -m "drop pack" && git push -q gitea master )
+( cd "$THIN3" && git rm -rq ovpack && $GIT commit -q -m "drop pack" && git push -q offsite master )
 RC="$(run_verify --drill KBS_VERIFY_KBS="$THIN3" KBS_VERIFY_RAW="$THIN3")"
-[ "$RC" != "0" ] && ok "missing openviking pack → drill fails" \
+[ "$RC" != "0" ] && ok "missing ovpack → drill fails" \
                  || bad "missing .ovpack was NOT caught by --drill"
 
 # No per-project memory: the tree added 2026-10-12. MUST fail.
 THIN4="$(make_repo thin4)"
-( cd "$THIN4" && git rm -rq pi-state/projects-memory && $GIT commit -q -m "drop project memory" && git push -q gitea master )
+( cd "$THIN4" && git rm -rq projects-memory && $GIT commit -q -m "drop project memory" && git push -q offsite master )
 RC="$(run_verify --drill KBS_VERIFY_KBS="$THIN4" KBS_VERIFY_RAW="$THIN4")"
 [ "$RC" != "0" ] && ok "missing project MEMORY.md → drill fails" \
                  || bad "missing project memory was NOT caught by --drill"

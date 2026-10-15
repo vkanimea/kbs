@@ -1,5 +1,5 @@
 #!/bin/bash
-# goal-loop.sh — KBS agentic goal-loop orchestrator (pi). V0.116
+# goal-loop.sh — KBS agentic goal-loop orchestrator (pi).
 #
 # Implements a persistent "Ralph / /goal" loop on pi WITHOUT a pi built-in:
 #   loop { run pi with the objective + progress -> apply changes

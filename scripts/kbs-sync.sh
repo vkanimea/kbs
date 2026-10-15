@@ -1,5 +1,5 @@
 #!/bin/bash
-# KBS Sync — refresh a data instance's system files from the system repo. V0.116
+# KBS Sync — refresh a data instance's system files from the system repo.
 #
 # The system repo (this repo) is the source of truth for system files. A data
 # instance (~/kbs / kbs-data) contains knowledge PLUS an installed copy of those

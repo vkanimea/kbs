@@ -1,6 +1,6 @@
 # Knowledge Base System (KBS)
 
-[![Version](https://img.shields.io/badge/version-0.125-blue.svg)](https://github.com/vkanimea/kbs)
+[![Version](https://img.shields.io/badge/version-0.126-blue.svg)](https://github.com/vkanimea/kbs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg)]()
 
@@ -30,7 +30,7 @@ A **chat client** (Claude.ai, ChatGPT, Gemini) can read and propose, but cannot 
 
 ---
 
-## What's New in V0.125
+## What's New in V0.126
 
 Latest changes; full history in [CHANGELOG.md](CHANGELOG.md).
 

@@ -46,6 +46,6 @@ If you need to change a template or script, edit it here, then users run `script
 
 - [ ] Tests pass (`test-checkers.sh`, `test-backup-verify.sh`, `check-doc-versions.sh`)
 - [ ] `agents.md` word count under 1,200
-- [ ] No instance-specific names leaked (run `grep -rnE "harbor01|pi-state|pi-hermes|session-hoarder" scripts/ docs/ agents.md SYSTEM.md CONVENTIONS.md`)
+- [ ] No instance-specific names leaked (run `scripts/private-name-check.sh`)
 - [ ] CHANGELOG entry added (if user-visible change)
 - [ ] Version in VERSION bumped (if release)

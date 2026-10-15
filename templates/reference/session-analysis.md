@@ -1,4 +1,4 @@
-# Reference: Session Analysis (V0.117)
+# Reference: Session Analysis
 
 Loaded when the owner runs one of:
 

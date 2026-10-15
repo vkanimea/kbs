@@ -1,4 +1,4 @@
-# Reference: Writing Style (V0.117)
+# Reference: Writing Style
 
 Loaded when the librarian **writes prose** — wiki topics, lesson outputs, query syntheses,
 reports. Not for captures (INBOX entries are the owner's words) and not for the system

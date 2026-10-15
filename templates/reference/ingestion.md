@@ -1,4 +1,4 @@
-# Reference: Ingestion (V0.116)
+# Reference: Ingestion
 
 Loaded when the owner runs: `Follow agents.md. Ingest [KB]`
 

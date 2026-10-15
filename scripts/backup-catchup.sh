@@ -3,10 +3,10 @@
 #
 # WHY THIS EXISTS (2026-10-12):
 # The laptop is not a 24x7 host. The daily backups were armed at fixed clock
-# times (13:30 openviking, 13:45 pi-state). If the machine was asleep at that
+# times (for kbs-raw repos). If the machine was asleep at that
 # minute, cron skipped the job entirely — no backlog, no retry. Observed: the
-# openviking and pi-state backups did not run for 3 days (last 2026-10-09
-# 16:15) because the laptop was asleep at 13:30-13:45; hourly jobs kept firing
+# kbs-raw backups did not run for 3 days (last 2026-10-09
+# 16:15) because the laptop was asleep at the scheduled times; hourly jobs kept firing
 # so cron looked healthy. Meanwhile sessions grew 137 -> 172 with no offsite
 # copy.
 #

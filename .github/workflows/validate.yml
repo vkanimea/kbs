@@ -83,7 +83,7 @@ jobs:
           # Proves backup-verify.sh catches the 2026-10-12 silent failures in
           # BOTH directions: an unpushed/divered remote and a recovery gap must
           # fail, while a healthy remote must pass. Fully offline (throwaway
-          # bare repos), so it needs no harbor01 and no GitHub.
+          # bare repos), so it needs no offsite remote and no GitHub.
           bash tests/test-backup-verify.sh "${{ runner.temp }}/kbs-test"
 
       - name: Run status check
@@ -146,7 +146,7 @@ jobs:
       - name: agents.md required sections (fails on missing)
         run: |
           set -e
-          for s in "The 10 Rules" "Query Process" "Wiki Page Format" "Confidence Movement" "Boundaries"; do
+          for s in "The 11 Rules" "Query Process" "Wiki Page Format" "Confidence Movement" "Boundaries"; do
             grep -q "$s" templates/agents.md || { echo "❌ agents.md missing: $s"; exit 1; }
             echo "✅ $s"
           done

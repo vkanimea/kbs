@@ -201,15 +201,15 @@ class WebhookHandler(BaseHTTPRequestHandler):
 
 def run_server(port: int = 8080):
     if not WEBHOOK_TOKEN:
-        print("⚠️  KBS_WEBHOOK_TOKEN not set — webhook accepts unauthenticated POSTs")
-        print("   Set KBS_WEBHOOK_TOKEN in .env to require X-KBS-Token header")
+        print("❌ KBS_WEBHOOK_TOKEN not set — refusing to start webhook server")
+        print("   Set KBS_WEBHOOK_TOKEN in .env to enable webhook mode")
+        sys.exit(1)
     print(f"KBS Chat API Adapter — listening on port {port}")
     print(f"POST to: http://localhost:{port}/capture")
-    print(f"Send: curl -X POST http://localhost:{port}/capture -H 'Content-Type: application/json' -H 'X-KBS-Token: YOUR_TOKEN' -d '{{\"text\":\"chat text\"}}'")
+    json_example = '{"text":"chat text"}'
+    print(f"Send: curl -X POST http://localhost:{port}/capture -H 'Content-Type: application/json' -H 'X-KBS-Token: YOUR_TOKEN' -d '{json_example}'")
     print("Press Ctrl+C to stop.")
     HTTPServer(("localhost", port), WebhookHandler).serve_forever()
-
-
 # ─── Entry Point ───────────────────────────────────────────────────────────────
 def main():
     parser = argparse.ArgumentParser(description="KBS Chat API Adapter")

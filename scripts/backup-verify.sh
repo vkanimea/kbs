@@ -1,5 +1,5 @@
 #!/bin/bash
-# backup-verify.sh — verify the backup OUTCOME, not the backup intent. V0.122
+# backup-verify.sh — verify the backup OUTCOME, not the backup intent.
 #
 # WHY THIS EXISTS (2026-10-12 action: "Enforce the backup outcome"):
 # Two silent-failure modes were found on the same day and neither was caught by
@@ -7,7 +7,7 @@
 #   1. nightly-backup.sh's guard skipped a repo whose commits were unpushed
 #      (clean index, HEAD ahead of the remote), so the offsite copy fell behind
 #      while the log said the backup ran.
-#   2. The openviking + pi-state backups did not run for 3 days because the
+#   2. The kbs-raw backups did not run for 3 days because the
 #      laptop was asleep at the fixed clock time; cron looked healthy.
 # Both share one shape: the schedule trusts its own *input* ("did we run?")
 # instead of the *outcome* ("is the remote actually up to date?"). A push can
@@ -34,7 +34,7 @@
 #
 # Env:
 #   KBS_VERIFY_KBS   repo holding curated knowledge   (default: $HOME/kbs)
-#   KBS_VERIFY_RAW   repo holding pi-state + packs    (default: $HOME/.cache/kbs-raw)
+#   KBS_VERIFY_RAW   repo holding kbs-raw + packs    (default: $HOME/.cache/kbs-raw)
 #   KBS_VERIFY_LOG   log file      (default: $KBS/backup.log)
 #   KBS_VERIFY_STATE state dir     (default: $HOME/.local/state/kbs-backup)
 
@@ -219,11 +219,11 @@ fi
 if clone_repo "$RAW_REPO" "$WORK/kbs-raw" "kbs-raw"; then
     # Configurable drill paths: what the recovery must contain.
     # Defaults cover the standard layout; override via KBS_VERIFY_PATHS (space-separated).
-    RAW_SESSIONS="${KBS_RAW_SESSIONS:-pi-state/sessions}"
-    RAW_CHAT="${KBS_RAW_CHAT:-pi-state/chat-transcripts}"
-    RAW_MEMORY="${KBS_RAW_MEMORY:-pi-state/pi-hermes-memory/MEMORY.md}"
-    RAW_PROJECTS="${KBS_RAW_PROJECTS:-pi-state/projects-memory}"
-    RAW_OVPACK="${KBS_RAW_OVPACK:-openviking}"
+    RAW_SESSIONS="${KBS_RAW_SESSIONS:-sessions}"
+    RAW_CHAT="${KBS_RAW_CHAT:-chat-transcripts}"
+    RAW_MEMORY="${KBS_RAW_MEMORY:-memory/MEMORY.md}"
+    RAW_PROJECTS="${KBS_RAW_PROJECTS:-projects-memory}"
+    RAW_OVPACK="${KBS_RAW_OVPACK:-ovpack}"
 
     expect_nonempty "$WORK/kbs-raw" "$RAW_SESSIONS" "kbs-raw" || DRILL_FAIL=1
     expect_nonempty "$WORK/kbs-raw" "$RAW_CHAT" "kbs-raw" || DRILL_FAIL=1

@@ -6,7 +6,7 @@
 #
 #   - The offsite remote (when present) is pushed by DEFAULT — it is the offsite durability
 #     path. Set KBS_OFFSITE_PUSH=0 to disable.
-#   - `origin` stays gated behind KBS_ALLOW_EXTERNAL_PUSH=1, so org/SPC-sensitive
+#   - `origin` stays gated behind KBS_ALLOW_EXTERNAL_PUSH=1, so org-sensitive
 #     content is never published to an external host by accident.
 #
 # A self-hosted remote is the right offsite target when the data mixes personal

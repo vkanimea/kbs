@@ -26,10 +26,10 @@ git config credential.helper '!bash scripts/git-credential-env.sh'
 git push -u origin master
 ```
 
-A **self-hosted Gitea** works as the offsite remote too, and is the better choice
+A **self-hosted Git server** (Gitea, Forgejo, GitLab, etc.) works as the offsite remote too, and is the better choice
 when the data is a mix of personal and org material that must not go to either a
-public host or your employer's infrastructure. Point the remote at your own Gitea
-and add its credentials to `.env` (`GITEA_USERNAME` / `GITEA_PASSWORD`), which the
+public host or your employer's infrastructure. Point the remote at your own server
+and add its credentials to `.env` (`KBS_OFFSITE_USERNAME` / `KBS_OFFSITE_PASSWORD`), which the
 same credential helper already understands:
 
 ```bash

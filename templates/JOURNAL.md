@@ -1,4 +1,4 @@
-# JOURNAL.md — Reflective Capture (V0.116)
+# JOURNAL.md — Reflective Capture
 
 A journal entry is not an INBOX item. It is a reflective conversation with the system. The LLM reads the wiki, past journal entries, and the CRM (if present) to ground its response in your accumulated knowledge.
 

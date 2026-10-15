@@ -1,8 +1,9 @@
-# Knowledge Base System (KBS) V0.116 — Windows PowerShell Installer
+# Knowledge Base System (KBS) — Windows PowerShell Installer
 # Usage:
 #   powershell -ExecutionPolicy Bypass -File install.ps1
 #   powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/vkanimea/kbs/main/install.ps1 | iex"
 #   .\install.ps1 -KbsPath "C:\custom\path" -KbName "myproject"
+#   $env:KBS_REF="v0.126"; .\install.ps1         # pin to a specific tag
 #
 # If run from a cloned repo, templates are copied locally. Otherwise downloaded;
 # any failure aborts loudly.
@@ -20,18 +21,32 @@ $Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 $ScriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { "" }
 
 # Version — read from the repo's VERSION file so this script never drifts from the release.
+# If KBS_REF is set, fetch from that tag instead of main.
+$Ref = $env:KBS_REF
+if (-not $Ref) { $Ref = "main" }
+
 $Version = ""
 if ($ScriptDir -and (Test-Path (Join-Path $ScriptDir "VERSION"))) {
     $Version = (Get-Content (Join-Path $ScriptDir "VERSION") -Raw).Trim()
 }
 if (-not $Version) {
-    try { $Version = (Invoke-WebRequest -Uri "$RepoUrl/VERSION" -UseBasicParsing -ErrorAction Stop).Content.Trim() } catch { }
+    try { 
+        $VersionUrl = $RepoUrl -replace "main", $Ref
+        $Version = (Invoke-WebRequest -Uri "$VersionUrl/VERSION" -UseBasicParsing -ErrorAction Stop).Content.Trim() 
+    } catch { }
 }
-if (-not $Version) { $Version = "0.116.4" }
+# Fallback to 'unknown' instead of a stale hard-coded version
+if (-not $Version) { $Version = "unknown" }
 
 Write-Host "╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
 Write-Host ("║{0,-62}║" -f "       Knowledge Base System (KBS) V$Version Installer") -ForegroundColor Cyan
 Write-Host "╚══════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+
+# If version is unknown, warn the user
+if ($Version -eq "unknown") {
+    Write-Host "⚠️  Could not determine version from repo — install may be from unpinned source" -ForegroundColor Yellow
+}
+
 Write-Host "📍 Path : $KbsPath" -ForegroundColor Yellow
 Write-Host "📚 KB   : $KbName"  -ForegroundColor Yellow
 Write-Host ""
@@ -54,22 +69,48 @@ Write-Host "✅ Directories created" -ForegroundColor Green
 # Detect fresh install vs upgrade (for the audit log event name)
 $InstanceExisted = Test-Path "$KbsPath\log.md"
 
-# ─── File installer ────────────────────────────────────────────────────────────
-$script:Failed = $false
+# SHA256SUMS support (optional) — if present in repo at the pinned REF, verify downloads
+$Sha256Sums = $null
+$Sha256SumsUrl = $RepoUrl -replace "main", $Ref
+$Sha256SumsUrl += "/SHA256SUMS"
+try { 
+    $Sha256Sums = (Invoke-WebRequest -Uri $Sha256SumsUrl -UseBasicParsing -ErrorAction SilentlyContinue).Content.Trim()
+} catch { }
+
+function Get-ExpectedHash {
+    param([string]$RelPath)
+    if ($Sha256Sums) {
+        $line = $Sha256Sums | Select-String -Pattern " $RelPath$"
+        if ($line) { return ($line -split '\s+')[0] }
+    }
+    return $null
+}
+
 function Install-KbsFile {
     param([string]$Src, [string]$Dst)
     $local = if ($ScriptDir) { Join-Path $ScriptDir ($Src -replace "/", "\") } else { "" }
     if ($local -and (Test-Path $local)) {
         Copy-Item $local $Dst -Force
         Write-Host "  ✓ $Src (local)" -ForegroundColor Green
-        return
+    } else {
+        try {
+            $url = $RepoUrl -replace "main", $Ref
+            $url += "/$Src"
+            Invoke-WebRequest -Uri $url -OutFile $Dst -ErrorAction Stop
+            Write-Host "  ✓ $Src" -ForegroundColor Green
+        } catch {
+            Write-Host "  ✗ $Src — FAILED" -ForegroundColor Red
+            $script:Failed = $true
+        }
     }
-    try {
-        Invoke-WebRequest -Uri "$RepoUrl/$Src" -OutFile $Dst -ErrorAction Stop
-        Write-Host "  ✓ $Src" -ForegroundColor Green
-    } catch {
-        Write-Host "  ✗ $Src — FAILED" -ForegroundColor Red
-        $script:Failed = $true
+    # Verify checksum if SHA256SUMS available
+    $expected = Get-ExpectedHash $Src
+    if ($expected) {
+        $actual = (Get-FileHash $Dst -Algorithm SHA256).Hash.ToLower()
+        if ($actual -ne $expected.ToLower()) {
+            Write-Host "  ✗ $Src — CHECKSUM MISMATCH (expected $expected, got $actual)" -ForegroundColor Red
+            $script:Failed = $true
+        }
     }
 }
 
@@ -83,6 +124,8 @@ function Install-KbsFilePreserve {
     }
     Install-KbsFile $Src $Dst
 }
+
+$script:Failed = $false
 
 Write-Host "📝 Installing system files..." -ForegroundColor Cyan
 @("agents.md","PROMPTS.md","CONVENTIONS.md") |
@@ -141,6 +184,14 @@ Add-Content "$KbsPath\log.md" "`n## $Timestamp | $Event | V$Version | Path: $Kbs
 if (-not (Test-Path "$KbsPath\.gitignore")) {
     ".env`n*.log`n*.tmp`nkb/*/wiki/snapshots/" | Out-File "$KbsPath\.gitignore" -Encoding utf8
 }
+
+# Ensure SHA256SUMS if available
+if ($Sha256Sums) {
+    $Sha256Sums | Out-File "$KbsPath\SHA256SUMS" -Encoding utf8
+}
+
+# Credential helper registration (idempotent)
+git -C $KbsPath config credential.helper '!bash scripts/git-credential-env.sh' 2>$null
 
 # ─── Done ──────────────────────────────────────────────────────────────────────
 Write-Host ""

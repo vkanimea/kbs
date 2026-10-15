@@ -1,4 +1,4 @@
-# Reference: Learning Operations (V0.117)
+# Reference: Learning Operations
 
 Loaded when the owner runs one of:
 

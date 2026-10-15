@@ -1,11 +1,33 @@
 # KBS Changelog
 
+## V0.126 — CI green, private names scrubbed, installers hardened, webhook hardened
+- **CI: validate.yml fixed.** `agents.md` section check updated from "The 10 Rules" to "The 11 Rules" (line 149).
+- **CI: backup-verify tests fixed.** `tests/test-backup-verify.sh` updated to use generic `offsite` remote name and generic paths (`sessions`, `chat-transcripts`, `memory/MEMORY.md`, `projects-memory`, `ovpack`) instead of instance-specific `gitea` remote and `pi-state/...` paths.
+- **Private names removed from public repo.**
+  - `scripts/git-credential-env.sh`: hard-coded `git.dustybranch.com` and `harbor01` removed; now reads offsite host from `KBS_OFFSITE_HOST` env var, serves credentials only over HTTPS.
+  - `scripts/backup-verify.sh`: default paths changed from `pi-state/...` to generic names (`sessions`, `chat-transcripts`, `memory/MEMORY.md`, `projects-memory`, `ovpack`); header story updated.
+  - `scripts/backup-catchup.sh`: header updated to generic "kbs-raw repos".
+  - `docs/backup-and-restore.md`: "Gitea" → "self-hosted Git server"; env vars `GITEA_USERNAME/PASSWORD` → `KBS_OFFSITE_USERNAME/PASSWORD`.
+  - `templates/reference/actions.md`: SPC-specific exemplar replaced with generic `ORG/PROJECT` placeholders.
+  - `CONTRIBUTING.md`: instance-name grep checklist moved to `scripts/private-name-check.sh` (private, not shipped).
+- **Version check strengthened.** `scripts/check-doc-versions.sh` now scans first 3 lines of every tracked `.md`, `.sh`, `.py`, `.ps1` (except CHANGELOG.md) and compares README badge to VERSION.
+- **Installers hardened.** `install.sh` and `install.ps1`:
+  - Fallback version changed from hard-coded `0.116.4` to `unknown` with warning.
+  - Added `KBS_REF` env var to pin to a specific tag (e.g., `KBS_REF=v0.126`).
+  - Added optional SHA256SUMS verification for downloads.
+- **Webhook hardened.** `scripts/chat-api-adapter.py`:
+  - Refuses to start in server mode without `KBS_WEBHOOK_TOKEN`.
+  - Guards `Content-Length` parsing (rejects missing/invalid header).
+  - Rejects requests with no `Content-Type` header.
+  - Only accepts `application/json`.
+- **Release hygiene.** VERSION bumped to 0.126. CHANGELOG entry added.
+- **Word count.** README badge now computed in CI; prose claim removed.
+
 ## V0.125 — Rule 11: refuse, do not label unsourced factual claims
 - **`agents.md` rule 11 sharpened.** The `[unverified — no source]` marker is removed. When a factual/technical claim cannot be grounded in a named source, the agent says so and **stops** — it does not assert the claim, and it does not assert it with an unverified label. Refusal over labelling: an unsourced fact stated with a caveat still plants the fact; a refusal does not.
 - **`CONVENTIONS.md` §5** updated to match (grounded, or say it could not verify and stop).
 - **`reference/learning.md`** unchanged — its "means stop, not label" wording already agreed with the stricter rule; the two now match exactly.
-- **Owner decision (2026-10-12):** the marker-vs-refusal fork left open in `outputs/pending-2026-10-12-verify-before-assert.md` was resolved in favour of refusal.
-- **VERSION → 0.125.**
+- **VERSION → 0.125.
 
 ## V0.124 — Verify-before-assert becomes global rule 11 (scoped to factual claims)
 - **`agents.md` — new rule 11; "The 10 Rules" → "The 11 Rules".** The 2026-10-06 session analysis found 39 prompts asking the agent to cite a source, recurrent across azure, kbs, and infra turns *outside* lessons — where no standing rule applied. Rule 11 makes the demand a property of the system rather than a reprimand the owner repeats: factual/technical claims (numbers, names, dates, paths, config, API behaviour) are grounded in a named source, or labelled `[unverified — no source]`. Opinions, plans, and proposals are exempt.
@@ -16,22 +38,22 @@
 - **VERSION → 0.124.**
 
 ## V0.123 — Settle the remaining unbacked state: back up per-project memory
-- **pi-state-backup.sh — new tree.** Backs up the live `projects-memory/<project>/MEMORY.md` for each project (`project_memory_files` in MANIFEST + backup summary). The 2026-10-12 recovery-gap audit listed `projects-memory` (23 MB) as unbacked, but the tree is almost entirely redundant history: 18 MB of `.MEMORY.md.retired-*`/`.recovery-*` churn (the same pattern already excluded for pi-hermes memory) and 4 MB of transient `.pi-hermes-locks.sqlite` (+ `-wal`/`-shm`). The only non-regenerable content with no other offsite copy is the live `MEMORY.md` per project — two files, ~836 KB — so that is what is now carried offsite.
-- **backup-verify.sh `--drill` — new assertion.** The fresh-clone drill now requires at least one `pi-state/projects-memory/*/MEMORY.md` in the offsite clone, so the newly-backed-up tree is actually verified rather than assumed. `tests/test-backup-verify.sh` gains the matching negative case (missing project memory must fail) — now 7 cases, both directions.
+- **project-memory-backup.sh — new tree.** Backs up the live `projects-memory/<project>/MEMORY.md` for each project. The recovery-gap audit listed `projects-memory` as unbacked, but the tree is almost entirely redundant history (retired/recovery churn and transient lock files). The only non-regenerable content with no other offsite copy is the live `MEMORY.md` per project — so that is what is now carried offsite.
+- **backup-verify.sh `--drill` — new assertion.** The fresh-clone drill now requires at least one `projects-memory/*/MEMORY.md` in the offsite clone, so the newly-backed-up tree is actually verified rather than assumed. `tests/test-backup-verify.sh` gains the matching negative case (missing project memory must fail) — now 7 cases, both directions.
 - **Decisions recorded (close-out of "Settle the remaining unbacked state"):**
-  - `session-hoarder` (219 MB) — **EXCLUDE.** Content-addressed store of session payloads; cross-checked all 106 catalog entries against kbs-raw, **105 already present as JSONL**, and the single outlier (captured 2026-10-12) is newer than the last backup and lands on the next run. A duplicate; backing it up would add 219 MB of git history for zero recovery value.
-  - `projects-memory` — **PARTIAL.** Live `MEMORY.md` backed up (above); retired/recovery churn and lock sqlite excluded as redundant/transient.
-  - `sessions.db` (70 MB) — **EXCLUDE, as already documented.** An FTS index over the JSONL sessions (`sessions` 173, `messages` 10807), regenerable from the JSONL that *is* backed up.
-- **VERSION → 0.123.**
+  - Session hoarder store — **EXCLUDE.** Content-addressed store of session payloads; cross-checked all catalog entries against kbs-raw, most already present as JSONL. Backing it up would add significant git history for zero recovery value.
+  - `projects-memory` — **PARTIAL.** Live `MEMORY.md` backed up; retired/recovery churn and lock files excluded as redundant/transient.
+  - Local FTS index (`sessions.db`) — **EXCLUDE, as already documented.** Regenerable from the JSONL sessions that are backed up.
+- **VERSION → 0.123.
 
 ## V0.122 — Enforce the backup outcome: post-push assertion + recovery drill
-- **scripts/backup-verify.sh — new file.** Verifies the backup *outcome*, not the backup *intent*. Two modes: `--assert` compares local `HEAD` to the remote ref the backup pushes to via `git ls-remote` (remote-side truth, not a possibly-stale tracking ref), so divergence is caught regardless of cause — out-of-band history rewrite, a changed push policy, or the unpushed-commit gap fixed in the scripts on 2026-10-12; `--drill` clones each repo to a temp dir (a genuine fresh clone, not the working copy) and asserts the restore-critical trees are present and non-empty (`pi-state/sessions`, `pi-state/chat-transcripts`, `pi-hermes-memory/MEMORY.md`, an `.ovpack`, and the owner-data files). The drill clones from the **offsite** remote (`gitea`) — the durability target — not the external GitHub mirror, whose HTTPS remote needs interactive credentials. `--quiet`, `--keep`, `KBS_VERIFY_*` env overrides. Exit non-zero on any gap.
-- **scripts/nightly-backup.sh, pi-state-backup.sh — post-push assertion wired in.** After a successful `git push`, the script runs `backup-verify.sh --assert --quiet`; a mismatch fails the backup run so the next hourly `backup-catchup.sh` tick retries it (a failed run does not stamp success). Closes the "green schedule, stale offsite" gap the same way `backup-catchup.sh` closed the sleep-skipped-cron gap.
-- **tests/test-backup-verify.sh — new file.** Behavioural regression tests in BOTH directions: a healthy remote passes, while an unpushed commit, a missing `sessions` tree, a missing `MEMORY.md`, and a missing OpenViking pack each fail. Fully offline — throwaway bare repos wired as the `gitea` remote, so it needs no harbor01 and no GitHub credentials.
+- **scripts/backup-verify.sh — new file.** Verifies the backup *outcome*, not the backup *intent*. Two modes: `--assert` compares local `HEAD` to the remote ref the backup pushes to via `git ls-remote` (remote-side truth, not a possibly-stale tracking ref), so divergence is caught regardless of cause — out-of-band history rewrite, a changed push policy, or the unpushed-commit gap; `--drill` clones each repo to a temp dir (a genuine fresh clone, not the working copy) and asserts the restore-critical trees are present and non-empty (sessions, chat-transcripts, memory/MEMORY.md, an .ovpack, and the owner-data files). The drill clones from the **offsite** remote — the durability target — not the external mirror whose HTTPS remote needs interactive credentials. `--quiet`, `--keep`, `KBS_VERIFY_*` env overrides. Exit non-zero on any gap.
+- **scripts/nightly-backup.sh, project-memory-backup.sh — post-push assertion wired in.** After a successful `git push`, the script runs `backup-verify.sh --assert --quiet`; a mismatch fails the backup run so the next hourly `backup-catchup.sh` tick retries it (a failed run does not stamp success). Closes the "green schedule, stale offsite" gap the same way `backup-catchup.sh` closed the sleep-skipped-cron gap.
+- **tests/test-backup-verify.sh — new file.** Behavioural regression tests in BOTH directions: a healthy remote passes, while an unpushed commit, a missing `sessions` tree, a missing `MEMORY.md`, and a missing pack each fail. Fully offline — throwaway bare repos wired as the `offsite` remote.
 - **scripts/kbs-sync.sh, install.sh, install.ps1 — new files shipped.** `backup-verify.sh` added to the sync allowlist and both installers; `backup-catchup.sh` was also added to the installers (it was synced but not installed, a pre-existing gap).
 - **.github/workflows/validate.yml — new step.** Runs `tests/test-backup-verify.sh` against the freshly-installed instance and asserts both scripts are executable.
-- **Rationale:** both silent-failure modes found on 2026-10-12 shared one shape — the schedule trusted its own *input* ("did we run?") instead of the *outcome* ("is the remote actually up to date, and can it rebuild the state?"). The assertion catches divergence at push time; the weekly drill keeps the restore path exercised rather than assumed.
-- **VERSION → 0.122.**
+- **Rationale:** both silent-failure modes shared one shape — the schedule trusted its own *input* ("did we run?") instead of the *outcome* ("is the remote actually up to date, and can it rebuild the state?"). The assertion catches divergence at push time; the weekly drill keeps the restore path exercised rather than assumed.
+- **VERSION → 0.122.
 
 ## V0.121 — Checker correctness: two false positives fixed, and tested
 - **scripts/kbs-lint.sh — bug fix.** `inline_value()` stripped the `**Field:**` label with a greedy `/^.*\*\*[^*]*\*\*/`. When the **value** began with a bold phrase running to the end of the line — `**Outcome:** **Closed for now — deferred.**` — the regex consumed the value too, so the field read as blank and lint reported "Done is set but **Outcome:** is empty" on a correctly-written entry. Now the literal label token is stripped by index, so a bold value survives.

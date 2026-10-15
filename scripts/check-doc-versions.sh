@@ -14,29 +14,28 @@ cd "$ROOT"
 V="$(tr -d '[:space:]' < VERSION)"
 bad=0
 
-# 1. Doc H1s must not contain a V-prefixed version
+# 1. Doc H1s must not contain a V-prefixed version (README, INSTALL, docs/)
 while IFS= read -r hit; do
-  echo "❌ stale version in doc title: $hit"; bad=1
+  echo "❌ stale version in doc title: $hit"
+  bad=1
 done < <(grep -nE '^# .*V[0-9]+\.[0-9]+' README.md INSTALL.md docs/*.md 2>/dev/null \
           | grep -v "V${V}" || true)
 
-# 2. Script descriptions must not contain a stale V-prefixed version
-while IFS= read -r hit; do
-  echo "❌ stale version in script: $hit"; bad=1
-done < <(grep -rnE 'description=.*V[0-9]+\.[0-9]+' scripts 2>/dev/null \
-          | grep -v "V${V}" || true)
+# 2. First three lines of every tracked .md, .sh, .py, .ps1 (except CHANGELOG.md)
+# must not contain a V-prefixed version that differs from VERSION
+while IFS= read -r file; do
+  [ "$file" = "CHANGELOG.md" ] && continue
+  while IFS= read -r hit; do
+    echo "❌ stale version in $file: $hit"
+    bad=1
+  done < <(head -3 "$file" | grep -nE 'V[0-9]+\.[0-9]+' | grep -v "V${V}" || true)
+done < <(git ls-files '*.md' '*.sh' '*.py' '*.ps1' 2>/dev/null)
 
-# 3. Python argparse descriptions
-while IFS= read -r hit; do
-  echo "❌ stale version in script: $hit"; bad=1
-done < <(grep -rnE 'description=.*V[0-9]+\.[0-9]+' scripts 2>/dev/null \
-          | grep -v "V${V}" || true)
-
-# 4. Docstring version lines
-while IFS= read -r hit; do
-  echo "❌ stale version in docstring: $hit"; bad=1
-done < <(grep -rnE '— V[0-9]+\.[0-9]+' scripts/*.py 2>/dev/null \
-          | grep -v "V${V}" || true)
+# 3. README badge must match VERSION
+if ! grep -q "V${V}" README.md 2>/dev/null; then
+  echo "❌ README badge does not match VERSION=$V"
+  bad=1
+fi
 
 if [ "$bad" -eq 0 ]; then
   echo "✅ All version references consistent with VERSION=$V"

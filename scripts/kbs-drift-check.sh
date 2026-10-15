@@ -1,5 +1,5 @@
 #!/bin/bash
-# KBS Drift Check — daily guard against system-file drift. V0.116.3
+# KBS Drift Check — daily guard against system-file drift.
 # Schedule (daily): 15 9 * * * ~/kbs/scripts/kbs-drift-check.sh
 #
 # The system repo is the source of truth for system files; a data instance holds

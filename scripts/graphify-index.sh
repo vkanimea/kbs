@@ -1,5 +1,5 @@
 #!/bin/bash
-# graphify-index.sh — KBS Graphify knowledge-graph indexer (V0.116)
+# graphify-index.sh — KBS Graphify knowledge-graph indexer
 #
 # Turns a code corpus into a queryable knowledge graph + agent-crawlable wiki,
 # stored inside the per-project KBS layout (kb/projects/<project>/...).
