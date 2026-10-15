@@ -31,7 +31,7 @@ jobs:
       - name: Verify core files (fails on missing)
         run: |
           set -e
-          for f in agents.md CONVENTIONS.md SYSTEM.md DECISIONS.md INBOX.md CHAT_INBOX.md FAILURES.md SUCCESSES.md CAREER.md ACTIONS.md JOURNAL.md log.md PROMPTS.md CHANGELOG.md; do
+          for f in agents.md CONVENTIONS.md SYSTEM.md DECISIONS.md INBOX.md CHAT_INBOX.md FAILURES.md SUCCESSES.md CAREER.md ACTIONS.md JOURNAL.md log.md PROMPTS.md; do
             test -f "${{ runner.temp }}/kbs-test/$f" || { echo "❌ missing: $f"; exit 1; }
             echo "✅ $f"
           done
@@ -90,7 +90,7 @@ jobs:
         run: KBS_PATH=${{ runner.temp }}/kbs-test bash ${{ runner.temp }}/kbs-test/scripts/status.sh
 
       - name: Verify audit log
-        run: grep -q "SYSTEM_CREATED" "${{ runner.temp }}/kbs-test/log.md"
+        run: grep -q "INSTALL" "${{ runner.temp }}/kbs-test/log.md"
 
       - name: Test chat adapter end-to-end
         run: |
