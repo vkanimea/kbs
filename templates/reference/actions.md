@@ -45,9 +45,9 @@ Blocked by unresolved failures: [n]
 A complete, lint-clean entry. Fields are **inline**; `Done` non-`No` requires an `Outcome`.
 
 ```markdown
-## 2026-10-11 | Rate-limit the two hot DigitalLibrary API endpoints
-**Decided:** Add edge rate-limiting to `…/GetCollectionDocumentsForCountry/*/FAME` and `…/ORG/PROJECT` rather than blocking the caller ASNs.
-**Why:** The 2.47M + 2.14M requests (89% of traffic) are the org's own Drupal sites calling server-to-server; an ASN block would break internal traffic. Rate-limit/cache is the correct fix for legitimate internal load.
+## 2026-10-11 | Rate-limit two hot internal API endpoints
+**Decided:** Add edge rate-limiting to `…/api/v1/collection/*/region` and `…/ORG/PROJECT` rather than blocking the caller ASNs.
+**Why:** The high-volume requests are the org's own internal services calling server-to-server; an ASN block would break legitimate traffic. Rate-limit/cache is the correct fix for legitimate internal load.
 **Due:** 2026-10-25
 **Done:** No
 **Outcome:**

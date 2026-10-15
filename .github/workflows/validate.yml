@@ -215,3 +215,10 @@ jobs:
           bash -n scripts/kbs-provenance.sh
           python3 -m py_compile scripts/chat-api-adapter.py
           echo "✅ all scripts pass syntax check"
+
+      - name: Private name check (fails on leaked instance names)
+        env:
+          KBS_PRIVATE_PATTERNS: ${{ secrets.KBS_PRIVATE_PATTERNS }}
+        run: |
+          set -e
+          bash scripts/private-name-check.sh

@@ -176,7 +176,15 @@ class WebhookHandler(BaseHTTPRequestHandler):
             return self._reply(415, "json only")
 
         # Body size limit
-        length = int(self.headers.get("Content-Length", 0))
+        cl_header = self.headers.get("Content-Length", "").strip()
+        if not cl_header:
+            return self._reply(411, "length required")
+        try:
+            length = int(cl_header)
+        except ValueError:
+            return self._reply(411, "invalid Content-Length")
+        if length < 0:
+            return self._reply(411, "invalid Content-Length")
         if length > MAX_BODY_SIZE:
             return self._reply(413, f"too large (max {MAX_BODY_SIZE} bytes)")
         if length == 0:

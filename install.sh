@@ -119,7 +119,7 @@ echo -e "${GREEN}✅ Scripts installed${NC}"
 
 # Docs
 mkdir -p "$KBS_PATH/docs"
-for f in backup-and-restore.md RESTORE.md version-advising.md; do
+for f in architecture.md backup-and-restore.md deployment.md glossary.md goal-spec.md input-output-guide.md security.md swot-analysis.md user-guide.md version-advising.md; do
   [ -f "$KBS_PATH/docs/$f" ] || download "$KBS_PATH/docs/$f" "docs/$f"
 done
 echo -e "${GREEN}✅ Docs installed${NC}"

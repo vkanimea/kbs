@@ -32,7 +32,7 @@ while IFS= read -r file; do
 done < <(git ls-files '*.md' '*.sh' '*.py' '*.ps1' 2>/dev/null)
 
 # 3. README badge must match VERSION
-if ! grep -q "V${V}" README.md 2>/dev/null; then
+if ! grep -q "version-${V}" README.md 2>/dev/null; then
   echo "❌ README badge does not match VERSION=$V"
   bad=1
 fi

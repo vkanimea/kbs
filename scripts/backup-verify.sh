@@ -223,7 +223,7 @@ if clone_repo "$RAW_REPO" "$WORK/kbs-raw" "kbs-raw"; then
     RAW_CHAT="${KBS_RAW_CHAT:-chat-transcripts}"
     RAW_MEMORY="${KBS_RAW_MEMORY:-memory/MEMORY.md}"
     RAW_PROJECTS="${KBS_RAW_PROJECTS:-projects-memory}"
-    RAW_OVPACK="${KBS_RAW_OVPACK:-ovpack}"
+    RAW_PACKS="${KBS_RAW_PACKS:-packs}"
 
     expect_nonempty "$WORK/kbs-raw" "$RAW_SESSIONS" "kbs-raw" || DRILL_FAIL=1
     expect_nonempty "$WORK/kbs-raw" "$RAW_CHAT" "kbs-raw" || DRILL_FAIL=1
@@ -239,9 +239,9 @@ if clone_repo "$RAW_REPO" "$WORK/kbs-raw" "kbs-raw"; then
     else
         say "OK    kbs-raw — project memory present"
     fi
-    if ! find "$WORK/kbs-raw/$RAW_OVPACK" -name '*.ovpack' -type f 2>/dev/null | grep -q .; then
-        log "drill | kbs-raw | FAIL: no .ovpack in $RAW_OVPACK/"
-        say "FAIL  kbs-raw — no .ovpack in $RAW_OVPACK/"
+    if ! find "$WORK/kbs-raw/$RAW_PACKS" -name '*.pack' -type f 2>/dev/null | grep -q .; then
+        log "drill | kbs-raw | FAIL: no .pack in $RAW_PACKS/"
+        say "FAIL  kbs-raw — no .pack in $RAW_PACKS/"
         DRILL_FAIL=1
     else
         say "OK    kbs-raw — pack present"

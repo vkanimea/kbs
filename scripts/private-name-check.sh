@@ -7,33 +7,34 @@
 #
 # Usage:  scripts/private-name-check.sh
 # CI:     .github/workflows/validate.yml
+# Env:    KBS_PRIVATE_PATTERNS (required) — space-separated patterns to scan for
 
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-bad=0
+# Require patterns from environment (kept out of this public file via repo secret)
+if [ -z "${KBS_PRIVATE_PATTERNS:-}" ]; then
+  echo "❌ KBS_PRIVATE_PATTERNS not set — cannot run without patterns" >&2
+  exit 1
+fi
 
-# Patterns that identify the owner's infrastructure — keep this list private.
-# If you add a pattern here, also update docs/backup-and-restore.md and
-# templates/reference/actions.md to use generic placeholders.
-PATTERNS=(
-  "harbor01"
-  "pi-state"
-  "pi-hermes"
-  "session-hoarder"
-  "git.dustybranch.com"
-  "GITEA_USERNAME"
-  "GITEA_PASSWORD"
-  "SPC"
-  "SPC_PCCOS"
-)
+# Split space-separated env var into array
+read -ra PATTERNS <<< "$KBS_PRIVATE_PATTERNS"
+
+if [ "${#PATTERNS[@]}" -eq 0 ]; then
+  echo "❌ KBS_PRIVATE_PATTERNS is empty — cannot run without patterns" >&2
+  exit 1
+fi
 
 echo "Checking for instance-specific names in public files..."
+bad=0
+
 for pattern in "${PATTERNS[@]}"; do
-  # Exclude this script itself and CHANGELOG (historical record)
-  if git grep -n "$pattern" -- ':!scripts/private-name-check.sh' ':!CHANGELOG.md' ':!docs/version-advising.md' 2>/dev/null | grep -v "Binary file"; then
-    echo "❌ Found '$pattern' in tracked files (see matches above)"
+  # Use grep -r so this works outside a git checkout (e.g., extracted ZIP in CI)
+  # Exclude this script, CHANGELOG (historical), version-advising.md, and .git
+  if grep -rIn --exclude-dir=.git --exclude=private-name-check.sh --exclude=CHANGELOG.md --exclude=version-advising.md "$pattern" . 2>/dev/null; then
+    echo "❌ Found '$pattern' in public files (see matches above)"
     bad=1
   fi
 done

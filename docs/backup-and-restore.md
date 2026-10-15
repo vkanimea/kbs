@@ -40,7 +40,7 @@ git remote add offsite ssh://git@git-host:<ssh-port>/<you>/<kbs-data>.git
 git config core.sshCommand "ssh -i /path/to/key -o StrictHostKeyChecking=accept-new"
 ```
 
-For binary artefacts that never belong in git — an OpenViking `.ovpack` pack, for
+For binary artefacts that never belong in git — a `.pack` file, for
 instance — keep a **separate private blob repo** and commit the artefact there; the
 `SHA256SUMS` file in that repo is the integrity check. See `RESTORE.md` §7a.
 

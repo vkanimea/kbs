@@ -135,6 +135,10 @@ Write-Host "📝 Installing system files..." -ForegroundColor Cyan
 Install-KbsFile "CHANGELOG.md" "$KbsPath\CHANGELOG.md"
 Install-KbsFile "VERSION" "$KbsPath\VERSION"
 
+Write-Host "📚 Installing docs..." -ForegroundColor Cyan
+@("architecture.md","backup-and-restore.md","deployment.md","glossary.md","goal-spec.md","input-output-guide.md","security.md","swot-analysis.md","user-guide.md","version-advising.md") |
+  ForEach-Object { Install-KbsFile "docs/$_" "$KbsPath\docs\$_" }
+
 Write-Host "🗂  Preserving your files (seed if missing)..." -ForegroundColor Cyan
 @("SYSTEM.md","DECISIONS.md","INBOX.md","CHAT_INBOX.md","FAILURES.md","SUCCESSES.md","CAREER.md","ACTIONS.md","JOURNAL.md","log.md") |
   ForEach-Object { Install-KbsFilePreserve "templates/$_" "$KbsPath\$_" }

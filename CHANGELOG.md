@@ -2,24 +2,37 @@
 
 ## V0.126 — CI green, private names scrubbed, installers hardened, webhook hardened
 - **CI: validate.yml fixed.** `agents.md` section check updated from "The 10 Rules" to "The 11 Rules" (line 149).
-- **CI: backup-verify tests fixed.** `tests/test-backup-verify.sh` updated to use generic `offsite` remote name and generic paths (`sessions`, `chat-transcripts`, `memory/MEMORY.md`, `projects-memory`, `ovpack`) instead of instance-specific `gitea` remote and `pi-state/...` paths.
+- **CI: backup-verify tests fixed.** `tests/test-backup-verify.sh` updated to use generic `offsite` remote name and generic paths (`sessions`, `chat-transcripts`, `memory/MEMORY.md`, `projects-memory`, `packs`) instead of instance-specific `gitea` remote and `pi-state/...` paths.
 - **Private names removed from public repo.**
-  - `scripts/git-credential-env.sh`: hard-coded `git.dustybranch.com` and `harbor01` removed; now reads offsite host from `KBS_OFFSITE_HOST` env var, serves credentials only over HTTPS.
-  - `scripts/backup-verify.sh`: default paths changed from `pi-state/...` to generic names (`sessions`, `chat-transcripts`, `memory/MEMORY.md`, `projects-memory`, `ovpack`); header story updated.
+  - `scripts/git-credential-env.sh`: hard-coded private hostname removed; now reads offsite host from `KBS_OFFSITE_HOST` env var, serves credentials only over HTTPS.
+  - `scripts/backup-verify.sh`: default paths changed from instance-specific names to generic names (`sessions`, `chat-transcripts`, `memory/MEMORY.md`, `projects-memory`, `packs`); header story updated.
   - `scripts/backup-catchup.sh`: header updated to generic "kbs-raw repos".
   - `docs/backup-and-restore.md`: "Gitea" → "self-hosted Git server"; env vars `GITEA_USERNAME/PASSWORD` → `KBS_OFFSITE_USERNAME/PASSWORD`.
-  - `templates/reference/actions.md`: SPC-specific exemplar replaced with generic `ORG/PROJECT` placeholders.
+  - `templates/reference/actions.md`: org-specific exemplar replaced with generic `ORG/PROJECT` placeholders.
   - `CONTRIBUTING.md`: instance-name grep checklist moved to `scripts/private-name-check.sh` (private, not shipped).
 - **Version check strengthened.** `scripts/check-doc-versions.sh` now scans first 3 lines of every tracked `.md`, `.sh`, `.py`, `.ps1` (except CHANGELOG.md) and compares README badge to VERSION.
 - **Installers hardened.** `install.sh` and `install.ps1`:
   - Fallback version changed from hard-coded `0.116.4` to `unknown` with warning.
   - Added `KBS_REF` env var to pin to a specific tag (e.g., `KBS_REF=v0.126`).
   - Added optional SHA256SUMS verification for downloads.
+  - `install.sh` blocker fixed: removed reference to non-existent `RESTORE.md` in docs loop.
+  - `install.ps1` now installs the full `docs/` folder (parity with `install.sh`).
 - **Webhook hardened.** `scripts/chat-api-adapter.py`:
   - Refuses to start in server mode without `KBS_WEBHOOK_TOKEN`.
-  - Guards `Content-Length` parsing (rejects missing/invalid header).
-  - Rejects requests with no `Content-Type` header.
+  - Guards `Content-Length` parsing (rejects missing/invalid header with 411).
+  - Rejects requests with no `Content-Type` header (415).
   - Only accepts `application/json`.
+- **Private-name guard wired into CI.** `scripts/private-name-check.sh` now:
+  - Reads patterns from `KBS_PRIVATE_PATTERNS` env var (repo secret), not hard-coded.
+  - Uses `grep -rIn --exclude-dir=.git` so it works outside a git checkout (e.g., extracted ZIP).
+  - Fails loudly if no patterns are set.
+  - CI step added to `validate.yml` with `env: KBS_PRIVATE_PATTERNS: ${{ secrets.KBS_PRIVATE_PATTERNS }}`.
+- **Remaining leaks scrubbed.**
+  - CHANGELOG V0.126 entry reworded to not name the private host.
+  - `templates/reference/actions.md` exemplar uses generic API paths.
+  - `scripts/backup-verify.sh` and `tests/test-backup-verify.sh`: `ovpack` → `packs`, `*.ovpack` → `*.pack`.
+  - `docs/backup-and-restore.md`: "OpenViking `.ovpack`" → generic `.pack`.
+- **Release script.** `scripts/release.sh` added to generate `SHA256SUMS` for tagged releases.
 - **Release hygiene.** VERSION bumped to 0.126. CHANGELOG entry added.
 - **Word count.** README badge now computed in CI; prose claim removed.
 
