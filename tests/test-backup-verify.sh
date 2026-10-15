@@ -47,7 +47,7 @@ make_repo() {
   ( cd "$work"
     git remote add offsite "$bare"
     # seed plausible recovery content (generic names, no instance specifics)
-    mkdir -p sessions chat-transcripts memory projects-memory/demo ovpack
+    mkdir -p sessions chat-transcripts memory projects-memory/demo packs
     # kbs-data required files
     echo "# ACTIONS"      > ACTIONS.md
     echo "# FAILURES"     > FAILURES.md
@@ -58,8 +58,8 @@ make_repo() {
     echo "tx"             > chat-transcripts/t.md
     echo "# MEMORY"       > memory/MEMORY.md
     echo "# proj"         > projects-memory/demo/MEMORY.md
-    echo "pack"           > ovpack/openviking-pack-test.ovpack
-    echo "sums"           > ovpack/SHA256SUMS
+    echo "pack"           > packs/test.pack
+    echo "sums"           > packs/SHA256SUMS
     git -c user.email=test@kbs -c user.name=test add -A
     git -c user.email=test@kbs -c user.name=test commit -q -m seed
     git push -q -u offsite master 2>/dev/null || git push -q -u offsite HEAD:master
@@ -109,12 +109,12 @@ RC="$(run_verify --drill KBS_VERIFY_KBS="$THIN2" KBS_VERIFY_RAW="$THIN2")"
 [ "$RC" != "0" ] && ok "missing MEMORY.md → drill fails" \
                  || bad "missing MEMORY.md was NOT caught by --drill"
 
-# No .ovpack: the pack is unbacked. MUST fail.
+# No .pack: the pack is unbacked. MUST fail.
 THIN3="$(make_repo thin3)"
-( cd "$THIN3" && git rm -rq ovpack && $GIT commit -q -m "drop pack" && git push -q offsite master )
+( cd "$THIN3" && git rm -rq packs && $GIT commit -q -m "drop pack" && git push -q offsite master )
 RC="$(run_verify --drill KBS_VERIFY_KBS="$THIN3" KBS_VERIFY_RAW="$THIN3")"
-[ "$RC" != "0" ] && ok "missing ovpack → drill fails" \
-                 || bad "missing .ovpack was NOT caught by --drill"
+[ "$RC" != "0" ] && ok "missing pack → drill fails" \
+                 || bad "missing .pack was NOT caught by --drill"
 
 # No per-project memory: the tree added 2026-10-12. MUST fail.
 THIN4="$(make_repo thin4)"

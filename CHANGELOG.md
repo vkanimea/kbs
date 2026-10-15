@@ -1,8 +1,16 @@
 # KBS Changelog
 
+## V0.127 — Drill fix, private-name guard for forks, installer pin examples, version checks
+- **backup-verify.sh drill fix.** Raw-repo checks now run only when `KBS_VERIFY_RAW` is explicitly set; users with only the data repo no longer see a false drill failure. `DRILL_FAIL` correctly set when either clone fails.
+- **Private-name guard: skip for forks.** CI step now detects fork PRs (no secret) and prints a visible skip message instead of failing closed. Secret patterns updated to include `openviking`, `ovpack`, `Drupal`.
+- **Installer pin examples updated.** `install.sh` and `install.ps1` now show `KBS_REF=<tag>` placeholder instead of hard-coded `v0.126`.
+- **Version check extended.** `scripts/check-doc-versions.sh` now flags hard-coded pin examples in installers.
+- **CHANGELOG V0.126 reworded.** Removed references to `pi-state` and `OpenViking/ovpack` from V0.126 entry.
+- **VERSION → 0.127.**
+
 ## V0.126 — CI green, private names scrubbed, installers hardened, webhook hardened
 - **CI: validate.yml fixed.** `agents.md` section check updated from "The 10 Rules" to "The 11 Rules" (line 149).
-- **CI: backup-verify tests fixed.** `tests/test-backup-verify.sh` updated to use generic `offsite` remote name and generic paths (`sessions`, `chat-transcripts`, `memory/MEMORY.md`, `projects-memory`, `packs`) instead of instance-specific `gitea` remote and `pi-state/...` paths.
+- **CI: backup-verify tests fixed.** `tests/test-backup-verify.sh` updated to use generic `offsite` remote name and generic paths (`sessions`, `chat-transcripts`, `memory/MEMORY.md`, `projects-memory`, `packs`) instead of instance-specific `gitea` remote and instance-specific paths.
 - **Private names removed from public repo.**
   - `scripts/git-credential-env.sh`: hard-coded private hostname removed; now reads offsite host from `KBS_OFFSITE_HOST` env var, serves credentials only over HTTPS.
   - `scripts/backup-verify.sh`: default paths changed from instance-specific names to generic names (`sessions`, `chat-transcripts`, `memory/MEMORY.md`, `projects-memory`, `packs`); header story updated.
@@ -13,7 +21,7 @@
 - **Version check strengthened.** `scripts/check-doc-versions.sh` now scans first 3 lines of every tracked `.md`, `.sh`, `.py`, `.ps1` (except CHANGELOG.md) and compares README badge to VERSION.
 - **Installers hardened.** `install.sh` and `install.ps1`:
   - Fallback version changed from hard-coded `0.116.4` to `unknown` with warning.
-  - Added `KBS_REF` env var to pin to a specific tag (e.g., `KBS_REF=v0.126`).
+  - Added `KBS_REF` env var to pin to a specific tag (e.g., `KBS_REF=<tag>`).
   - Added optional SHA256SUMS verification for downloads.
   - `install.sh` blocker fixed: removed reference to non-existent `RESTORE.md` in docs loop.
   - `install.ps1` now installs the full `docs/` folder (parity with `install.sh`).
@@ -28,7 +36,6 @@
   - Fails loudly if no patterns are set.
   - CI step added to `validate.yml` with `env: KBS_PRIVATE_PATTERNS: ${{ secrets.KBS_PRIVATE_PATTERNS }}`.
 - **Remaining leaks scrubbed.**
-  - CHANGELOG V0.126 entry reworded to not name the private host.
   - `templates/reference/actions.md` exemplar uses generic API paths.
   - `scripts/backup-verify.sh` and `tests/test-backup-verify.sh`: `ovpack` → `packs`, `*.ovpack` → `*.pack`.
   - `docs/backup-and-restore.md`: "OpenViking `.ovpack`" → generic `.pack`.

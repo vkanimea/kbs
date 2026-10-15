@@ -13,10 +13,10 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-# Require patterns from environment (kept out of this public file via repo secret)
+# Skip gracefully for fork PRs (no secret available)
 if [ -z "${KBS_PRIVATE_PATTERNS:-}" ]; then
-  echo "❌ KBS_PRIVATE_PATTERNS not set — cannot run without patterns" >&2
-  exit 1
+  echo "⏭️  KBS_PRIVATE_PATTERNS not set (likely a fork PR) — skipping private-name check"
+  exit 0
 fi
 
 # Split space-separated env var into array

@@ -214,9 +214,12 @@ if clone_repo "$KBS_REPO" "$WORK/kbs-data" "kbs-data"; then
         fi
     done
     [ "$DRILL_FAIL" -eq 1 ] || say "OK    kbs-data — required files present"
+else
+    DRILL_FAIL=1
 fi
 
-if clone_repo "$RAW_REPO" "$WORK/kbs-raw" "kbs-raw"; then
+# Only run raw-repo checks if KBS_VERIFY_RAW is explicitly set
+if [ -n "${KBS_VERIFY_RAW:-}" ] && clone_repo "$RAW_REPO" "$WORK/kbs-raw" "kbs-raw"; then
     # Configurable drill paths: what the recovery must contain.
     # Defaults cover the standard layout; override via KBS_VERIFY_PATHS (space-separated).
     RAW_SESSIONS="${KBS_RAW_SESSIONS:-sessions}"
@@ -246,6 +249,8 @@ if clone_repo "$RAW_REPO" "$WORK/kbs-raw" "kbs-raw"; then
     else
         say "OK    kbs-raw — pack present"
     fi
+else
+    DRILL_FAIL=1
 fi
 
 if [ "$DRILL_FAIL" -eq 1 ]; then

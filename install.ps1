@@ -3,7 +3,7 @@
 #   powershell -ExecutionPolicy Bypass -File install.ps1
 #   powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/vkanimea/kbs/main/install.ps1 | iex"
 #   .\install.ps1 -KbsPath "C:\custom\path" -KbName "myproject"
-#   $env:KBS_REF="v0.126"; .\install.ps1         # pin to a specific tag
+#   $env:KBS_REF="<tag>"; .\install.ps1         # pin to a specific tag
 #
 # If run from a cloned repo, templates are copied locally. Otherwise downloaded;
 # any failure aborts loudly.

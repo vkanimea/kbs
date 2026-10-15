@@ -3,7 +3,7 @@
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/vkanimea/kbs/main/install.sh | bash
 #   KBS_PATH=/custom/path KB_NAME=myproject ./install.sh
-#   KBS_REF=v0.126 ./install.sh         # pin to a specific tag
+#   KBS_REF=<tag> ./install.sh         # pin to a specific tag
 #
 # If run from a cloned repo, templates are copied locally (no network needed).
 # If run standalone (curl pipe), templates are downloaded; any failure aborts loudly.
