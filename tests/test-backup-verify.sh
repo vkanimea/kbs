@@ -75,6 +75,30 @@ run_verify() {
   echo $?
 }
 
+# make_data_repo — a DATA-ONLY repo (owner files, no kbs-raw content). This is
+# the shape a user with only the curated repo has; the drill must SKIP the raw
+# step rather than fail it.
+make_data_repo() {
+  local name="$1"
+  local bare="$WORK/$name.git"
+  local work="$WORK/$name"
+  git init -q --bare "$bare"
+  git init -q "$work"
+  ( cd "$work"
+    git remote add offsite "$bare"
+    echo "# ACTIONS"   > ACTIONS.md
+    echo "# FAILURES"  > FAILURES.md
+    echo "# SUCCESSES" > SUCCESSES.md
+    echo "# DECISIONS" > DECISIONS.md
+    git -c user.email=test@kbs -c user.name=test add -A
+    git -c user.email=test@kbs -c user.name=test commit -q -m seed
+    git push -q -u offsite master 2>/dev/null || git push -q -u offsite HEAD:master
+    git branch -M master 2>/dev/null || true
+    git push -q -u offsite master
+  ) >/dev/null 2>&1
+  echo "$work"
+}
+
 echo "── backup-verify.sh — --assert ──"
 
 GOOD="$(make_repo good)"
@@ -122,6 +146,27 @@ THIN4="$(make_repo thin4)"
 RC="$(run_verify --drill KBS_VERIFY_KBS="$THIN4" KBS_VERIFY_RAW="$THIN4")"
 [ "$RC" != "0" ] && ok "missing project MEMORY.md → drill fails" \
                  || bad "missing project memory was NOT caught by --drill"
+
+# Data-repo-only user: KBS_VERIFY_RAW unset. The drill must SKIP (not fail)
+# the raw step — a data-only user is not missing anything. This is the exact
+# failure case that shipped in 2026-10-15 review round: it exited 1 anyway.
+DATAONLY="$(make_data_repo dataonly)"
+# run WITHOUT KBS_VERIFY_RAW in the environment at all
+RC="$(env "${QUIET_ENV[@]}" KBS_VERIFY_KBS="$DATAONLY" "$VERIFY" --drill >/dev/null 2>&1; echo $?)"
+[ "$RC" = "0" ] && ok "data-only repo, KBS_VERIFY_RAW unset → drill passes (raw step skipped)" \
+                || bad "data-only repo should SKIP raw step and pass (got rc=$RC)"
+
+# Same shape, but check the skip message is emitted (not a silent pass via exit code).
+OUT="$(env "${QUIET_ENV[@]}" KBS_VERIFY_KBS="$DATAONLY" "$VERIFY" --drill 2>&1)"
+echo "$OUT" | grep -q "SKIP.*kbs-raw" \
+  && ok "data-only drill emits a visible SKIP for kbs-raw" \
+  || bad "data-only drill should print a SKIP line, got:$(printf '\n%s' "$OUT" | head -20)"
+
+# And a broken raw repo is STILL a failure when KBS_VERIFY_RAW IS configured:
+# configured-but-invalid is not a skip.
+RC="$(env "${QUIET_ENV[@]}" KBS_VERIFY_KBS="$DATAONLY" KBS_VERIFY_RAW="$WORK/nonexistent-raw" "$VERIFY" --drill >/dev/null 2>&1; echo $?)"
+[ "$RC" != "0" ] && ok "configured-but-cloneable-fails raw repo → drill still fails" \
+                || bad "a configured raw repo that fails to clone should fail the drill (got rc=$RC)"
 
 echo
 echo "── summary ──"

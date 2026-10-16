@@ -2,10 +2,10 @@
 
 ## V0.127 — Drill fix, private-name guard for forks, installer pin examples, version checks
 - **backup-verify.sh drill fix.** Raw-repo checks now run only when `KBS_VERIFY_RAW` is explicitly set; users with only the data repo no longer see a false drill failure. `DRILL_FAIL` correctly set when either clone fails.
-- **Private-name guard: skip for forks.** CI step now detects fork PRs (no secret) and prints a visible skip message instead of failing closed. Secret patterns updated to include `openviking`, `ovpack`, `Drupal`.
+- **Private-name guard: skip only for fork PRs; fail closed otherwise.** The CI step passes `IS_FORK` from the fork flag and skips only there (forks have no secret). On any non-fork run an empty pattern set is now an ERROR, not a skip — so a deleted/mistyped secret cannot silently disable the guard. The private-name pattern list itself was updated (exact values stay out of this public file).
 - **Installer pin examples updated.** `install.sh` and `install.ps1` now show `KBS_REF=<tag>` placeholder instead of hard-coded `v0.126`.
 - **Version check extended.** `scripts/check-doc-versions.sh` now flags hard-coded pin examples in installers.
-- **CHANGELOG V0.126 reworded.** Removed references to `pi-state` and `OpenViking/ovpack` from V0.126 entry.
+- **CHANGELOG V0.126 reworded.** Removed references to private instance terms from the V0.126 entry (names kept out of public files).
 - **VERSION → 0.127.**
 
 ## V0.126 — CI green, private names scrubbed, installers hardened, webhook hardened
@@ -37,8 +37,8 @@
   - CI step added to `validate.yml` with `env: KBS_PRIVATE_PATTERNS: ${{ secrets.KBS_PRIVATE_PATTERNS }}`.
 - **Remaining leaks scrubbed.**
   - `templates/reference/actions.md` exemplar uses generic API paths.
-  - `scripts/backup-verify.sh` and `tests/test-backup-verify.sh`: `ovpack` → `packs`, `*.ovpack` → `*.pack`.
-  - `docs/backup-and-restore.md`: "OpenViking `.ovpack`" → generic `.pack`.
+  - `scripts/backup-verify.sh` and `tests/test-backup-verify.sh`: pack directory and file pattern renamed to `packs/*.pack`.
+  - `docs/backup-and-restore.md`: renamed the pack file pattern to the generic `.pack`.
 - **Release script.** `scripts/release.sh` added to generate `SHA256SUMS` for tagged releases.
 - **Release hygiene.** VERSION bumped to 0.126. CHANGELOG entry added.
 - **Word count.** README badge now computed in CI; prose claim removed.
@@ -67,7 +67,7 @@
 - **VERSION → 0.123.
 
 ## V0.122 — Enforce the backup outcome: post-push assertion + recovery drill
-- **scripts/backup-verify.sh — new file.** Verifies the backup *outcome*, not the backup *intent*. Two modes: `--assert` compares local `HEAD` to the remote ref the backup pushes to via `git ls-remote` (remote-side truth, not a possibly-stale tracking ref), so divergence is caught regardless of cause — out-of-band history rewrite, a changed push policy, or the unpushed-commit gap; `--drill` clones each repo to a temp dir (a genuine fresh clone, not the working copy) and asserts the restore-critical trees are present and non-empty (sessions, chat-transcripts, memory/MEMORY.md, an .ovpack, and the owner-data files). The drill clones from the **offsite** remote — the durability target — not the external mirror whose HTTPS remote needs interactive credentials. `--quiet`, `--keep`, `KBS_VERIFY_*` env overrides. Exit non-zero on any gap.
+- **scripts/backup-verify.sh — new file.** Verifies the backup *outcome*, not the backup *intent*. Two modes: `--assert` compares local `HEAD` to the remote ref the backup pushes to via `git ls-remote` (remote-side truth, not a possibly-stale tracking ref), so divergence is caught regardless of cause — out-of-band history rewrite, a changed push policy, or the unpushed-commit gap; `--drill` clones each repo to a temp dir (a genuine fresh clone, not the working copy) and asserts the restore-critical trees are present and non-empty (sessions, chat-transcripts, memory/MEMORY.md, a pack, and the owner-data files). The drill clones from the **offsite** remote — the durability target — not the external mirror whose HTTPS remote needs interactive credentials. `--quiet`, `--keep`, `KBS_VERIFY_*` env overrides. Exit non-zero on any gap.
 - **scripts/nightly-backup.sh, project-memory-backup.sh — post-push assertion wired in.** After a successful `git push`, the script runs `backup-verify.sh --assert --quiet`; a mismatch fails the backup run so the next hourly `backup-catchup.sh` tick retries it (a failed run does not stamp success). Closes the "green schedule, stale offsite" gap the same way `backup-catchup.sh` closed the sleep-skipped-cron gap.
 - **tests/test-backup-verify.sh — new file.** Behavioural regression tests in BOTH directions: a healthy remote passes, while an unpushed commit, a missing `sessions` tree, a missing `MEMORY.md`, and a missing pack each fail. Fully offline — throwaway bare repos wired as the `offsite` remote.
 - **scripts/kbs-sync.sh, install.sh, install.ps1 — new files shipped.** `backup-verify.sh` added to the sync allowlist and both installers; `backup-catchup.sh` was also added to the installers (it was synced but not installed, a pre-existing gap).

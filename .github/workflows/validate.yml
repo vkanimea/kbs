@@ -219,6 +219,10 @@ jobs:
       - name: Private name check (fails on leaked instance names)
         env:
           KBS_PRIVATE_PATTERNS: ${{ secrets.KBS_PRIVATE_PATTERNS }}
+          # true only on fork-PR runs (no secret available there); everything
+          # else must FAIL CLOSED if the secret is missing so a deleted/mistyped
+          # secret cannot silently disable the guard.
+          IS_FORK: ${{ github.event.pull_request.head.repo.fork }}
         run: |
           set -e
           bash scripts/private-name-check.sh

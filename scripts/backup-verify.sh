@@ -218,8 +218,14 @@ else
     DRILL_FAIL=1
 fi
 
-# Only run raw-repo checks if KBS_VERIFY_RAW is explicitly set
-if [ -n "${KBS_VERIFY_RAW:-}" ] && clone_repo "$RAW_REPO" "$WORK/kbs-raw" "kbs-raw"; then
+# kbs-raw is OPTIONAL: only the data repo is required for a valid recovery.
+# Not configuring KBS_VERIFY_RAW is therefore a SKIP, not a failure — a
+# data-only user is not missing anything. Only a configured raw repo that then
+# fails to clone/check is a real gap.
+if [ -z "${KBS_VERIFY_RAW:-}" ]; then
+    log "drill | kbs-raw | SKIP: KBS_VERIFY_RAW not set (raw repo not configured)"
+    say "SKIP  kbs-raw — KBS_VERIFY_RAW not set (raw repo optional)"
+elif clone_repo "$RAW_REPO" "$WORK/kbs-raw" "kbs-raw"; then
     # Configurable drill paths: what the recovery must contain.
     # Defaults cover the standard layout; override via KBS_VERIFY_PATHS (space-separated).
     RAW_SESSIONS="${KBS_RAW_SESSIONS:-sessions}"

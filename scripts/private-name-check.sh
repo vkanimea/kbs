@@ -13,10 +13,19 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-# Skip gracefully for fork PRs (no secret available)
+# On a FORK PR there is no secret available, so skip is expected and correct.
+# On any other run (push to main, same-repo PR, workflow_dispatch) an empty
+# KBS_PRIVATE_PATTERNS means the guard has silently gone missing — that is a
+# FAIL-CLOSED condition, not a skip: a deleted/mistyped secret must not turn
+# the private-name guard off without failing.
+IS_FORK="${IS_FORK:-false}"
 if [ -z "${KBS_PRIVATE_PATTERNS:-}" ]; then
-  echo "⏭️  KBS_PRIVATE_PATTERNS not set (likely a fork PR) — skipping private-name check"
-  exit 0
+  if [ "$IS_FORK" = "true" ]; then
+    echo "⏭️  KBS_PRIVATE_PATTERNS not set (fork PR — no secret) — skipping private-name check"
+    exit 0
+  fi
+  echo "❌ KBS_PRIVATE_PATTERNS is not set but this is not a fork PR — private-name guard requires a secret; fail closed" >&2
+  exit 1
 fi
 
 # Split space-separated env var into array
