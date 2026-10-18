@@ -56,8 +56,8 @@ if [ -f "$KBS_PATH/log.md" ]; then INSTANCE_EXISTED=1; else INSTANCE_EXISTED=0; 
 SYSTEM_TEMPLATES=(agents.md PROMPTS.md CONVENTIONS.md)
 # User-owned files — seeded only when absent, NEVER overwritten (your content lives here)
 USER_FILES=(SYSTEM.md DECISIONS.md INBOX.md CHAT_INBOX.md FAILURES.md SUCCESSES.md CAREER.md ACTIONS.md JOURNAL.md log.md)
-REFERENCES=(session-close.md ingestion.md chat-input.md failures.md successes.md actions.md journal.md learning.md session-analysis.md writing-style.md health-check.md)
-SCRIPTS=(chat-adapter.sh chat-api-adapter.py health-check.sh status.sh auto-close.sh due-actions.sh topic-index.sh youtube-ingest.sh hourly-ingest.sh rag.py rag-index.sh rag-query.sh nightly-backup.sh git-credential-env.sh goal-loop.sh graphify-index.sh kbs-sync.sh kbs-drift-check.sh model-config.sh kbs-lint.sh kbs-provenance.sh backup-catchup.sh backup-verify.sh)
+REFERENCES=(session-close.md ingestion.md chat-input.md failures.md successes.md actions.md journal.md learning.md session-analysis.md writing-style.md health-check.md atoms.md)
+SCRIPTS=(chat-adapter.sh chat-api-adapter.py health-check.sh status.sh auto-close.sh due-actions.sh topic-index.sh youtube-ingest.sh hourly-ingest.sh rag.py rag-index.sh rag-query.sh nightly-backup.sh git-credential-env.sh goal-loop.sh graphify-index.sh kbs-sync.sh kbs-drift-check.sh model-config.sh kbs-lint.sh ingest-freshness.sh staleness-sweep.sh kbs-provenance.sh backup-catchup.sh backup-verify.sh)
 
 # SHA256SUMS support (optional) — if present in repo at the pinned REF, verify downloads
 SHA256SUMS_URL="${REPO_URL/main/$REF}/SHA256SUMS"
@@ -119,7 +119,7 @@ echo -e "${GREEN}✅ Scripts installed${NC}"
 
 # Docs
 mkdir -p "$KBS_PATH/docs"
-for f in architecture.md backup-and-restore.md deployment.md glossary.md goal-spec.md input-output-guide.md security.md swot-analysis.md user-guide.md version-advising.md; do
+for f in architecture.md backup-and-restore.md connector-hygiene.md deployment.md glossary.md goal-spec.md input-output-guide.md security.md swot-analysis.md user-guide.md version-advising.md; do
   [ -f "$KBS_PATH/docs/$f" ] || download "$KBS_PATH/docs/$f" "docs/$f"
 done
 echo -e "${GREEN}✅ Docs installed${NC}"

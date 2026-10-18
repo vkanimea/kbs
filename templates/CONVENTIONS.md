@@ -141,8 +141,40 @@ shape the pipeline actually consumed. Report the disagreement so the rules get f
 
 ---
 
+---
+
+## 8. Recency, retrieval hooks, freshness
+
+A model treats everything in its context as equally important — a two-year-old
+price ranks equal to today's. KBS makes recency explicit instead of trusting
+the reader to notice:
+
+- **Supersede, do not delete.** When an entry is replaced, keep it and add
+  `**Superseded by:** <YYYY-MM-DD entry or wiki topic>`; answer from the
+  current entry and cite the pointer. Never silently delete history.
+- **Write the retrieval hook.** Knowledge entries carry `**Query:**` — the
+  literal question a future agent would type to find this. Keyword search over
+  these hooks is the primary retrieval path; plain-text retrieval beats
+  embeddings at this scale, so the hooks do the work embeddings would.
+- **Atoms.** Exact error / exact fix / working command / why — see
+  `reference/atoms.md`; the most reusable knowledge is the smallest.
+- **Freshness is watched, not assumed.** `scripts/ingest-freshness.sh` warns
+  when a connector stops producing (rotated keys, changed permissions, dead
+  routes); `scripts/staleness-sweep.sh` reports entries past their shelf life
+  (it marks, never deletes). Detail: `docs/connector-hygiene.md`.
+
+The linter enforces the markers: `**Query:**` / `**Superseded by:**` / atom
+fields that are present but empty are errors — a marker either carries
+content or does not exist.
+
+---
+
 ## Changelog
 
+- **V0.128 (2026-10-19)** — §8 added (recency/supersession markers, `**Query:**`
+  retrieval hooks, atoms, connector freshness) from the Nick Saraev PKB video
+  evaluation (LP7bfT4vOlo); BM25-over-vectors validated the existing design,
+  these four gaps were adopted owner-approved.
 - **V0.119 (2026-10-11)** — created. Names the two-repo rule, model wiring, output
   contracts, close-out status flipping, and provenance expectations, so a model new
   to KBS does not have to rediscover them by trial and error. Added §7 (worked

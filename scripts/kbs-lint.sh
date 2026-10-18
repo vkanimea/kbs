@@ -23,6 +23,11 @@
 # FIELD RULE: fields are INLINE — '**Field:** value' on one line. A field with an
 #   empty value after the marker is reported (except where noted optional).
 #
+# OPTIONAL-FIELD RULE (V0.128): Query / Superseded by / Exact error / Exact fix /
+#   Command / Why — ABSENT is always fine (back-compat); PRESENT-but-empty is an
+#   ERROR. A retrieval hook or supersession marker that exists but says nothing
+#   is worse than no marker: retrieval follows it into a dead end.
+#
 # Installer seed rows (20XX-… dates) are INFO, never failures.
 
 set -uo pipefail
@@ -35,7 +40,7 @@ for arg in "$@"; do
   case "$arg" in
     --quiet|-q) QUIET=1 ;;
     --json)     JSON=1 ;;
-    -h|--help)  sed -n '2,32p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help)  sed -n '2,37p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     -*)         echo "unknown flag: $arg" >&2; exit 2 ;;
     *)          INSTANCE="$arg" ;;
   esac
@@ -95,6 +100,18 @@ line_of_field() { # file start label
   awk -v s="$2" -v lab="$3" 'NR>s{ if(/^## /) exit; needle="**" lab ":**"; if(index($0,needle)){print NR; exit} }' "$1"
 }
 
+# optional fields — absent is fine, present-but-empty is an ERROR (see header).
+lint_optional_fields() { # file start label [label...]
+  local f="$1" s="$2"; shift 2
+  local lab ln val
+  for lab in "$@"; do
+    ln="$(line_of_field "$f" "$s" "$lab")"
+    [ -z "${ln:-}" ] && continue
+    val="$(inline_value "$f" "$ln" "$lab")"
+    [ -z "$val" ] && finding ERROR "$(basename "$f")" "$ln" "**$lab:** is present but empty"
+  done
+}
+
 # ── ACTIONS.md ───────────────────────────────────────────────────────────────
 lint_actions() {
   local f="$INSTANCE/ACTIONS.md"
@@ -116,6 +133,7 @@ lint_actions() {
         finding ERROR ACTIONS.md "$ln" "missing **$fld:** (${title:0:50})"
       fi
     done
+    lint_optional_fields "$f" "$ln" "Query" "Superseded by" "Exact error" "Exact fix" "Command"
 
     if is_seed_date "$d"; then
       finding INFO ACTIONS.md "$ln" "installer seed row (20XX date) — retire with 'Done: N/A — installer seed example'"
@@ -190,6 +208,7 @@ lint_fs() { # filename  required_pipe_sep  seed_ok
         finding ERROR "$fname" "$ln" "missing **$req:** (${heading:0:45})"
       fi
     done < <(printf '%s' "$required" | tr '|' '\n')
+    lint_optional_fields "$f" "$ln" "Query" "Superseded by" "Exact error" "Exact fix" "Command" "Why"
   done < <(entry_headings "$f")
 }
 

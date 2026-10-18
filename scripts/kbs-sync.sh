@@ -85,6 +85,7 @@ SYSTEM_PATHS=(
   templates/reference/actions.md:reference/actions.md
   templates/reference/chat-input.md:reference/chat-input.md
   templates/reference/failures.md:reference/failures.md
+  templates/reference/atoms.md:reference/atoms.md
   templates/reference/health-check.md:reference/health-check.md
   templates/reference/ingestion.md:reference/ingestion.md
   templates/reference/journal.md:reference/journal.md
@@ -112,6 +113,8 @@ SYSTEM_PATHS=(
   scripts/hourly-ingest.sh
   scripts/kbs-drift-check.sh
   scripts/kbs-lint.sh
+  scripts/ingest-freshness.sh
+  scripts/staleness-sweep.sh
   scripts/kbs-provenance.sh
   scripts/model-config.sh
   scripts/nightly-backup.sh

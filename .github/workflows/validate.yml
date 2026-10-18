@@ -39,7 +39,7 @@ jobs:
       - name: Verify reference modules (fails on missing)
         run: |
           set -e
-          for f in session-close.md ingestion.md chat-input.md failures.md successes.md actions.md journal.md health-check.md; do
+          for f in session-close.md ingestion.md chat-input.md failures.md successes.md actions.md journal.md health-check.md atoms.md; do
             test -f "${{ runner.temp }}/kbs-test/reference/$f" || { echo "❌ missing: reference/$f"; exit 1; }
             echo "✅ reference/$f"
           done
@@ -55,6 +55,8 @@ jobs:
           test -x "${{ runner.temp }}/kbs-test/scripts/youtube-ingest.sh" || exit 1
           test -x "${{ runner.temp }}/kbs-test/scripts/hourly-ingest.sh" || exit 1
           test -x "${{ runner.temp }}/kbs-test/scripts/kbs-lint.sh" || exit 1
+          test -x "${{ runner.temp }}/kbs-test/scripts/ingest-freshness.sh" || exit 1
+          test -x "${{ runner.temp }}/kbs-test/scripts/staleness-sweep.sh" || exit 1
           test -x "${{ runner.temp }}/kbs-test/scripts/kbs-provenance.sh" || exit 1
           test -x "${{ runner.temp }}/kbs-test/scripts/backup-catchup.sh" || exit 1
           test -x "${{ runner.temp }}/kbs-test/scripts/backup-verify.sh" || exit 1
@@ -125,7 +127,7 @@ jobs:
             if (-not (Test-Path "$base\$f")) { Write-Host "❌ missing: $f"; exit 1 }
             Write-Host "✅ $f"
           }
-          $refs = @("session-close.md","ingestion.md","chat-input.md","failures.md","successes.md","actions.md","journal.md","health-check.md")
+          $refs = @("session-close.md","ingestion.md","chat-input.md","failures.md","successes.md","actions.md","journal.md","health-check.md","atoms.md")
           foreach ($f in $refs) {
             if (-not (Test-Path "$base\reference\$f")) { Write-Host "❌ missing: reference/$f"; exit 1 }
             Write-Host "✅ reference/$f"
@@ -186,6 +188,7 @@ jobs:
           grep -q "Orphan topics" templates/reference/health-check.md || exit 1
           grep -q "confidence upgrade" templates/reference/successes.md || exit 1
           grep -q "Route the outcome" templates/reference/actions.md || exit 1
+          grep -q "Exact error" templates/reference/atoms.md || exit 1
           grep -q "Journal Operations" templates/reference/journal.md || exit 1
           grep -q "Phase 3 — Teach" templates/reference/learning.md || exit 1
           grep -q "Session Analysis" templates/reference/session-analysis.md || exit 1
@@ -213,6 +216,9 @@ jobs:
           bash -n scripts/youtube-ingest.sh
           bash -n scripts/hourly-ingest.sh
           bash -n scripts/kbs-provenance.sh
+          bash -n scripts/ingest-freshness.sh
+          bash -n scripts/staleness-sweep.sh
+          bash -n scripts/kbs-lint.sh
           python3 -m py_compile scripts/chat-api-adapter.py
           echo "✅ all scripts pass syntax check"
 

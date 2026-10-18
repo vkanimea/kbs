@@ -1,5 +1,17 @@
 # KBS Changelog
 
+## V0.128 — Recency weighting, retrieval hooks, atoms, connector freshness
+Source: evaluation of the Nick Saraev PKB video (LP7bfT4vOlo, 2026-10-19); owner approved adopting all six items. His BM25-beats-vectors finding independently validated the no-vector-DB design — no architecture change, four gaps + two hygiene items only.
+- **Recency weighting (CONVENTIONS §8).** Entries carry `**Superseded by:**` when replaced; readers answer from the current entry and cite the pointer. Supersession markers never delete history.
+- **Retrieval-query hooks.** Entries carry `**Query:**` — the literal question a future search would type — raising keyword hit rates without touching retrieval code.
+- **Atoms.** New `templates/reference/atoms.md`: exact error / exact fix / working command / why as optional entry fields, so implicit fixes become explicit institutional memory.
+- **Connector watchdog.** New `scripts/ingest-freshness.sh`: derives freshness from artefacts (log.md HOURLY_INGEST lines, backup.log, catchup stamps, capture recency) and WARNs + exits 1 when a connector stops producing. Extends the 2026-10-12 backup-path lesson to the ingest layer; kbs-raw stays covered by backup-catchup/backup-verify (documented, not duplicated).
+- **Staleness sweep.** New `scripts/staleness-sweep.sh`: age + volatile-fact (model IDs, versions, prices, quotas) report over DECISIONS/FAILURES/SUCCESSES/JOURNAL/wiki; report-only, marks nothing — provenance posture preserved.
+- **Connector hygiene doc.** New `docs/connector-hygiene.md`: incremental pulls, read-only ingest credentials with the scoped backup exception, and the first audit record (2026-10-19: no changes required).
+- **Linter.** `kbs-lint.sh` enforces present-but-empty = ERROR for the new optional fields (`Query`, `Superseded by`, atom fields); absence stays legal so legacy entries keep passing. Behavioural tests added to `tests/test-checkers.sh` in both directions (filled passes, legacy passes, each empty variant errors, ACTIONS variant covered).
+- **Wiring.** `kbs-sync.sh` SYSTEM_PATHS, `install.sh`, `install.ps1`, and CI `validate.yml` ship/verify the new scripts, `reference/atoms.md`, and `docs/connector-hygiene.md`.
+- **VERSION → 0.128.**
+
 ## V0.127 — Drill fix, private-name guard for forks, installer pin examples, version checks
 - **backup-verify.sh drill fix.** Raw-repo checks now run only when `KBS_VERIFY_RAW` is explicitly set; users with only the data repo no longer see a false drill failure. `DRILL_FAIL` correctly set when either clone fails.
 - **Private-name guard: skip only for fork PRs; fail closed otherwise.** The CI step passes `IS_FORK` from the fork flag and skips only there (forks have no secret). On any non-fork run an empty pattern set is now an ERROR, not a skip — so a deleted/mistyped secret cannot silently disable the guard. The private-name pattern list itself was updated (exact values stay out of this public file).

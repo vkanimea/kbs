@@ -123,6 +123,102 @@ N=$(lint_actions "$ACTIONS_HEAD
 [ "$N" -eq 0 ] && ok "open entry without Outcome passes" \
               || bad "open entry reported $N error(s)"
 
+# ── kbs-lint.sh: optional fields — Query / Superseded by / atoms (V0.128) ────
+echo "── kbs-lint.sh — optional fields ──"
+
+# lint_failures <content> -> number of errors reported
+lint_failures() {
+  local dir="$WORK/lintf-$$-$RANDOM"
+  mkdir -p "$dir"
+  printf '%b\n' "$1" > "$dir/FAILURES.md"
+  : > "$dir/ACTIONS.md"; : > "$dir/DECISIONS.md"
+  : > "$dir/SUCCESSES.md"; : > "$dir/INBOX.md"; : > "$dir/CHAT_INBOX.md"
+  bash "$LINT" "$dir" --quiet 2>/dev/null | grep -c 'ERROR' || true
+}
+
+F_HEAD='# FAILURES\n\n## Resolved Failures'
+
+# All optional fields present AND filled — must pass.
+N=$(lint_failures "$F_HEAD
+
+## 2026-01-01 | Case H — optional fields all filled
+**What failed:** x
+**Root cause:** y
+**Expected vs actual:** z
+**Lesson:** l
+**Query:** what broke the thing
+**Superseded by:** 2026-02-01
+**Exact error:** boom
+**Exact fix:** patch applied
+**Command:** fix --now
+**Resolved:** Yes")
+[ "$N" -eq 0 ] && ok "filled Query/Superseded/atom fields pass" \
+              || bad "filled optional fields reported $N error(s) — false positive"
+
+# Absent optional fields — back-compat, must pass.
+N=$(lint_failures "$F_HEAD
+
+## 2026-01-01 | Case I — no optional fields at all (legacy shape)
+**What failed:** x
+**Root cause:** y
+**Expected vs actual:** z
+**Lesson:** l
+**Resolved:** Yes")
+[ "$N" -eq 0 ] && ok "legacy entry without optional fields passes" \
+              || bad "legacy entry reported $N error(s) — back-compat broken"
+
+# Present-but-empty **Query:** — must ERROR.
+N=$(lint_failures "$F_HEAD
+
+## 2026-01-01 | Case J — empty Query must ERROR
+**What failed:** x
+**Root cause:** y
+**Expected vs actual:** z
+**Lesson:** l
+**Query:**
+**Resolved:** Yes")
+[ "$N" -ge 1 ] && ok "empty **Query:** is caught" \
+              || bad "empty **Query:** was NOT caught — retrieval hook check weakened"
+
+# Present-but-empty **Superseded by:** — must ERROR.
+N=$(lint_failures "$F_HEAD
+
+## 2026-01-01 | Case K — empty Superseded by must ERROR
+**What failed:** x
+**Root cause:** y
+**Expected vs actual:** z
+**Lesson:** l
+**Superseded by:**
+**Resolved:** Yes")
+[ "$N" -ge 1 ] && ok "empty **Superseded by:** is caught" \
+              || bad "empty **Superseded by:** was NOT caught — recency marker check weakened"
+
+# Present-but-empty atom field — must ERROR.
+N=$(lint_failures "$F_HEAD
+
+## 2026-01-01 | Case L — empty atom field must ERROR
+**What failed:** x
+**Root cause:** y
+**Expected vs actual:** z
+**Lesson:** l
+**Exact error:**
+**Resolved:** Yes")
+[ "$N" -ge 1 ] && ok "empty atom field (**Exact error:**) is caught" \
+              || bad "empty atom field was NOT caught — atom check weakened"
+
+# Empty optional field in an ACTIONS entry — must ERROR.
+N=$(lint_actions "$ACTIONS_HEAD
+
+## 2026-01-01 | Case M — empty Superseded by in ACTIONS must ERROR
+**Decided:** x
+**Why:** y
+**Due:** next session
+**Done:** No
+**Outcome:**
+**Superseded by:**")
+[ "$N" -ge 1 ] && ok "empty **Superseded by:** in ACTIONS is caught" \
+              || bad "empty **Superseded by:** in ACTIONS was NOT caught"
+
 # ── due-actions.sh: deferral annotations must not create deadlines ────────────
 echo "── due-actions.sh — deferred / on-hold / dated ──"
 

@@ -63,6 +63,8 @@ Awaiting approval: outputs/pending-[date].md
 
 Required fields: `What worked`, `Lesson`, `Expected vs actual`. `Evidence` is
 **optional**; `Repeatable` is conditional (set it when the method is reusable).
+Optional: `Query` — the retrieval hook from CONVENTIONS §8 (the literal
+question a future search would type to find this success).
 
 ```markdown
 ## 2026-10-04 | Fail-closed pre-commit secret scan that reports the cause
@@ -70,5 +72,6 @@ Required fields: `What worked`, `Lesson`, `Expected vs actual`. `Evidence` is
 **Expected vs actual:** Expected an install-and-forget tool — the value is in the failure behaviour (closed, explained), not the scanning itself.
 **Evidence:** Staged a realistic fake secret: commit blocked, HEAD unchanged; bypass verified; hiding the scanner blocked the commit with an explanatory message.
 **Repeatable:** Yes
+**Query:** how to install a secret scanner without sudo or false positives
 **Lesson:** Make the guard fail closed and say why — a hook that silently does nothing is indistinguishable from a clean repository; test it with a realistic fake, not a vendor's documented example value.
 ```

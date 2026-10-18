@@ -63,6 +63,10 @@ Awaiting approval: outputs/pending-[date].md
 
 Required fields: `What failed`, `Root cause`, `Expected vs actual`, `Lesson`, `Resolved`.
 `Evidence` / `Wiki impact` are optional; `Resolution:` appears only once resolved.
+Optional retrieval/recency fields (CONVENTIONS §8): `Query` (the literal
+question a future search would type), `Superseded by` (set when a later entry
+replaces this one), and the atom fields — `Exact error`, `Exact fix`,
+`Command`, `Why` (see `atoms.md`). Present-but-empty is a lint error.
 
 ```markdown
 ## 2026-10-04 | CLI reported absence via an error line; stderr filtering turned it into "no backups anywhere"
@@ -72,4 +76,7 @@ Required fields: `What failed`, `Root cause`, `Expected vs actual`, `Lesson`, `R
 **Lesson:** A verification tool must fail loudly when it cannot run, not report a clean negative; check exit status before interpreting empty output.
 **Resolved:** Yes
 **Resolution:** Added an explicit exit-status check and made "could not run" a hard error, distinct from "ran and found none."
+**Query:** why does the backup check say no backups exist when the CLI errored
+**Exact error:** "no backups found" printed while the underlying CLI had exited non-zero
+**Exact fix:** check exit status before interpreting empty output; make "could not run" a hard error
 ```

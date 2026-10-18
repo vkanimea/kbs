@@ -130,13 +130,13 @@ $script:Failed = $false
 Write-Host "📝 Installing system files..." -ForegroundColor Cyan
 @("agents.md","PROMPTS.md","CONVENTIONS.md") |
   ForEach-Object { Install-KbsFile "templates/$_" "$KbsPath\$_" }
-@("session-close.md","ingestion.md","chat-input.md","failures.md","successes.md","actions.md","journal.md","learning.md","session-analysis.md","writing-style.md","health-check.md") |
+@("session-close.md","ingestion.md","chat-input.md","failures.md","successes.md","actions.md","journal.md","learning.md","session-analysis.md","writing-style.md","health-check.md","atoms.md") |
   ForEach-Object { Install-KbsFile "templates/reference/$_" "$KbsPath\reference\$_" }
 Install-KbsFile "CHANGELOG.md" "$KbsPath\CHANGELOG.md"
 Install-KbsFile "VERSION" "$KbsPath\VERSION"
 
 Write-Host "📚 Installing docs..." -ForegroundColor Cyan
-@("architecture.md","backup-and-restore.md","deployment.md","glossary.md","goal-spec.md","input-output-guide.md","security.md","swot-analysis.md","user-guide.md","version-advising.md") |
+@("architecture.md","backup-and-restore.md","connector-hygiene.md","deployment.md","glossary.md","goal-spec.md","input-output-guide.md","security.md","swot-analysis.md","user-guide.md","version-advising.md") |
   ForEach-Object { Install-KbsFile "docs/$_" "$KbsPath\docs\$_" }
 
 Write-Host "🗂  Preserving your files (seed if missing)..." -ForegroundColor Cyan
@@ -148,7 +148,7 @@ if ($script:Kept.Count -gt 0) {
 }
 
 Write-Host "🔧 Installing scripts..." -ForegroundColor Cyan
-@("chat-adapter.sh","chat-api-adapter.py","health-check.sh","status.sh","auto-close.sh","due-actions.sh","topic-index.sh","youtube-ingest.sh","hourly-ingest.sh","git-credential-env.sh","nightly-backup.sh","rag.py","rag-index.sh","rag-query.sh","goal-loop.sh","graphify-index.sh","kbs-sync.sh","kbs-drift-check.sh","model-config.sh","kbs-lint.sh","kbs-provenance.sh","backup-catchup.sh","backup-verify.sh") |
+@("chat-adapter.sh","chat-api-adapter.py","health-check.sh","status.sh","auto-close.sh","due-actions.sh","topic-index.sh","youtube-ingest.sh","hourly-ingest.sh","git-credential-env.sh","nightly-backup.sh","rag.py","rag-index.sh","rag-query.sh","goal-loop.sh","graphify-index.sh","kbs-sync.sh","kbs-drift-check.sh","model-config.sh","kbs-lint.sh","ingest-freshness.sh","staleness-sweep.sh","kbs-provenance.sh","backup-catchup.sh","backup-verify.sh") |
   ForEach-Object { Install-KbsFile "scripts/$_" "$KbsPath\scripts\$_" }
 @("sessions.py","cost.py","prompts.py","search.py","show_session.py","README.md") |
   ForEach-Object { Install-KbsFile "scripts/analyze-sessions/$_" "$KbsPath\scripts\analyze-sessions\$_" }
