@@ -60,6 +60,7 @@ jobs:
           test -x "${{ runner.temp }}/kbs-test/scripts/kbs-provenance.sh" || exit 1
           test -x "${{ runner.temp }}/kbs-test/scripts/backup-catchup.sh" || exit 1
           test -x "${{ runner.temp }}/kbs-test/scripts/backup-verify.sh" || exit 1
+          test -x "${{ runner.temp }}/kbs-test/scripts/doctor.sh" || exit 1
           test -f "${{ runner.temp }}/kbs-test/scripts/chat-api-adapter.py" || exit 1
           echo "✅ scripts verified"
 

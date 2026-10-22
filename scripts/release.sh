@@ -68,6 +68,7 @@ FILES=(
   "scripts/kbs-provenance.sh"
   "scripts/backup-catchup.sh"
   "scripts/backup-verify.sh"
+  "scripts/doctor.sh"
   "scripts/private-name-check.sh"
   "scripts/release.sh"
   "scripts/analyze-sessions/sessions.py"

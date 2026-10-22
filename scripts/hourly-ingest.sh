@@ -8,6 +8,14 @@
 
 KBS_PATH="${KBS_PATH:-$HOME/kbs}"
 KB_NAME="${KB_NAME:-main}"
+
+# Portable timeout: GNU `timeout` (Linux), `gtimeout` (Homebrew/coreutils on macOS),
+# or no limit if neither is installed (stock macOS).
+if command -v timeout >/dev/null 2>&1; then run_timeout() { timeout "$@"; }
+elif command -v gtimeout >/dev/null 2>&1; then run_timeout() { gtimeout "$@"; }
+else run_timeout() { local _d="$1"; shift; "$@"; }
+fi
+
 RAW_DIR="$KBS_PATH/kb/$KB_NAME/raw"
 PROCESSED_DIR="$RAW_DIR/processed"
 LOG="$KBS_PATH/log.md"
@@ -47,7 +55,7 @@ echo "[$TIMESTAMP] HOURLY_INGEST | $KB_NAME | Complete — $COUNT files moved to
 # ─── Post-ingest: rebuild RAG semantic index (best effort) ────────────────────
 RAG_INDEX="$KBS_PATH/scripts/rag-index.sh"
 if [ -x "$RAG_INDEX" ]; then
-  if timeout 600 "$RAG_INDEX" 2>&1; then
+  if run_timeout 600 "$RAG_INDEX" 2>&1; then
     echo "[$TIMESTAMP] RAG_INDEX | $KB_NAME | re-indexed topics" >> "$LOG"
   else
     echo "[$TIMESTAMP] RAG_INDEX | $KB_NAME | FAILED (Ollama unreachable?)" >> "$LOG"

@@ -95,6 +95,22 @@ KBS does not name a preferred harness — which one you run is instance-specific
 
 See *The Harness Layer* in [architecture.md](architecture.md) for the client-class comparison and Activity Level ceiling.
 
+### Optional external tools (not bundled)
+
+Some scripts shell out to third-party binaries that KBS does **not** ship. Install them yourself
+if you want the feature; `scripts/doctor.sh` reports which are present.
+
+| Tool | Feature | Source / install | Pin it? |
+|---|---|---|---|
+| `graphify` | Knowledge-graph indexing (`scripts/graphify-index.sh`) | Install separately; **pin a known version** and record it here — the wrapper targets a specific CLI surface (`--mode deep`, `--backend`, `--code-only`) that can change between releases | Pin the version you validated; re-run `graphify-index.sh` after any upgrade |
+| `ollama` | Local RAG embeddings (`scripts/rag-index.sh`) | `curl -fsSL https://ollama.com/install.sh \| sh`; `ollama pull nomic-embed-text` | Model name is overridable via `KBS_RAG_MODEL` |
+| `yt-dlp` + `ffmpeg` | YouTube ingest (`scripts/youtube-ingest.sh`) | `pipx install yt-dlp`; `apt install ffmpeg` | — |
+| `timeout` | Bounds long operations | GNU coreutils; macOS: `brew install coreutils` (`gtimeout`) | — |
+
+KBS's own scripts are versioned with the repo (`VERSION`); these external tools are not, so
+their behaviour is outside KBS's test coverage. If a feature misbehaves, check the tool version
+first — see [version-advising.md](version-advising.md).
+
 ### Provider credentials
 Set the key for whichever provider you use (e.g. Anthropic, OpenAI, local Ollama needs none):
 ```bash

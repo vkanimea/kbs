@@ -40,6 +40,13 @@
 
 set -u
 
+# Portable timeout: GNU `timeout` (Linux), `gtimeout` (Homebrew/coreutils on macOS),
+# or no limit if neither is installed (stock macOS). Keep the intent, drop the hard fail.
+if command -v timeout >/dev/null 2>&1; then run_timeout() { timeout "$@"; }
+elif command -v gtimeout >/dev/null 2>&1; then run_timeout() { gtimeout "$@"; }
+else run_timeout() { local _d="$1"; shift; "$@"; }
+fi
+
 MODE=""
 QUIET=0
 KEEP=0
@@ -168,7 +175,7 @@ clone_repo() {
         return 1
     fi
     say "....  $label — cloning $remote"
-    if ! timeout 600 git clone -q "$remote" "$dst" 2>>"$LOG"; then
+    if ! run_timeout 600 git clone -q "$remote" "$dst" 2>>"$LOG"; then
         log "drill | $label | FAIL: fresh clone failed from $remote"
         say "FAIL  $label — fresh clone failed"
         return 1

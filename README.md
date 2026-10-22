@@ -1,13 +1,13 @@
 # Knowledge Base System (KBS)
 
-[![Version](https://img.shields.io/badge/version-0.128.1-blue.svg)](https://github.com/vkanimea/kbs)
+[![Version](https://img.shields.io/badge/version-0.128.2-blue.svg)](https://github.com/vkanimea/kbs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg)]()
 
 An **agnostic, self-improving second brain** — a governed, evolving knowledge graph that learns from successes *and* failures, compounds every session, and improves not just what it knows, but how it runs.
 
 **Agnostic by design:**
-- **No LLM lock-in** — plain-text instructions that any LLM follows: Claude, GPT, Gemini, Ollama, or whatever comes next. Switching providers means zero migration.
+- **No LLM lock-in** — plain-text instructions written to be model-agnostic: Claude, GPT, Gemini, Ollama, or whatever comes next. The *format* is portable by construction; how faithfully a given model follows the procedures varies (see *Model compatibility* below). Switching providers means zero migration.
 - **No app lock-in** — knowledge lives in plain markdown + git, fully yours. Obsidian, Notion, and Logseq are optional read-only viewers, never the system of record.
 - **Self-improving** — failure learning, confidence scoring, and session-close compounding; even its own instructions are lazy-loaded and refined, the same way its knowledge is.
 
@@ -27,6 +27,16 @@ KBS works with any LLM, but what it can do depends on whether you run a chat cli
 | Scheduled / autonomous operation | ❌ | ✅ |
 
 A **chat client** (Claude.ai, ChatGPT, Gemini) can read and propose, but cannot run `scripts/`, push git, or take scheduled actions. An **agent harness** (Claude Code, pi, Aider, opencode) is required for the full pipeline — scripts, backups, and Activity Levels 2–3. See [docs/security.md](docs/security.md) for what each level can touch.
+
+### Model compatibility — what is and isn't proven
+
+KBS is **model-agnostic by design, not model-tested by CI.** The repository's automated tests
+cover the deterministic layer only (`tests/test-checkers.sh`, `tests/test-backup-verify.sh`,
+the shape linter, and CI's install check) — they do not exercise LLM behaviour. The natural-
+language rules in `agents.md` and `reference/*.md` are written for a capable instruction-
+following model; a small local model may need the per-operation exemplars and the linter to
+stay on-format. There is no published pass-rate matrix of model × harness × level. Treat
+"works with any LLM" as *designed to*, and verify on your own model before relying on it.
 
 ---
 

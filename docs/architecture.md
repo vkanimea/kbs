@@ -299,6 +299,7 @@ teach beyond the wiki, and it must capture every claim it asserts.
 | `nightly-backup.sh` | Commit + push data repo to offsite remote | @reboot + 12:45/16:45 |
 | `backup-verify.sh` | Verify backup outcome (assert + drill) | After push / periodic |
 | `backup-catchup.sh` | Run periodic job only if overdue (sleep-safe) | Hourly wrapper |
+| `doctor.sh` | Environment preflight: required vs optional tools, instance wiring | After install / when something is missing |
 | `goal-loop.sh` | Autonomous goal-loop contract execution | On demand |
 | `graphify-index.sh` | Build knowledge graph from code/docs corpus | On demand |
 | `analyze-sessions/*.py` | Analyze agent history: cost rollups, prompt-pattern mining, session search/render | On demand (`Analyze sessions`) |

@@ -1,5 +1,16 @@
 # KBS Changelog
 
+## V0.128.2 — Replication audit fixes: portability, preflight, honest claims
+Response to an external (Claude) replication review. No feature changes; fixes real portability bugs, adds an environment preflight, and corrects two overclaims. Verified: scripts parse, `doctor.sh` runs, macOS fallbacks tested in isolation.
+- **macOS date bug fixed.** `kbs-provenance.sh` used `date -d` (GNU-only) with a silent `|| echo TODAY` fallback — on macOS its 8-day window silently collapsed to zero days. Now uses a portable GNU/BSD branch and WARNs if neither works.
+- **`timeout` portability.** Stock macOS has no `timeout`. Four scripts (`backup-verify`, `graphify-index`, `hourly-ingest`, `nightly-backup`) now use a `run_timeout` shim: `timeout` → `gtimeout` → run-without-limit. Long operations no longer hard-fail on macOS.
+- **Author-specific defaults removed.** `kbs-drift-check.sh` and `kbs-sync.sh` no longer default to `~/AIC/kbs`; discovery now uses `KBS_SYSTEM_REPO`, `~/kbs-system`, `~/kbs`, then the script's parent. `kbs-drift-check.sh` reports a clear "KBS_SYSTEM_REPO not set" instead of an empty path. The `pi-jev` example in `graphify-index.sh` is now generic.
+- **New `scripts/doctor.sh`** — read-only environment preflight: required vs optional tools, plus instance wiring (VERSION, agents.md, .env, kb/, system repo). Exits non-zero only on a missing *required* tool. Wired into `install.sh`, `install.ps1`, `kbs-sync.sh`, CI, and `release.sh`.
+- **Prerequisites documented.** `INSTALL.md` gains a prerequisites table (required vs optional, with Debian/macOS install lines) and a macOS `timeout` note; `docs/deployment.md` gains an "Optional external tools (not bundled)" table that flags `graphify` as unpinned/separate-source and outside KBS's test coverage.
+- **Honest claims.** README no longer asserts "any LLM follows" as fact — new *Model compatibility* section states KBS is model-agnostic **by design, not model-tested by CI**, names what the tests actually cover, and says to verify on your own model. (Claude's point: "any LLM" is untested; a behaviour-eval matrix is a separate, larger effort.)
+- **Stale pin example fixed.** `INSTALL.md`'s `<TAG>` placeholder replaces the hard-coded `v0.125`.
+- **VERSION → 0.128.2.**
+
 ## V0.128.1 — Harness/pi boundary clarified, doc pointer fixes
 Wording and documentation-accuracy patch. No behaviour change; no script touched. Fixes two places where the docs over- or under-claimed the harness boundary, plus dangling cross-references.
 - **pi-targeted tooling is a shipped worked example, not a requirement.** `architecture.md` said "exporters are not shipped", contradicting the shipped `scripts/analyze-sessions/*.py` (which read `~/.pi/agent/sessions`). The footnote now separates the **read path** (shipped, pi-bound) from the **write path** (the exporter, instance-only, bound to pi's JSONL schema) and states both are a reference implementation to port or ignore.

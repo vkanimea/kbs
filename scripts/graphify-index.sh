@@ -11,7 +11,7 @@
 # Usage:
 #   graphify-index.sh <project> <code_dir> [--deep] [--wiki]
 # Examples:
-#   graphify-index.sh pi-jev ~/pi-jev/src --wiki
+#   graphify-index.sh myproject ~/src/myproject --wiki
 #
 # Output layout:
 #   kb/projects/<project>/graphs/graph.json        (persistent, queryable)
@@ -21,6 +21,13 @@
 #   kb/projects/<project>/wiki/graph/index.md      (agent entry point, when --wiki)
 
 set -euo pipefail
+
+# Portable timeout: GNU `timeout` (Linux), `gtimeout` (Homebrew/coreutils on macOS),
+# or no limit if neither is installed (stock macOS).
+if command -v timeout >/dev/null 2>&1; then run_timeout() { timeout "$@"; }
+elif command -v gtimeout >/dev/null 2>&1; then run_timeout() { gtimeout "$@"; }
+else run_timeout() { local _d="$1"; shift; "$@"; }
+fi
 
 KBS="${KBS:-$HOME/kbs}"
 GRAPHIFY="${GRAPHIFY:-$HOME/.local/bin/graphify}"
@@ -98,7 +105,7 @@ if [ "$OPENROUTER_BACKEND" = "1" ] || [ "$BACKEND" = "openrouter" ]; then
   # Use the OpenRouter key pi already holds (goal-loop) to reach DeepSeek models.
   # graphify prefers --backend openai + OPENAI_BASE_URL for OpenAI-compatible gateways.
   OR_KEY=""
-  for cand in "${OPENROUTER_API_KEY:-}" "$(timeout 15 "${PI_BIN:-pi}" auth print-api-key --provider openrouter 2>/dev/null | head -n1)"; do
+  for cand in "${OPENROUTER_API_KEY:-}" "$(run_timeout 15 "${PI_BIN:-pi}" auth print-api-key --provider openrouter 2>/dev/null | head -n1)"; do
     if [ -n "$cand" ]; then OR_KEY="$cand"; break; fi
   done
   if [ -z "$OR_KEY" ]; then

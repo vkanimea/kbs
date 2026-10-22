@@ -58,7 +58,16 @@ fi
 
 # dates supplied by the input
 SRC_DATES="$(grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' "$SRC" | sort -u | tr '\n' ' ')"
-CUTOFF="$(date -d "$TODAY - 8 days" +%Y-%m-%d 2>/dev/null || echo "$TODAY")"
+# 8 days before TODAY, portable across GNU (Linux) and BSD (macOS) date.
+# GNU: date -d "..."   BSD: date -v-8d
+if date -d "$TODAY - 8 days" +%Y-%m-%d >/dev/null 2>&1; then
+  CUTOFF="$(date -d "$TODAY - 8 days" +%Y-%m-%d)"
+elif date -v-8d -j -f %Y-%m-%d "$TODAY" +%Y-%m-%d >/dev/null 2>&1; then
+  CUTOFF="$(date -v-8d -j -f %Y-%m-%d "$TODAY" +%Y-%m-%d)"
+else
+  echo "WARN: could not compute an 8-day cutoff on this platform; using TODAY" >&2
+  CUTOFF="$TODAY"
+fi
 
 grounded() { # date
   local d="$1"

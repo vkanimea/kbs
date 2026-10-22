@@ -11,14 +11,14 @@
 #
 # Config (env or ~/.env):
 #   KBS_PATH        data instance            (default: ~/kbs)
-#   KBS_SYSTEM_REPO system repo checkout     (default: ~/AIC/kbs)
+#   KBS_SYSTEM_REPO system repo checkout     (no default; set this or --from)
 #   KBS_KB_NAME     KB label for the log     (default: main)
 
 set -euo pipefail
 
 KBS_PATH="${KBS_PATH:-$HOME/kbs}"
 KB_NAME="${KBS_KB_NAME:-${KB_NAME:-main}}"
-SYSTEM_REPO="${KBS_SYSTEM_REPO:-$HOME/AIC/kbs}"
+SYSTEM_REPO="${KBS_SYSTEM_REPO:-}"
 LOG="$KBS_PATH/log.md"
 SYNC="$KBS_PATH/scripts/kbs-sync.sh"
 
@@ -28,6 +28,10 @@ TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 # quietly, and exit 0 so cron does not mail on every run.
 if [ ! -x "$SYNC" ] && [ ! -f "$SYNC" ]; then
   echo "[$TIMESTAMP] DRIFT_CHECK | $KB_NAME | skipped — kbs-sync.sh not found in $KBS_PATH/scripts" >> "$LOG"
+  exit 0
+fi
+if [ -z "$SYSTEM_REPO" ]; then
+  echo "[$TIMESTAMP] DRIFT_CHECK | $KB_NAME | skipped — KBS_SYSTEM_REPO not set (set it in ~/.env or the environment)" >> "$LOG"
   exit 0
 fi
 if [ ! -d "$SYSTEM_REPO" ]; then

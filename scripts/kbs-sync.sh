@@ -39,7 +39,7 @@ TO="${KBS:-$HOME/kbs}"
 #   3. a sibling checkout of the system repo, discovered by looking for VERSION
 #      plus a scripts/kbs-sync.sh at the usual locations
 FROM=""
-for cand in "${KBS_SYSTEM_REPO:-}" "$HOME/AIC/kbs" "$HOME/kbs-system" "$(cd "$SCRIPT_DIR/.." && pwd)"; do
+for cand in "${KBS_SYSTEM_REPO:-}" "$HOME/kbs-system" "$HOME/kbs" "$(cd "$SCRIPT_DIR/.." && pwd)"; do
   [ -n "$cand" ] || continue
   if [ "$cand" != "$TO" ] && [ -f "$cand/install.sh" ] && [ -f "$cand/VERSION" ]; then
     FROM="$cand"
@@ -63,7 +63,7 @@ done
 
 [ -n "$FROM" ] || {
   echo "ERROR: could not locate the system repo. Pass --from <dir> or set KBS_SYSTEM_REPO." >&2
-  echo "       Looked in: \$KBS_SYSTEM_REPO, ~/AIC/kbs, ~/kbs-system, $SCRIPT_DIR/.." >&2
+  echo "       Looked in: \$KBS_SYSTEM_REPO, ~/kbs-system, ~/kbs, $SCRIPT_DIR/.." >&2
   exit 2
 }
 [ "$FROM" != "$TO" ] || { echo "ERROR: system repo and instance are the same directory ($FROM)." >&2; exit 2; }
@@ -101,6 +101,7 @@ SYSTEM_PATHS=(
   scripts/analyze-sessions/search.py
   scripts/backup-catchup.sh
   scripts/backup-verify.sh
+  scripts/doctor.sh
   scripts/analyze-sessions/show_session.py
   scripts/analyze-sessions/README.md
   scripts/chat-adapter.sh

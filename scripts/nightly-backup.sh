@@ -25,6 +25,14 @@
 #   KBS_BRANCH           — branch to push (default: current HEAD branch)
 
 set -u
+
+# Portable timeout: GNU `timeout` (Linux), `gtimeout` (Homebrew/coreutils on macOS),
+# or no limit if neither is installed (stock macOS).
+if command -v timeout >/dev/null 2>&1; then run_timeout() { timeout "$@"; }
+elif command -v gtimeout >/dev/null 2>&1; then run_timeout() { gtimeout "$@"; }
+else run_timeout() { local _d="$1"; shift; "$@"; }
+fi
+
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT" || exit 1
 
@@ -124,7 +132,7 @@ if [ "${KBS_OFFSITE_PUSH:-1}" = "1" ] && git remote get-url "$OFFSITE_REMOTE" >/
         RH="$(ssh -G "$PROBE_HOST" 2>/dev/null | awk '/^hostname /{print $2; exit}')"
         RP="$(ssh -G "$PROBE_HOST" 2>/dev/null | awk '/^port /{print $2; exit}')"
         [ -n "${RH:-}" ] && [ "$RH" != "$PROBE_HOST" ] && { PROBE_HOST="$RH"; PROBE_PORT="$RP"; }
-        if timeout 15 bash -c "cat < /dev/null > /dev/tcp/$PROBE_HOST/$PROBE_PORT" 2>/dev/null; then
+        if run_timeout 15 bash -c "cat < /dev/null > /dev/tcp/$PROBE_HOST/$PROBE_PORT" 2>/dev/null; then
             PROBE_OK=1
         fi
     fi
