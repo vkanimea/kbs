@@ -1,5 +1,14 @@
 # KBS Changelog
 
+## V0.128.1 — Harness/pi boundary clarified, doc pointer fixes
+Wording and documentation-accuracy patch. No behaviour change; no script touched. Fixes two places where the docs over- or under-claimed the harness boundary, plus dangling cross-references.
+- **pi-targeted tooling is a shipped worked example, not a requirement.** `architecture.md` said "exporters are not shipped", contradicting the shipped `scripts/analyze-sessions/*.py` (which read `~/.pi/agent/sessions`). The footnote now separates the **read path** (shipped, pi-bound) from the **write path** (the exporter, instance-only, bound to pi's JSONL schema) and states both are a reference implementation to port or ignore.
+- **pi-chooser guidance.** `deployment.md` → *Agent Harnesses* now tells a replicator who picks pi exactly what works out of the box (`scripts/analyze-sessions/`, `reference/session-analysis.md`, the transcript-exporter pattern) and that the same scripts are a porting template for other harnesses.
+- **"What is deliberately not shipped".** New `architecture.md` subsection: harness integrations and companion tools (OpenViking-style vector/RAG stores) are instance state by design, not gaps. Applies the portable-vs-instance test that governs the two-repo split.
+- **Dangling pointer fixed.** `backup-and-restore.md` pointed at `RESTORE.md §7a`, a file that does not exist in this public repo; it now directs readers to their own private-repo `RESTORE.md`.
+- **Generic raw-repo naming.** `connector-hygiene.md` §5 now presents `kbs-raw` as an example name (the role is portable; the name is instance-specific).
+- **VERSION → 0.128.1.**
+
 ## V0.128 — Recency weighting, retrieval hooks, atoms, connector freshness
 Source: evaluation of the Nick Saraev PKB video (LP7bfT4vOlo, 2026-10-19); owner approved adopting all six items. His BM25-beats-vectors finding independently validated the no-vector-DB design — no architecture change, four gaps + two hygiene items only.
 - **Recency weighting (CONVENTIONS §8).** Entries carry `**Superseded by:**` when replaced; readers answer from the current entry and cite the pointer. Supersession markers never delete history.

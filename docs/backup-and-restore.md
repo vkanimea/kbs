@@ -42,7 +42,9 @@ git config core.sshCommand "ssh -i /path/to/key -o StrictHostKeyChecking=accept-
 
 For binary artefacts that never belong in git — a `.pack` file, for
 instance — keep a **separate private blob repo** and commit the artefact there; the
-`SHA256SUMS` file in that repo is the integrity check. See `RESTORE.md` §7a.
+`SHA256SUMS` file in that repo is the integrity check. Document the fetch-and-verify
+steps in the `RESTORE.md` of your **private data repo** (this system repo ships no
+`RESTORE.md`; the runbook is instance-specific by design — see below).
 
 Nightly automation:
 

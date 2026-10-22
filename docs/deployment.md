@@ -87,6 +87,8 @@ KBS does not name a preferred harness — which one you run is instance-specific
 
 **Choosing one:** use whatever agent your environment already supports — the interface is only markdown + git, so nothing KBS-specific is required. If you have none installed, a shell-capable CLI agent (opencode, pi, Claude Code, or similar) is the lowest-friction start. Document the choice and its configuration in your **private data repo**, not in this system.
 
+**If you pick pi:** `scripts/analyze-sessions/` and `reference/session-analysis.md` work out of the box (they read `~/.pi/agent/sessions`), and the companion exporter pattern (session transcripts → `raw/chat-transcripts/` + `CHAT_INBOX.md`) is documented in *The Harness Layer* in [architecture.md](architecture.md). For any other harness, treat those scripts as a porting template — swap the session-store path and the record schema; the cost/search/render logic is harness-neutral.
+
 **What it unlocks:** `hourly-ingest.sh` scheduling, semantic index rebuilds, session close that commits/pushes (see [backup-and-restore.md](backup-and-restore.md)), health checks, and the git-remote backup pattern.
 
 **Capture:** if the harness persists session transcripts, export them into `kb/<name>/raw/chat-transcripts/` and append to `CHAT_INBOX.md` — the chat-input style then processes them (LOW confidence, verified before the wiki).

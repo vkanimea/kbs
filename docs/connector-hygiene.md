@@ -56,8 +56,9 @@ Provenance is the constraint: the sweep marks, the owner decides.
 
 ## 5. What is deliberately NOT swept
 
-The kbs-raw offsite archive (sessions, chat-transcripts, memory,
-projects-memory, packs) is immutable history. No supersession markers, no
-staleness sweep, no deletion. It is the raw layer the wiki summary layer
-points back to — the retrieval-hook and supersession conventions apply to the
-summary layer only.
+The raw offsite archive (sessions, chat-transcripts, memory, projects-memory,
+packs — e.g. a `kbs-raw`-style repo) is immutable history. No supersession
+markers, no staleness sweep, no deletion. It is the raw layer the wiki summary
+layer points back to — the retrieval-hook and supersession conventions apply to
+the summary layer only. The name is instance-specific; only the *role* is
+portable.

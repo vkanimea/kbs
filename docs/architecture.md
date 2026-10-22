@@ -303,7 +303,9 @@ teach beyond the wiki, and it must capture every claim it asserts.
 | `graphify-index.sh` | Build knowledge graph from code/docs corpus | On demand |
 | `analyze-sessions/*.py` | Analyze agent history: cost rollups, prompt-pattern mining, session search/render | On demand (`Analyze sessions`) |
 
-> Harness session transcripts (opencode, pi, …) can be exported into `raw/chat-transcripts/` + `CHAT_INBOX.md` by an instance-specific exporter — see *The Harness Layer* above. Exporters are not shipped: they depend on the harness's own storage format.
+> Harness session transcripts (opencode, pi, …) can be exported into `raw/chat-transcripts/` + `CHAT_INBOX.md` by an instance-specific exporter — see *The Harness Layer* above.
+>
+> **pi-targeted tooling ships as a worked example.** `scripts/analyze-sessions/*.py` (read path) queries pi sessions under `~/.pi/agent/sessions` — cost rollups, prompt mining, session search/render — and `reference/session-analysis.md` documents it. Its companion **exporter** (write path, e.g. a `pi-session-to-inbox.py`) lives in the *instance* because it writes into your data repo and is bound to pi's JSONL schema. Run a different harness and nothing breaks — these are a reference implementation, not a requirement: port the read/write paths to your harness's storage format, or ignore them entirely.
 
 ## The Harness Layer — Who Executes KBS
 
@@ -325,6 +327,13 @@ KBS ships **instructions and state, not an agent**. `agents.md` and `reference/*
 **Transcript capture.** Conversation with any client is a first-class input style (`CHAT_INBOX.md`: LOW confidence, attributed to the LLM and date, verified before it reaches the wiki). Harnesses that persist session transcripts can export them into `kb/<name>/raw/chat-transcripts/` automatically, so the capture loop closes without manual copy-paste.
 
 **Boundary:** which harness you run, and how it is configured, is instance-specific and belongs in your **private data repo** — never in this system.
+
+**What is deliberately not shipped.** KBS ships the *portable* layer only. Two things a running instance may have are out of scope for this repo by design, and their absence is not a gap:
+
+- **Harness integrations.** Session exporters, skills/procedure memory, and extension code are tied to one harness's storage and plugin formats, so they cannot be harness-agnostic. They live in your instance (and, if you back them up, your private repo). The public repo documents the *interface* (folder access, file read/write, shell, git) that any harness must satisfy — not any one harness's wiring.
+- **Companion tools.** A semantic-search / resource-ingest companion (for example an OpenViking-style vector store, or any RAG service) is an optional accelerator over the same markdown sources, not part of the core loop. If you run one, its configuration, its backup cadence, and its restore procedure belong in your **private data repo**. Nothing in `scripts/` requires it: the core loop works on markdown + git alone, and every index is regenerable.
+
+The test is the same one that governs the two-repo split: *is this portable across instances?* If yes, it can be a system file; if no, it is instance state.
 
 ### System repo vs data repo — one source of truth
 
