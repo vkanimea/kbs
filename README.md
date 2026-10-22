@@ -1,6 +1,6 @@
 # Knowledge Base System (KBS)
 
-[![Version](https://img.shields.io/badge/version-0.128.2-blue.svg)](https://github.com/vkanimea/kbs)
+[![Version](https://img.shields.io/badge/version-0.128.3-blue.svg)](https://github.com/vkanimea/kbs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg)]()
 
@@ -32,7 +32,7 @@ A **chat client** (Claude.ai, ChatGPT, Gemini) can read and propose, but cannot 
 
 KBS is **model-agnostic by design, not model-tested by CI.** The repository's automated tests
 cover the deterministic layer only (`tests/test-checkers.sh`, `tests/test-backup-verify.sh`,
-the shape linter, and CI's install check) — they do not exercise LLM behaviour. The natural-
+`tests/test-wiring.sh`, the shape linter, and CI's install check) — they do not exercise LLM behaviour. The natural-
 language rules in `agents.md` and `reference/*.md` are written for a capable instruction-
 following model; a small local model may need the per-operation exemplars and the linter to
 stay on-format. There is no published pass-rate matrix of model × harness × level. Treat

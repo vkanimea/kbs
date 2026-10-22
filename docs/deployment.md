@@ -51,6 +51,58 @@ KBS is **client-agnostic** — the interface is markdown + git, and any LLM clie
 ### General requirement (all clients)
 Grant your LLM client folder access to `~/kbs` (read/write). The exact mechanism is client-specific — a permissions dialog, a workspace/folder setting, or a `cd ~/kbs` in a shell-based agent. Then test with the Initial Setup prompt from PROMPTS.md.
 
+### How to wire each client to load `agents.md`
+
+KBS's behaviour lives in `agents.md` (the 11 rules) and the reference files it points to. **If the client never reads `agents.md`, KBS degrades to a plain folder of markdown** — the rules are not enforced, only described. Every client therefore needs a way to put `agents.md` in front of the model. The mechanism differs per client:
+
+| Client | Wiring mechanism | What to do |
+|---|---|---|
+| **Claude Code** | `CLAUDE.md` project memory | `ln -s ~/kbs/agents.md ~/kbs/CLAUDE.md` (or copy). Claude Code auto-loads `CLAUDE.md` from the working directory each session. Run it with cwd `~/kbs`. |
+| **pi** | `AGENTS.md` project file | `ln -s ~/kbs/agents.md ~/kbs/AGENTS.md`. pi loads `AGENTS.md` from the project root at startup. |
+| **Aider** | `--read` flag or `.aider.conf.yml` | Add `read: [agents.md, CONVENTIONS.md, SYSTEM.md]` to `~/kbs/.aider.conf.yml`, or pass `aider --read agents.md`. |
+| **opencode** | `AGENTS.md` (same convention as pi) | `ln -s ~/kbs/agents.md ~/kbs/AGENTS.md`; open the session with cwd `~/kbs`. |
+| **Generic CLI agent** | System prompt / custom instructions | Paste the contents of `agents.md` into the client's persistent-instructions field, or prepend it to the first message. |
+| **Chat client (Claude.ai, ChatGPT, Gemini)** | Project / Custom Instructions | Paste `agents.md` into the project's custom instructions. **Level 1 only** — the model can read and propose but cannot run scripts, git, or schedules. |
+
+**The reliable fallback (any client):** begin every session with the literal phrase
+
+> `Follow agents.md.`
+
+`agents.md` is written so this phrase is self-loading — the model reads `agents.md`, which then
+points it at `CONVENTIONS.md`, `SYSTEM.md`, and the relevant `reference/*.md` for the operation.
+Even clients with a native `AGENTS.md`/`CLAUDE.md` convention should be tested to confirm it fires.
+
+> **Verify the wiring, don't assume it.** A symlink or project file that the client silently
+> ignores looks identical to one that works — until the model violates a rule. Use the smoke test
+> below to prove the wiring before relying on it.
+
+### 5-minute smoke test (proves the wiring works)
+
+Run this once per client after wiring. It takes ~5 minutes and needs no API key or network.
+
+1. **Open the client with `~/kbs` as the working directory** (or the folder added to its workspace).
+2. **Send exactly:**
+   ```
+   Follow agents.md. Ingest this: "The office coffee machine is on the 3rd floor."
+   ```
+3. **Expected — the client must:**
+   - Read `agents.md`, then `reference/ingestion.md` (it may say so);
+   - Write a record to `INBOX.md` (or `kb/main/raw/`), **not** directly to the wiki;
+   - Apply a **confidence rating** and a **source attribution** (the chat insight is LOW confidence per Rule 8);
+   - Ask before promoting anything to `wiki/` (Rule 2 — propose, don't decide).
+4. **Then send:** `Follow agents.md. Close session for main`
+   **Expected:** the 11-step close from `reference/session-close.md` runs, and the changes are committed (`git log` shows a new commit).
+5. **Pass/fail:**
+   - ✅ **Pass** — a new `INBOX.md` entry with a confidence rating + source, and a git commit on close. The wiring works.
+   - ❌ **Fail** — the client answered in chat without writing a file, wrote straight to `wiki/`, or skipped the close. The `agents.md` wiring is not firing: fix the mechanism above and retest.
+
+Record the result (client, model, level reached, pass/fail) in your **private data repo**, not in this system.
+
+**Deterministic pre-check.** Before the manual test above, run `tests/test-wiring.sh ~/kbs`.
+It verifies the *deterministic half* — that every file `agents.md` says to load actually exists,
+and the operation-table references are real. If it passes, any failure in steps 1–4 is a **model**
+issue, not a missing-file issue. (It does not prove model behaviour; see README → *Model compatibility*.)
+
 ### Chat/desktop clients (Activity Level 1: read & write files)
 Examples: Claude Desktop, ChatGPT, Gemini, Open WebUI, or any chat app with folder access. Where your client does not expose a shell, the agent-harness path below is what unlocks automation.
 

@@ -89,6 +89,14 @@ jobs:
           # bare repos), so it needs no offsite remote and no GitHub.
           bash tests/test-backup-verify.sh "${{ runner.temp }}/kbs-test"
 
+      - name: Run wiring test
+        run: |
+          set -e
+          # Proves every file agents.md tells the model to load actually exists
+          # in a fresh install — the deterministic half of the 5-minute smoke
+          # test in docs/deployment.md. Does NOT prove model behaviour.
+          bash tests/test-wiring.sh "${{ runner.temp }}/kbs-test"
+
       - name: Run status check
         run: KBS_PATH=${{ runner.temp }}/kbs-test bash ${{ runner.temp }}/kbs-test/scripts/status.sh
 

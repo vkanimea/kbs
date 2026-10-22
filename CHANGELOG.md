@@ -1,5 +1,13 @@
 # KBS Changelog
 
+## V0.128.3 — Replication audit, stage 2: pinned releases, client wiring, wiring test
+Continues the response to the external (Claude) replication review. Stage 1 (V0.128.2) fixed portability/preflight; this stage makes releases pinnable and the LLM wiring explicit and testable.
+- **First pinned release.** `v0.128.2` is now a git tag on `origin`, with a published `SHA256SUMS` (71 files) at the tag. `KBS_REF=v0.128.2 ./install.sh` installs a checksum-verified, reproducible snapshot instead of tracking `main`. Verified: the tag's `SHA256SUMS` matches the fetched `install.sh`, and a pinned install completes. (`KBS_REF` pinning previously existed but was unusable — no tags, no checksums.)
+- **Per-client wiring table + 5-minute smoke test** (`docs/deployment.md`). Names the exact mechanism per client — `CLAUDE.md` (Claude Code), `AGENTS.md` (pi, opencode), `.aider.conf.yml` (Aider), custom instructions (chat clients) — plus the universal fallback: begin with the literal phrase `Follow agents.md.`. The smoke test has a concrete expected outcome (INBOX entry with confidence + source, then a git commit on close) and a pass/fail rule, so wiring can be proven rather than assumed.
+- **New `tests/test-wiring.sh`** — deterministic half of the smoke test: asserts every file `agents.md` tells the model to load exists, the operation-table references are real, and the `Follow agents.md` trigger and 11-Rules section are present. Wired into CI. Explicitly does **not** claim to test model behaviour.
+- **Honest scope on behaviour evals.** A full `tests/evals/` matrix (model × harness × level pass-rate) remains a research-scale effort and is **not** shipped. What is shipped is the wiring test above plus the manual smoke test; the README's *Model compatibility* section already states the limits.
+- **VERSION → 0.128.3.**
+
 ## V0.128.2 — Replication audit fixes: portability, preflight, honest claims
 Response to an external (Claude) replication review. No feature changes; fixes real portability bugs, adds an environment preflight, and corrects two overclaims. Verified: scripts parse, `doctor.sh` runs, macOS fallbacks tested in isolation.
 - **macOS date bug fixed.** `kbs-provenance.sh` used `date -d` (GNU-only) with a silent `|| echo TODAY` fallback — on macOS its 8-day window silently collapsed to zero days. Now uses a portable GNU/BSD branch and WARNs if neither works.
