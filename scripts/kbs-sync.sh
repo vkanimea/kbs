@@ -47,6 +47,11 @@ for cand in "${KBS_SYSTEM_REPO:-}" "$HOME/kbs-system" "$HOME/kbs" "$(cd "$SCRIPT
   fi
 done
 
+# Preserve the original argv: the while-loop below shifts it away, and the
+# self-update re-exec later needs it intact. Without this the re-exec launches
+# with no arguments and loses --from/--to/--dry-run/--check. (Fix: V0.128.2.)
+ORIG_ARGS=("$@")
+
 DRY_RUN=0
 CHECK=0
 
@@ -126,6 +131,7 @@ SYSTEM_PATHS=(
   scripts/topic-index.sh
   scripts/windows/status.ps1
   scripts/youtube-ingest.sh
+  scripts/kbs-sync.sh
 )
 
 # docs/ is synced wholesale: it contains no user content.
@@ -149,7 +155,9 @@ if [ "${KBS_SYNC_REEXEC:-0}" != "1" ] && [ "$DRY_RUN" -eq 0 ] && [ "$CHECK" -eq 
   _self_copy="$(mktemp "${TMPDIR:-/tmp}/kbs-sync-run.XXXXXX")"
   cp "$SELF_REAL" "$_self_copy"
   chmod +x "$_self_copy"
-  KBS_SYNC_REEXEC=1 exec "$_self_copy" "$@"
+  # ${ORIG_ARGS[@]+...} guards against `set -u` on bash 3.2 (stock macOS), where
+  # expanding an empty array unguarded is an error.
+  KBS_SYNC_REEXEC=1 exec "$_self_copy" ${ORIG_ARGS[@]+"${ORIG_ARGS[@]}"}
 fi
 
 for rel in "${SYSTEM_PATHS[@]}"; do
