@@ -98,7 +98,13 @@ Run this once per client after wiring. It takes ~5 minutes and needs no API key 
 
 Record the result (client, model, level reached, pass/fail) in your **private data repo**, not in this system.
 
-**Deterministic pre-check.** Before the manual test above, run `tests/test-wiring.sh ~/kbs`.
+**Deterministic pre-check.** From a **clone of the system repo** (the `tests/` directory is not
+installed into data instances), run:
+
+```bash
+bash tests/test-wiring.sh ~/kbs      # point at your instance
+```
+
 It verifies the *deterministic half* — that every file `agents.md` says to load actually exists,
 and the operation-table references are real. If it passes, any failure in steps 1–4 is a **model**
 issue, not a missing-file issue. (It does not prove model behaviour; see README → *Model compatibility*.)
