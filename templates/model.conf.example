@@ -6,19 +6,23 @@
 # Copy:  cp <system-repo>/templates/model.conf.example ~/kbs/model.conf
 # Then set both keys. Any provider/model pi supports works.
 #
-# TIER 1: Text-Only (core KBS work — actions, failures, decisions, successes)
-#   openrouter + nvidia/nemotron-3-ultra-550b-a55b:free  # $0.00/M, 100% shape pass, 35 t/s
-#   openrouter + deepseek/deepseek-v4-flash-0731         # $0.656/M, 100% shape pass, 29 t/s (DEFAULT)
-#   openrouter + xiaomi/mimo-v2.6-flash                  # $0.38/M, 100% shape pass, 21 t/s, +multimodal bonus
+# Prices below are from the 2026-10-26 OpenRouter leaderboard, not the live API
+# (they differ — check https://openrouter.ai/models before relying on a figure).
+# Free tiers (e.g. NVIDIA Nemotron) and router/classifier models (e.g. TypeSafe
+# Jev) are deliberately excluded: they do not do general text/coding work.
+#
+# TOP 3 — paid, general text/coding, ranked by lowest combined cost:
+#   openrouter + z-ai/glm-5.3-flash              # $0.1214/M combined, 14.4T/wk, 1M ctx (DEFAULT)
+#   openrouter + deepseek/deepseek-v4-flash-0731 # $0.2185/M combined, 4.53T/wk, 338ms latency
+#   openrouter + deepseek/deepseek-v4-flash-latest # $0.4711/M combined, cheapest input, older build
 #
 # TIER 2: Multimodal (image/video/audio — when vision needed)
-#   openrouter + xiaomi/mimo-v2.6-flash           # $0.38/M, text+image+audio+video
-#   openrouter + deepseek/deepseek-v4.1-flash     # $0.907/M, text+image
-#   openrouter + stepfun/step-5-preview           # $3.70/M, text+image+video, mandatory reasoning
-#   openrouter + z-ai/glm-5.3-flash               # $0.936/M, text+image+video, mandatory reasoning
+#   openrouter + xiaomi/mimo-v2.6-flash           # text+image+audio+video
+#   openrouter + deepseek/deepseek-v4.1-flash     # text+image
+#   openrouter + stepfun/step-5-preview           # text+image+video, mandatory reasoning
 #
 # Leave a key commented out to force the env to supply it (resolution order:
 # env -> this file -> fail loudly).
 
 PI_PROVIDER=openrouter
-PI_MODEL=deepseek/deepseek-v4-flash-0731
+PI_MODEL=z-ai/glm-5.3-flash
