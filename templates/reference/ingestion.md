@@ -19,6 +19,8 @@ Loaded when the owner runs: `Follow agents.md. Ingest [KB]`
 
 Files without an INBOX entry referencing them are invisible. Flag orphaned files in the report.
 
+**Raw-file lifecycle (staging-only).** `scripts/hourly-ingest.sh` reports on `raw/` — it does not ingest and it does not move or mark files. Files stay in `raw/` as immutable originals. A file is only "referenced" when an entry in `INBOX.md` or `CHAT_INBOX.md` names it; unreferenced files are logged as ORPHANS for the owner. A file being discovered, referenced, or moved is never ingestion success — only a completed entry in the pipeline (Steps 1–6) is.
+
 ---
 
 ## The 6-Step Pipeline

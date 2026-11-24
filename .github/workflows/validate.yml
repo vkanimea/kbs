@@ -89,6 +89,15 @@ jobs:
           # bare repos), so it needs no offsite remote and no GitHub.
           bash tests/test-backup-verify.sh "${{ runner.temp }}/kbs-test"
 
+      - name: Run hourly-ingest lifecycle tests
+        run: |
+          set -e
+          # Proves the staging-only raw-file lifecycle: files are never moved or
+          # marked processed by a scan, orphans are reported, classification is
+          # idempotent, filenames with spaces are handled, and RAG indexing is
+          # conditional (skips unchanged wiki, reports failure separately).
+          bash tests/test-hourly-ingest.sh
+
       - name: Run wiring test
         run: |
           set -e

@@ -287,7 +287,7 @@ teach beyond the wiki, and it must capture every claim it asserts.
 | `topic-index.sh` | Lightweight grep-based topic search for 100+ KBs | On demand |
 | `rag-index.sh` / `rag-query.sh` | Semantic retrieval (Ollama embeddings, stdlib Python) | Rebuilt after hourly-ingest |
 | `health-check.sh` | Monthly reminder + pending/failure summary | Monthly 1st |
-| `hourly-ingest.sh` | Auto-process raw/ files + move to raw/processed/ + rebuild RAG index | Hourly |
+| `hourly-ingest.sh` | Staging-only raw/ lifecycle report (orphan detection; moves nothing, marks nothing processed) + conditional RAG rebuild | Hourly |
 | `youtube-ingest.sh` | Download YouTube audio + transcribe + INBOX entry | On demand |
 | `chat-adapter.sh` | Pipe/file capture to CHAT_INBOX.md | On demand |
 | `chat-api-adapter.py` | Webhook server for API capture (auth-gated) | On demand |

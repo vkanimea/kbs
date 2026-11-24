@@ -47,6 +47,8 @@ Only ingest content that clearly supports: current role, active projects, readin
 
 **Rules:** Start at 0. Never skip a level. Test rollback before each upgrade.
 
+**Policy, not containment:** this table describes what the agent *should* do at each level; KBS's instructions do not technically enforce it. Real enforcement must come from your harness or host controls (sandbox, restricted account, allowlists) — see `docs/security.md` and `docs/swot-analysis.md` §I3. "Auto-ingest" at Level 3 means the LLM ingestion procedure runs without per-item approval; `scripts/hourly-ingest.sh` is a staging-only report and ingests nothing.
+
 ### Level 1 Scheduling (cron)
 ```cron
 0 9 * * 1  ~/kbs/scripts/health-check.sh

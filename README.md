@@ -1,6 +1,6 @@
 # Knowledge Base System (KBS)
 
-[![Version](https://img.shields.io/badge/version-0.128.3-blue.svg)](https://github.com/vkanimea/kbs)
+[![Version](https://img.shields.io/badge/version-0.129-blue.svg)](https://github.com/vkanimea/kbs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg)]()
 
@@ -40,7 +40,7 @@ stay on-format. There is no published pass-rate matrix of model × harness × le
 
 ---
 
-## What's New in V0.126
+## What's New
 
 Latest changes; full history in [CHANGELOG.md](CHANGELOG.md).
 
@@ -176,7 +176,7 @@ Daily/weekly/monthly rituals: [docs/user-guide.md](docs/user-guide.md)
 
 **Local search index:** For 100+ topic KBs, `scripts/topic-index.sh` accelerates topic selection before LLM synthesis.
 
-**Semantic index (RAG):** Optional fuzzy retrieval over `wiki/topics/` — `scripts/rag-index.sh` / `rag-query.sh`, local Ollama embeddings, no pip deps. Index regenerable, built after each `hourly-ingest.sh` run; source of truth stays markdown + git.
+**Semantic index (RAG):** Optional fuzzy retrieval over `wiki/topics/` — `scripts/rag-index.sh` / `rag-query.sh`, local Ollama embeddings, no pip deps. Index regenerable, rebuilt by `hourly-ingest.sh` only when `wiki/` content changed since the last successful index; source of truth stays markdown + git.
 
 ---
 

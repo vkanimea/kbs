@@ -1,10 +1,22 @@
 #!/bin/bash
-# KBS Hourly Ingest
-# Checks raw/ for unprocessed files, ingests them, moves to raw/processed/.
-# Post-step: rebuilds the RAG semantic index (scripts/rag-index.sh) if available.
-# Schedule: 0 * * * * ~/kbs/scripts/hourly-ingest.sh
+# KBS Hourly Ingest — staging-only lifecycle (staging-only design, SWOT I2 option A)
 #
-# Usage: ~/kbs/scripts/hourly-ingest.sh
+# This script does NOT ingest anything and does NOT move files.
+# Ingestion is an LLM procedure (templates/reference/ingestion.md) run by the owner
+# via "Follow agents.md. Ingest [KB]". A file being discovered or referenced is not
+# ingestion success; therefore nothing here marks a file processed.
+#
+# What it does (idempotent, safe to re-run):
+#   1. Scans top-level raw/ for candidate files (md/txt/csv/json).
+#   2. Classifies each by whether an entry file (INBOX.md, CHAT_INBOX.md) references it:
+#        referenced   → ingested-or-in-pipeline (state: referenced)
+#        unreferenced → ORPHAN — reported for the owner, never marked complete
+#   3. Logs counts to log.md (HOURLY_INGEST). Files stay in raw/ as immutable originals.
+#   4. Rebuilds the RAG index only if kb/<KB>/wiki content changed since the last
+#      successful index (stamp file), and reports indexing failure separately.
+#
+# Schedule: 0 * * * * ~/kbs/scripts/hourly-ingest.sh
+# Usage:    ~/kbs/scripts/hourly-ingest.sh
 
 KBS_PATH="${KBS_PATH:-$HOME/kbs}"
 KB_NAME="${KB_NAME:-main}"
@@ -16,54 +28,66 @@ elif command -v gtimeout >/dev/null 2>&1; then run_timeout() { gtimeout "$@"; }
 else run_timeout() { local _d="$1"; shift; "$@"; }
 fi
 
+# Rebuild RAG index only when wiki content changed since last success (defined
+# here so the no-files early-exit path can call it).
+rag_maybe_rebuild() {
+    [ -x "$KBS_PATH/scripts/rag-index.sh" ] || return 0
+    local latest
+    latest=$(find "$KB_DIR/wiki" -name '*.md' -newer "$STAMP" -print -quit 2>/dev/null || true)
+    if [ ! -f "$STAMP" ] || [ -n "$latest" ]; then
+        if run_timeout 600 "$KBS_PATH/scripts/rag-index.sh" 2>&1; then
+            mkdir -p "$(dirname "$STAMP")"
+            touch "$STAMP"
+            echo "[$TIMESTAMP] RAG_INDEX | $KB_NAME | re-indexed (wiki changed since last index)" >> "$LOG"
+        else
+            # Indexing failure is separate from ingestion state — WARN only.
+            echo "[$TIMESTAMP] RAG_INDEX | $KB_NAME | FAILED (Ollama unreachable?)" >> "$LOG"
+        fi
+    else
+        echo "[$TIMESTAMP] RAG_INDEX | $KB_NAME | skipped (wiki unchanged since last index)" >> "$LOG"
+    fi
+}
+
 RAW_DIR="$KBS_PATH/kb/$KB_NAME/raw"
-PROCESSED_DIR="$RAW_DIR/processed"
+KB_DIR="$KBS_PATH/kb/$KB_NAME"
 LOG="$KBS_PATH/log.md"
+STAMP="$KB_DIR/.rag-index-stamp"
 
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
-mkdir -p "$PROCESSED_DIR"
+mkdir -p "$RAW_DIR"
 
-# Find unprocessed files (not already in processed/)
-UNPROCESSED=$(find "$RAW_DIR" -maxdepth 1 -type f \( -name "*.md" -o -name "*.txt" -o -name "*.csv" -o -name "*.json" \) 2>/dev/null)
+# ─── 1. Find candidate files (null-safe: handles spaces in filenames) ─────────
+mapfile -d '' FILES < <(find "$RAW_DIR" -maxdepth 1 -type f \( -name '*.md' -o -name '*.txt' -o -name '*.csv' -o -name '*.json' \) -print0 2>/dev/null)
 
-COUNT=$(echo "$UNPROCESSED" | grep -c "\." 2>/dev/null || echo "0")
-
-if [ "$COUNT" -eq 0 ] || [ -z "$UNPROCESSED" ]; then
-    echo "[$TIMESTAMP] HOURLY_INGEST | $KB_NAME | No unprocessed files" >> "$LOG"
+if [ "${#FILES[@]}" -eq 0 ]; then
+    echo "[$TIMESTAMP] HOURLY_INGEST | $KB_NAME | No raw files staged" >> "$LOG"
+    # No candidates, but the RAG index may still need a rebuild after wiki edits.
+    rag_maybe_rebuild
     exit 0
 fi
 
-echo "[$TIMESTAMP] HOURLY_INGEST | $KB_NAME | Files: $COUNT" >> "$LOG"
-
-# Move each file to processed after ingestion is triggered
-# NOTE: Actual ingestion requires LLM call. This script prepares and logs.
-# The owner runs: Follow agents.md. Ingest [KB] in their LLM client.
-# Level 2+ can wire LLM CLI into the stub below.
-
-echo "$UNPROCESSED" | while read -r f; do
-    [ -f "$f" ] || continue
+# ─── 2. Classify by INBOX reference — never move, never mark processed ────────
+REFERENCED=0
+ORPHANS=()
+for f in "${FILES[@]}"; do
     BASENAME=$(basename "$f")
-    echo "  → $BASENAME"
-    # Move to processed (LLM ingestion happens separately or via auto below)
-    mv "$f" "$PROCESSED_DIR/$BASENAME"
-    echo "[$TIMESTAMP] HOURLY_INGEST | $KB_NAME | Processed: $BASENAME" >> "$LOG"
+    # A file counts as referenced when any entry file names it (Source line or body).
+    if grep -rql -- "$BASENAME" "$KB_DIR/INBOX.md" "$KB_DIR/CHAT_INBOX.md" 2>/dev/null; then
+        REFERENCED=$((REFERENCED + 1))
+    else
+        ORPHANS+=("$BASENAME")
+    fi
 done
 
-echo "[$TIMESTAMP] HOURLY_INGEST | $KB_NAME | Complete — $COUNT files moved to processed/" >> "$LOG"
+LOG_LINE="[$TIMESTAMP] HOURLY_INGEST | $KB_NAME | files=${#FILES[@]} referenced=$REFERENCED orphans=${#ORPHANS[@]} (staging-only: no files moved)"
+echo "$LOG_LINE" >> "$LOG"
 
-# ─── Post-ingest: rebuild RAG semantic index (best effort) ────────────────────
-RAG_INDEX="$KBS_PATH/scripts/rag-index.sh"
-if [ -x "$RAG_INDEX" ]; then
-  if run_timeout 600 "$RAG_INDEX" 2>&1; then
-    echo "[$TIMESTAMP] RAG_INDEX | $KB_NAME | re-indexed topics" >> "$LOG"
-  else
-    echo "[$TIMESTAMP] RAG_INDEX | $KB_NAME | FAILED (Ollama unreachable?)" >> "$LOG"
-  fi
+if [ "${#ORPHANS[@]}" -gt 0 ]; then
+    echo "[$TIMESTAMP] HOURLY_INGEST | $KB_NAME | ORPHANS (unreferenced in INBOX.md/CHAT_INBOX.md): ${ORPHANS[*]}" >> "$LOG"
+    echo "Orphaned files (no INBOX reference — they are invisible to ingestion):" >&2
+    printf '  %s\n' "${ORPHANS[@]}" >&2
 fi
 
-# ─── Optional: Automated LLM call (requires LLM CLI) ──────────────────────────
-# Uncomment and configure for your LLM CLI tool (e.g., Anthropic CLI, llm by Simon Willison):
-#
-# INGEST_PROMPT="Follow agents.md. Ingest $KB_NAME"
-# echo "$INGEST_PROMPT" | llm --system "$KBS_PATH/agents.md" >> "$KBS_PATH/kb/$KB_NAME/outputs/hourly-ingest-$(date +%Y-%m-%d-%H).md"
+# ─── 3. RAG index rebuild (see rag_maybe_rebuild above) ───────────────────────
+rag_maybe_rebuild

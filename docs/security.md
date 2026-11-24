@@ -26,6 +26,8 @@ Mitigations:
 
 A chat client (Claude.ai, ChatGPT web) caps at **Level 1** — it can read and propose but cannot run scripts, push git, or make network calls. An agent harness (Claude Code, pi, Aider) is required for Levels 2–3.
 
+**These levels are policy, not containment.** KBS's core instructions describe what an agent at each level *should* do; KBS itself does not technically enforce these boundaries. A harness with broader host permissions may still exceed them, especially while processing untrusted content or inside a goal loop. Actual enforcement must come from your harness or host controls (sandboxing, restricted accounts, filesystem/command allowlists, constrained network access) — see `docs/swot-analysis.md` §W8/§I3.
+
 ## Token Scoping
 
 - Use a **fine-grained, repo-limited PAT** for the data repo — never a personal access token with org-wide scope.
